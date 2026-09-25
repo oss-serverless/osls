@@ -25,6 +25,7 @@ describe('removeStack', () => {
     };
     return {
       ...removeStack,
+      serverless: { service: { provider: {} } },
       ...overrides,
       provider,
     };
@@ -167,6 +168,20 @@ describe('removeStack', () => {
       expect(context.provider.getCustomDeploymentRole).to.have.been.calledOnceWithExactly();
       expect(removeStackStub.firstCall.args[0]).to.be.instanceOf(DeleteStackCommand);
       expect(removeStackStub.firstCall.args[0].input.RoleARN).to.equal(customDeploymentRole);
+    });
+
+    it('should delete the stack in express mode when configured', async () => {
+      const context = createRemoveStackContext({
+        serverless: { service: { provider: { deploymentMode: 'express' } } },
+      });
+
+      await context.remove();
+
+      expect(removeStackStub.firstCall.args[0]).to.be.instanceOf(DeleteStackCommand);
+      expect(removeStackStub.firstCall.args[0].input).to.deep.equal({
+        StackName: stackName,
+        DeploymentConfig: { Mode: 'EXPRESS' },
+      });
     });
   });
 

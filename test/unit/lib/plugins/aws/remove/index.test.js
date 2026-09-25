@@ -2,6 +2,7 @@
 
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
+const logEmitter = require('log/lib/emitter');
 const { S3Client, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
 const emptyS3Bucket = require('../../../../../../lib/plugins/aws/remove/lib/bucket');
 const runServerless = require('../../../../../utils/run-serverless');
@@ -257,6 +258,33 @@ describe('test/unit/lib/plugins/aws/remove/index.test.js', () => {
     expect(
       cloudFormationSends.find(({ method }) => method === 'describeStackEvents').client
     ).to.equal(cloudFormationSends.find(({ method }) => method === 'deleteStack').client);
+  });
+
+  it('removes the stack in express mode and reports it', async () => {
+    describeRepositoriesStub.throws({ providerError: { code: 'RepositoryNotFoundException' } });
+    const logEvents = [];
+    const listener = (event) => logEvents.push(event);
+    logEmitter.on('log', listener);
+    let awsNaming;
+    try {
+      ({ awsNaming } = await runServerless({
+        fixture: 'function',
+        command: 'remove',
+        awsSdkV3StubMap,
+        configExt: { provider: { deploymentMode: 'express' } },
+      }));
+    } finally {
+      logEmitter.off('log', listener);
+    }
+
+    expectAwsSdkV3StubInput(deleteStackStub, {
+      StackName: awsNaming.getStackName(),
+      DeploymentConfig: { Mode: 'EXPRESS' },
+    });
+    const noticeMessages = logEvents
+      .filter((event) => event.logger.level === 'notice')
+      .map((event) => String(event.messageTokens[0]));
+    expect(noticeMessages.join('\n')).to.include('Removed with CloudFormation express mode');
   });
 
   it('fails before cleanup when the stack has deletion protection enabled', async () => {

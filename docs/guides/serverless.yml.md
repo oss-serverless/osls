@@ -82,6 +82,9 @@ provider:
     key: value
   # Method used for CloudFormation deployments: 'changesets' or 'direct' (default: changesets)
   deploymentMethod: direct
+  # CloudFormation deployment mode: 'standard' or 'express' (default: standard, values are case-sensitive)
+  # Express mode completes stack operations once resource configuration is applied, without waiting for resources to stabilize
+  deploymentMode: express
   # Manage CloudFormation termination protection for the stack after each deploy (not managed by default).
   # `true`/`false` applies to every stage; the `stages` form enables protection for the listed
   # stages and disables it for all others.
