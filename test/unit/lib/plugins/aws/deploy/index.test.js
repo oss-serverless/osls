@@ -1,6 +1,7 @@
 'use strict';
 
 const sinon = require('sinon');
+const logEmitter = require('log/lib/emitter');
 
 const runServerless = require('../../../../../utils/run-serverless');
 
@@ -229,6 +230,155 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
     });
   });
 
+  describe('express deployment mode', () => {
+    async function deployExpress(options = {}) {
+      const createStackStub = sinon.stub().resolves({});
+      const updateStackStub = sinon.stub().resolves({});
+      const createChangeSetStub = sinon.stub().resolves({});
+      const executeChangeSetStub = sinon.stub().resolves({});
+      const logEvents = [];
+      const listener = (event) => logEvents.push(event);
+      logEmitter.on('log', listener);
+      try {
+        await runServerless({
+          fixture: 'function',
+          command: 'deploy',
+          awsSdkV3StubMap: {
+            ...baseAwsSdkV3StubMap,
+            ECR: {
+              describeRepositories: sinon.stub().throws({
+                providerError: { code: 'RepositoryNotFoundException' },
+              }),
+            },
+            S3: {
+              deleteObjects: {},
+              listObjectsV2: { Contents: [] },
+              upload: {},
+              headBucket: {},
+            },
+            CloudFormation: {
+              describeStacks: sinon
+                .stub()
+                .onFirstCall()
+                .throws(createCloudFormationValidationError('stack does not exist'))
+                .onSecondCall()
+                .resolves({ Stacks: [{}] }),
+              createStack: createStackStub,
+              updateStack: updateStackStub,
+              createChangeSet: createChangeSetStub,
+              executeChangeSet: executeChangeSetStub,
+              deleteChangeSet: {},
+              describeChangeSet: {
+                ChangeSetName: 'new-service-dev-change-set',
+                ChangeSetId: 'some-change-set-id',
+                StackName: 'new-service-dev',
+                Status: 'CREATE_COMPLETE',
+              },
+              describeStackEvents: {
+                StackEvents: [
+                  {
+                    EventId: '1e2f3g4h',
+                    StackName: 'new-service-dev',
+                    LogicalResourceId: 'new-service-dev',
+                    ResourceType: 'AWS::CloudFormation::Stack',
+                    Timestamp: new Date(),
+                    ResourceStatus: 'CREATE_COMPLETE',
+                  },
+                ],
+              },
+              describeStackResource: {
+                StackResourceDetail: { PhysicalResourceId: 's3-bucket-resource' },
+              },
+              validateTemplate: {},
+              listStackResources: {},
+            },
+          },
+          configExt: {
+            service: 'new-service',
+            provider: { deploymentMode: 'express', ...options.provider },
+          },
+        });
+      } finally {
+        logEmitter.off('log', listener);
+      }
+      const noticeMessages = logEvents
+        .filter((event) => event.logger.level === 'notice')
+        .map((event) => String(event.messageTokens[0]));
+      return {
+        createStackStub,
+        updateStackStub,
+        createChangeSetStub,
+        executeChangeSetStub,
+        noticeMessages,
+      };
+    }
+
+    it('passes DeploymentConfig with rollback enabled on direct deployments', async () => {
+      const { createStackStub, updateStackStub, noticeMessages } = await deployExpress({
+        provider: { deploymentMethod: 'direct' },
+      });
+      const deploymentConfig = { Mode: 'EXPRESS', DisableRollback: false };
+      expect(createStackStub.getCall(0).args[0].DeploymentConfig).to.deep.equal(deploymentConfig);
+      expect(createStackStub.getCall(0).args[0]).to.not.have.property('OnFailure');
+      expect(updateStackStub.getCall(0).args[0].DeploymentConfig).to.deep.equal(deploymentConfig);
+      expect(noticeMessages.join('\n')).to.include('Deployed with CloudFormation express mode');
+    });
+
+    it('carries `disableRollback` in DeploymentConfig on direct deployments', async () => {
+      const { createStackStub, updateStackStub } = await deployExpress({
+        provider: { deploymentMethod: 'direct', disableRollback: true },
+      });
+      const deploymentConfig = { Mode: 'EXPRESS', DisableRollback: true };
+      expect(createStackStub.getCall(0).args[0].DeploymentConfig).to.deep.equal(deploymentConfig);
+      expect(createStackStub.getCall(0).args[0]).to.not.have.property('OnFailure');
+      expect(createStackStub.getCall(0).args[0]).to.not.have.property('DisableRollback');
+      expect(updateStackStub.getCall(0).args[0].DeploymentConfig).to.deep.equal(deploymentConfig);
+      expect(updateStackStub.getCall(0).args[0]).to.not.have.property('DisableRollback');
+    });
+
+    it('passes DeploymentConfig on change sets and executes them as before', async () => {
+      const { createChangeSetStub, executeChangeSetStub } = await deployExpress();
+      const deploymentConfig = { Mode: 'EXPRESS', DisableRollback: false };
+      expect(createChangeSetStub.getCall(0).args[0].DeploymentConfig).to.deep.equal(
+        deploymentConfig
+      );
+      expect(createChangeSetStub.getCall(1).args[0].DeploymentConfig).to.deep.equal(
+        deploymentConfig
+      );
+      expect(executeChangeSetStub.getCall(0).args[0]).to.deep.equal({
+        StackName: 'new-service-dev',
+        ChangeSetName: 'new-service-dev-change-set',
+      });
+      expect(executeChangeSetStub.getCall(1).args[0]).to.deep.equal({
+        StackName: 'new-service-dev',
+        ChangeSetName: 'new-service-dev-change-set',
+      });
+    });
+
+    it('keeps `disableRollback` on change set execution', async () => {
+      const { createChangeSetStub, executeChangeSetStub } = await deployExpress({
+        provider: { disableRollback: true },
+      });
+      const deploymentConfig = { Mode: 'EXPRESS', DisableRollback: true };
+      expect(createChangeSetStub.getCall(0).args[0].DeploymentConfig).to.deep.equal(
+        deploymentConfig
+      );
+      expect(createChangeSetStub.getCall(1).args[0].DeploymentConfig).to.deep.equal(
+        deploymentConfig
+      );
+      expect(executeChangeSetStub.getCall(0).args[0]).to.deep.equal({
+        StackName: 'new-service-dev',
+        ChangeSetName: 'new-service-dev-change-set',
+        DisableRollback: true,
+      });
+      expect(executeChangeSetStub.getCall(1).args[0]).to.deep.equal({
+        StackName: 'new-service-dev',
+        ChangeSetName: 'new-service-dev-change-set',
+        DisableRollback: true,
+      });
+    });
+  });
+
   describe('with direct create/update calls', () => {
     it('with nonexistent stack - first deploy', async () => {
       const describeStacksStub = sinon
@@ -291,6 +441,9 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
 
       expect(createStackStub).to.be.calledOnce;
       expect(updateStackStub).to.be.calledOnce;
+      expect(createStackStub.getCall(0).args[0].OnFailure).to.equal('DELETE');
+      expect(createStackStub.getCall(0).args[0]).to.not.have.property('DeploymentConfig');
+      expect(updateStackStub.getCall(0).args[0]).to.not.have.property('DeploymentConfig');
       const createStackSends = getCloudFormationSends(awsSdkV3Stub, 'createStack');
       const updateStackSends = getCloudFormationSends(awsSdkV3Stub, 'updateStack');
       const validateTemplateSends = getCloudFormationSends(awsSdkV3Stub, 'validateTemplate');

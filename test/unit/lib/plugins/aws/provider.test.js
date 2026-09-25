@@ -357,6 +357,21 @@ describe('AwsProvider', () => {
       }
     });
 
+    describe('deploymentMode validation', () => {
+      it('rejects "EXPRESS"', async () => {
+        await expect(
+          runServerless({
+            fixture: 'function',
+            command: 'print',
+            configExt: { provider: { deploymentMode: 'EXPRESS' } },
+          })
+        ).to.eventually.be.rejected.and.have.property(
+          'code',
+          'INVALID_NON_SCHEMA_COMPLIANT_CONFIGURATION'
+        );
+      });
+    });
+
     describe('deploymentBucket configuration', () => {
       it('should do nothing if not defined', () => {
         serverless.service.provider.deploymentBucket = undefined;

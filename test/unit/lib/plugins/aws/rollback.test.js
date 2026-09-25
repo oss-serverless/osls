@@ -7,6 +7,7 @@ const Serverless = require('../../../../../lib/serverless');
 const chai = require('chai');
 const assert = require('chai').assert;
 const sinon = require('sinon');
+const logEmitter = require('log/lib/emitter');
 const { S3Client, ListObjectsV2Command, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { Readable } = require('stream');
 
@@ -578,5 +579,73 @@ describe('test/unit/lib/plugins/aws/rollback.test.js', () => {
     expect(sentMethods).to.include('updateStack');
     expect(sentMethods).to.not.include('updateTerminationProtection');
     expect(updateTerminationProtectionStub).not.to.have.been.called;
+  });
+
+  it('rolls back in express mode and reports it', async () => {
+    const updateStackStub = sinon.stub().resolves({});
+    const deploymentDirectory = '1476779096930-2016-10-18T08:24:56.930Z';
+    const logEvents = [];
+    const listener = (event) => logEvents.push(event);
+    logEmitter.on('log', listener);
+    try {
+      await runServerless({
+        fixture: 'function',
+        command: 'rollback',
+        options: { timestamp: '1476779096930' },
+        configExt: { provider: { deploymentMethod: 'direct', deploymentMode: 'express' } },
+        awsSdkV3StubMap: {
+          CloudFormation: {
+            describeStackResource: {
+              StackResourceDetail: { PhysicalResourceId: 'deployment-bucket' },
+            },
+            updateStack: updateStackStub,
+            describeStackEvents: {
+              StackEvents: [
+                {
+                  EventId: '1e2f3g4h',
+                  StackName: 'service-dev',
+                  LogicalResourceId: 'service-dev',
+                  ResourceType: 'AWS::CloudFormation::Stack',
+                  Timestamp: new Date(),
+                  ResourceStatus: 'UPDATE_COMPLETE',
+                },
+              ],
+            },
+          },
+          STS: {
+            getCallerIdentity: {
+              ResponseMetadata: { RequestId: 'ffffffff-ffff-ffff-ffff-ffffffffffff' },
+              UserId: 'XXXXXXXXXXXXXXXXXXXXX',
+              Account: '999999999999',
+              Arn: 'arn:aws:iam::999999999999:user/test',
+            },
+          },
+          S3: {
+            headObject: () => {},
+            headBucket: () => {},
+            listObjectsV2: ({ Prefix }) => ({
+              Contents: [
+                { Key: `${Prefix}${deploymentDirectory}/compiled-cloudformation-template.json` },
+                { Key: `${Prefix}${deploymentDirectory}/service.zip` },
+              ],
+            }),
+            getObject: { Body: '{}' },
+          },
+        },
+      });
+    } finally {
+      logEmitter.off('log', listener);
+    }
+
+    expect(updateStackStub).to.have.been.calledOnce;
+    expect(updateStackStub.firstCall.args[0].DeploymentConfig).to.deep.equal({
+      Mode: 'EXPRESS',
+      DisableRollback: false,
+    });
+    expect(updateStackStub.firstCall.args[0]).to.not.have.property('DisableRollback');
+    const noticeMessages = logEvents
+      .filter((event) => event.logger.level === 'notice')
+      .map((event) => String(event.messageTokens[0]));
+    expect(noticeMessages.join('\n')).to.include('Rolled back with CloudFormation express mode');
   });
 });

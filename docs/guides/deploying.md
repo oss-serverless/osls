@@ -44,6 +44,34 @@ provider:
   deploymentMethod: direct
 ```
 
+### Deployment mode
+
+[CloudFormation express mode](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-express-mode.html) completes stack operations as soon as resource configuration is applied, without waiting for resources to stabilize. Deployments usually finish faster, but resources may still be initializing when the command returns. AWS positions it for development iteration; keep the default mode where a successful deployment must mean that resources are ready to serve traffic.
+
+Enable it with `provider.deploymentMode`:
+
+```yaml
+provider:
+  name: aws
+  deploymentMode: express
+```
+
+The setting applies to every stack operation osls performs for the service: `osls deploy` (with either `deploymentMethod`), `osls rollback` and `osls remove`. `osls deploy function` does not use CloudFormation and is unaffected. No template changes are needed. CloudFormation still waits for custom resources to respond, and stack outputs that reference resource attributes are resolved before the operation completes. AWS documents no resource restrictions, but a resource that depends on another one being fully operational can fail; if that happens, use the default mode for that stage.
+
+Rollback keeps working as in the default mode: a failed deployment is rolled back unless `provider.disableRollback` is `true`. This differs from CloudFormation's own express default, used by the AWS CLI and the CDK, which disables rollback unless you opt back in; the SAM CLI makes the same choice as osls. Keep rollback enabled unless you need to inspect failed resources: the constraints below only apply while it is disabled.
+
+Keep in mind:
+
+- `osls deploy` returns as soon as the configuration is applied. Resources such as CloudFront distributions may still be propagating when osls prints the service information, so a request made straight after the deploy can still reach the previous configuration. Express mode is not always faster: an express operation can still take tens of seconds for a single resource, and a resource that keeps failing can be retried for several minutes before the deployment fails.
+- CloudFormation does not accept `OnFailure` in express mode, so osls cannot ask it to delete a stack whose creation failed, which it otherwise does with `deploymentMethod: direct`. This matters when a deployment creates the stack: the first deployment of a service creates the stack with the deployment bucket, and with a custom `provider.deploymentBucket` it creates the whole stack at once. A failed creation leaves the stack in `ROLLBACK_COMPLETE`; run `osls remove` before deploying again, as is already the case for change set deployments.
+- With `disableRollback: true`, a failed express deployment leaves the stack in `CREATE_FAILED` or `UPDATE_FAILED`. Until an update succeeds, CloudFormation rejects every update that does not also use express mode with rollback disabled, and `RollbackStack` (`aws cloudformation rollback-stack`) is rejected too. Keep both settings, fix the problem and deploy again, with either deployment method. If `osls deploy` reports that there are no changes, deploy with `--force`.
+- While rollback is disabled, CloudFormation rejects updates that replace a resource, for example changing a function's `name` (which also replaces its log group) or a DynamoDB table's or SQS queue's name. The deployment fails and leaves the stack in `UPDATE_FAILED`, and CloudFormation records the attempted properties, so reverting the change is treated as a replacement as well: a resource that keeps its physical name is deleted before it is created again, which discards a log group and its logs, and the creation can fail once more with `AlreadyExists` until the deletion has propagated. Deploy the reverted configuration with `deploymentMethod: direct` and `disableRollback: true` still set (`osls rollback --timestamp` uses the same path, while a change set built from the reverted configuration alone reports nothing to deploy), or remove and redeploy the service. Re-enable rollback before deploying the replacement.
+- `provider.rollbackConfiguration` still applies, and the operation only completes after its monitoring period.
+- Switching between express and the default mode is a per-deployment choice: after a successful operation, the next one can use either mode.
+- `osls deploy --package` uses the value saved by `osls package`; re-run `osls package` after changing it. `osls rollback` and `osls remove` use the current `serverless.yml`.
+- `osls remove` reports completion while resources may still be deleting in the background. Deploying a service that reuses the same physical resource names straight afterwards, including redeploying the same service right after `osls remove`, can fail with a name conflict.
+- Nested stacks inherit the mode from the root stack.
+
 ### Deletion protection
 
 Set `provider.deletionProtection` to have osls manage [CloudFormation termination protection](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-protect-stacks.html) for the service stack:

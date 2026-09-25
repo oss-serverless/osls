@@ -4,6 +4,8 @@ The `osls remove` command will remove the deployed service, defined in your curr
 
 If the stack has deletion protection enabled (see [`provider.deletionProtection`](../guides/deploying.md#deletion-protection)), the command fails before deleting anything.
 
+With [`provider.deploymentMode: express`](../guides/deploying.md#deployment-mode), the stack is deleted in CloudFormation express mode and the command returns while resources may still be deleting.
+
 ```bash
 osls remove
 ```

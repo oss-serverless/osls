@@ -933,6 +933,7 @@ export interface AWS {
           sseKMSKeyId?: string;
           tags?: AwsResourceTags;
         };
+    deploymentMode?: 'standard' | 'express';
     deploymentPrefix?: string;
     disableRollback?: boolean;
     endpointType?: string;

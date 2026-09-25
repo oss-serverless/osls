@@ -19,6 +19,8 @@ If `timestamp` is not specified, the CLI will show your existing deployments.
 
 Rollback only works while the target deployment's artifacts still exist in the deployment bucket. osls keeps the most recent deployments and prunes older ones (the last `5` by default, configurable via `provider.deploymentBucket.maxPreviousDeploymentArtifacts`). Once a deployment's artifacts have been pruned, you can no longer roll back to it.
 
+Rollback uses the [`provider.deploymentMode`](../guides/deploying.md#deployment-mode) from the current `serverless.yml`, not the one saved with the target deployment.
+
 ## Examples
 
 ### AWS

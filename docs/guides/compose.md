@@ -141,6 +141,8 @@ services:
 
 As seen in the above example, it is possible to configure more than one dependency by providing `dependsOn` as a list.
 
+Dependencies, explicit or from variables, only order the commands: a dependent service starts deploying as soon as the services it depends on have finished. With [`provider.deploymentMode: express`](./deploying.md#deployment-mode) on an upstream service, its stack completes before its resources have stabilized, so a dependent service that uses those resources while it deploys (an event source mapping on a stream, a custom resource that calls an endpoint, or networking such as a VPC and NAT gateway, for example) can fail and need to be deployed again. Removals run in reverse order, and an express removal returns while resources such as VPC network interfaces may not have been released yet, so removing the upstream service straight afterwards can fail with a dependency error until they are gone.
+
 ### Global commands
 
 On top of `osls deploy`, the following commands can be run globally across all services:
