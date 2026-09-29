@@ -198,9 +198,11 @@ This configuration sets up the onFailure location for events to be sent to once 
 
 [Related AWS documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-destinationconfig)
 
-The ARN for the SNS or SQS can be specified as a string, the reference to the ARN of a resource by logical ID, or the import of an ARN that was exported by a different service or CloudFormation stack.
+The destination can be an SNS topic, an SQS queue or an S3 bucket. Its ARN can be specified as a string, the reference to the ARN of a resource by logical ID, or the import of an ARN that was exported by a different service or CloudFormation stack.
 
-**Note:** The `destinationConfig` will hook up your existing SNS or SQS resources. osls won't create a new SNS or SQS for you.
+**Note:** The `destinationConfig` will hook up your existing SNS, SQS or S3 resources. osls won't create a new SNS, SQS or S3 bucket for you.
+
+For an S3 bucket, osls grants the function `s3:ListBucket` on the bucket and `s3:PutObject` on its objects.
 
 ```yaml
 functions:
@@ -254,6 +256,18 @@ functions:
                     - Ref: AWS::AccountId
                     - mySnsTopic
               type: sns
+
+  preprocess4:
+    handler: handler.preprocess
+    events:
+      - stream:
+          arn: arn:aws:kinesis:region:XXXXXX:stream/foo
+          batchSize: 100
+          maximumRetryAttempts: 10
+          startingPosition: LATEST
+          enabled: false
+          destinations:
+            onFailure: arn:aws:s3:::my-failed-batches-bucket
 ```
 
 ## Setting the ParallelizationFactor
