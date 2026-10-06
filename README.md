@@ -41,22 +41,6 @@ Browse the reference sections, each with its own index:
 
 This repository was created and is maintained by [Bref](https://bref.sh) maintainers and contributors. The main goal is continuity for existing serverless projects, including Bref projects, so they keep working over the long term. No major new feature areas are planned, but community contributions are welcome for maintenance work such as supporting new AWS Lambda runtimes, adapting to AWS changes, fixing bugs, and making small improvements.
 
-## Open-source sponsors
-
-This project is open-source and free to use. However, maintaining it requires time and effort. If you want to support the project, you can become a sponsor on GitHub Sponsors.
-
-<p align="center">
-<a href="https://www.voxie.com/"><img src="docs/sponsors/voxie.svg" width="150px" /></a>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-<a href="https://www.flagsmith.com/"><img src="docs/sponsors/flagsmith.png" height="50px" /></a>
-</p>
-
-<p align="center">
-<a href="https://www.mybuilder.com/"><img src="docs/sponsors/mybuilder.svg" height="40px" /></a>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-<a href="https://optionmetrics.com/"><img src="docs/sponsors/optionmetrics.png" height="50px" /></a>
-</p>
-
 ## How osls differs from upstream Serverless Framework
 
 - The documentation is focused on the current osls release and AWS usage. Documentation for non-AWS providers has been removed.
