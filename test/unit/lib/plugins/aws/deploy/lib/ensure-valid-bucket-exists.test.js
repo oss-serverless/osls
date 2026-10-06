@@ -2,9 +2,24 @@
 
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { HeadBucketCommand } = require('@aws-sdk/client-s3');
+const { HeadBucketCommand, GetBucketLocationCommand } = require('@aws-sdk/client-s3');
 const { GetTemplateCommand, UpdateStackCommand } = require('@aws-sdk/client-cloudformation');
 const ensureValidBucketExists = require('../../../../../../../lib/plugins/aws/deploy/lib/ensure-valid-bucket-exists');
+
+const forbiddenHeadBucketError = () =>
+  Object.assign(new Error('UnknownError'), {
+    name: 'Forbidden',
+    $metadata: { httpStatusCode: 403 },
+  });
+
+const customBucketContext = (send, region = 'us-east-1') => ({
+  bucketName: 'deployment-bucket',
+  provider: { getRegion: sinon.stub().returns(region) },
+  serverless: { service: { provider: { deploymentBucket: 'deployment-bucket' } } },
+  setBucketName: sinon.stub().resolves(),
+  s3ClientPromise: Promise.resolve({ send }),
+  ...ensureValidBucketExists,
+});
 
 describe('ensureValidBucketExists', () => {
   it('uses an existing S3 client promise for custom deployment bucket validation', async () => {
@@ -121,5 +136,63 @@ describe('ensureValidBucketExists', () => {
       StackId: 'stack-id',
     });
     expect(setBucketName).to.have.been.calledTwice;
+  });
+
+  it('falls back to GetBucketLocation when HeadBucket is forbidden', async () => {
+    // A role whose s3:ListBucket is limited by an s3:prefix condition cannot HeadBucket
+    const send = sinon.stub().callsFake(async (command) => {
+      if (command instanceof HeadBucketCommand) throw forbiddenHeadBucketError();
+      if (command instanceof GetBucketLocationCommand) return { LocationConstraint: undefined };
+      throw new Error(`Unexpected S3 command ${command.constructor.name}`);
+    });
+    const context = customBucketContext(send);
+
+    await context.ensureValidBucketExists();
+
+    expect(send).to.have.been.calledTwice;
+    expect(send.secondCall.args[0]).to.be.instanceOf(GetBucketLocationCommand);
+    expect(send.secondCall.args[0].input).to.deep.equal({ Bucket: 'deployment-bucket' });
+  });
+
+  it('rejects a bucket in another region found through the GetBucketLocation fallback', async () => {
+    const send = sinon.stub().callsFake(async (command) => {
+      if (command instanceof HeadBucketCommand) throw forbiddenHeadBucketError();
+      return { LocationConstraint: 'EU' };
+    });
+
+    await expect(
+      customBucketContext(send).ensureValidBucketExists()
+    ).to.eventually.be.rejected.and.have.property('code', 'DEPLOYMENT_BUCKET_INVALID_REGION');
+  });
+
+  it('reports the HeadBucket error when the GetBucketLocation fallback fails too', async () => {
+    const send = sinon.stub().callsFake(async (command) => {
+      if (command instanceof HeadBucketCommand) throw forbiddenHeadBucketError();
+      throw Object.assign(new Error('Access Denied'), { name: 'AccessDenied' });
+    });
+
+    const error = await customBucketContext(send)
+      .ensureValidBucketExists()
+      .then(
+        () => null,
+        (err) => err
+      );
+
+    expect(error).to.have.property('code', 'DEPLOYMENT_BUCKET_NOT_FOUND');
+    expect(error.message).to.include('UnknownError');
+  });
+
+  it('does not fall back when HeadBucket fails for a reason other than a 403', async () => {
+    const send = sinon.stub().rejects(
+      Object.assign(new Error('NotFound'), {
+        name: 'NotFound',
+        $metadata: { httpStatusCode: 404 },
+      })
+    );
+
+    await expect(
+      customBucketContext(send).ensureValidBucketExists()
+    ).to.eventually.be.rejected.and.have.property('code', 'DEPLOYMENT_BUCKET_NOT_FOUND');
+    expect(send).to.have.been.calledOnce;
   });
 });
