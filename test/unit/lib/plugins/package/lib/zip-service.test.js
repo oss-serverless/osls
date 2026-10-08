@@ -1397,7 +1397,8 @@ describe('zipService', () => {
 
         serverless.utils.writeFileDir(largeFilePath);
         await fs.promises.writeFile(largeFilePath, '');
-        await fs.promises.truncate(largeFilePath, 512 * 1024 * 1024);
+        // Just below the 250 MB AWS Lambda limit, larger packages are rejected
+        await fs.promises.truncate(largeFilePath, 240 * 1024 * 1024);
 
         await packagePlugin.zipFiles(['event.json'], getTestArtifactFileName('warmup'));
         forceGc();
@@ -1416,8 +1417,8 @@ describe('zipService', () => {
         }
 
         // The sampled peak includes dead stream chunks that V8 has not collected yet,
-        // and that GC lag alone can exceed 64 MiB. The cap only needs to stay far
-        // below the 512 MiB file size to prove the file was streamed, not materialized.
+        // and that GC lag alone can exceed 64 MiB. The cap only needs to stay well
+        // below the 240 MiB file size to prove the file was streamed, not materialized.
         expect(peakArrayBuffers - before.arrayBuffers).to.be.lessThan(128 * 1024 * 1024);
 
         forceGc();
@@ -1434,6 +1435,40 @@ describe('zipService', () => {
         Error,
         'No files to package'
       ));
+
+    it('rejects packages above the AWS Lambda unzipped size limit before zipping them', async () => {
+      serverless.utils.writeFileSync(path.join(tmpDirPath, 'handler.js'), 'handler');
+      // Sparse files: only their size is read
+      const largeFiles = {
+        'vendor/large.bin': 200 * 1024 * 1024,
+        'node_modules/medium.bin': 60 * 1024 * 1024,
+      };
+      for (const [filePath, size] of Object.entries(largeFiles)) {
+        serverless.utils.writeFileSync(path.join(tmpDirPath, filePath), '');
+        await fs.promises.truncate(path.join(tmpDirPath, filePath), size);
+      }
+      const artifactFilePath = path.join(serverless.serviceDir, '.serverless', 'too-large.zip');
+
+      let error;
+      try {
+        await packagePlugin.zipFiles(['handler.js', ...Object.keys(largeFiles)], 'too-large.zip');
+      } catch (caughtError) {
+        error = caughtError;
+      }
+
+      expect(error).to.have.property('code', 'PACKAGE_TOO_LARGE');
+      expect(error.message).to.equal(
+        [
+          'The "too-large.zip" package is 260.0 MB unzipped, above the 250 MB AWS Lambda limit (function code and layers combined).',
+          'Largest files and directories in the package:',
+          '  vendor/         200.0 MB',
+          '  node_modules/    60.0 MB',
+          '  handler.js        0.0 MB',
+          'Exclude files that are not needed at runtime with "package.patterns": https://github.com/oss-serverless/osls/blob/3.x/docs/guides/packaging.md#patterns',
+        ].join('\n')
+      );
+      expect(fs.existsSync(artifactFilePath)).to.equal(false);
+    });
 
     it('configures metadata stat concurrency with ext/promise/limit', () => {
       let configuredLimit;

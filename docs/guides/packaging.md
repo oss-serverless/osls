@@ -68,6 +68,10 @@ package:
     - '!.git/**'
 ```
 
+### Size limit
+
+AWS Lambda limits a function's code and layers to 250 MB once unzipped. When a package built by osls is larger than that, `serverless package` and `serverless deploy` fail before anything is uploaded, and list the largest files and directories of the package. Use `patterns` to exclude files that are not needed at runtime.
+
 ### Artifact
 
 For complete control over the packaging process you can specify your own artifact zip file.
