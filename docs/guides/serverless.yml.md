@@ -156,7 +156,7 @@ provider:
   architecture: x86_64
 ```
 
-If `provider.runtime` is omitted for AWS services, osls defaults to the latest supported Node.js Lambda runtime. Today that is `nodejs24.x`.
+If `provider.runtime` is omitted for AWS services, osls defaults to the latest generally available Node.js Lambda runtime. Today that is `nodejs24.x`.
 
 Even so, we recommend explicitly setting the runtime you want to deploy so your service does not change runtimes when that default advances.
 

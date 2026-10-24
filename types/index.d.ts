@@ -65,6 +65,7 @@ export type AwsLambdaRuntime =
   | 'nodejs20.x'
   | 'nodejs22.x'
   | 'nodejs24.x'
+  | 'nodejs26.x'
   | 'provided.al2'
   | 'provided.al2023'
   | 'python3.10'
@@ -72,6 +73,7 @@ export type AwsLambdaRuntime =
   | 'python3.12'
   | 'python3.13'
   | 'python3.14'
+  | 'python3.15'
   | 'ruby3.3'
   | 'ruby3.4'
   | 'ruby4.0';

@@ -327,6 +327,28 @@ describe('lib/plugins/aws/package/compile/layers/index.test.js', () => {
     ).to.deep.equal(['java8.al2023', 'java11.al2023', 'java17.al2023']);
   });
 
+  it('should accept `layers[].compatibleRuntimes: [nodejs26.x, python3.15]`', async () => {
+    const {
+      awsNaming,
+      cfTemplate: { Resources },
+    } = await runServerless({
+      fixture: 'layer',
+      command: 'package',
+      configExt: {
+        layers: {
+          layer: {
+            compatibleRuntimes: ['nodejs26.x', 'python3.15'],
+          },
+        },
+      },
+      awsSdkV3StubMap,
+    });
+
+    expect(
+      Resources[awsNaming.getLambdaLayerLogicalId('layer')].Properties.CompatibleRuntimes
+    ).to.deep.equal(['nodejs26.x', 'python3.15']);
+  });
+
   it('should reject deprecated `layers[].compatibleRuntimes` values', () => {
     return expect(
       runServerless({
