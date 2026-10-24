@@ -773,6 +773,17 @@ describe('AwsInvokeLocal', () => {
       ).to.be.equal(true);
     });
 
+    it('should call invokeLocalPython when python3.15 runtime is set', async () => {
+      awsInvokeLocal.options.functionObj.runtime = 'python3.15';
+      await awsInvokeLocal.invokeLocal();
+      // NOTE: this is important so that tests on Windows won't fail
+      const runtime = process.platform === 'win32' ? 'python.exe' : 'python3.15';
+      expect(invokeLocalPythonStub.calledOnce).to.be.equal(true);
+      expect(
+        invokeLocalPythonStub.calledWithExactly(runtime, 'handler', 'hello', {}, undefined)
+      ).to.be.equal(true);
+    });
+
     [
       'java8.al2',
       'java8.al2023',

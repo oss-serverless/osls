@@ -1628,6 +1628,98 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
       );
     });
 
+    it('should accept `provider.runtime: nodejs26.x`', async () => {
+      const {
+        awsNaming: localNaming,
+        cfTemplate: { Resources: localResources },
+      } = await runServerless({
+        fixture: 'function',
+        command: 'package',
+        configExt: {
+          provider: {
+            runtime: 'nodejs26.x',
+          },
+        },
+      });
+
+      expect(localResources[localNaming.getLambdaLogicalId('basic')].Properties.Runtime).to.equal(
+        'nodejs26.x'
+      );
+      expect(localResources[localNaming.getLambdaLogicalId('other')].Properties.Runtime).to.equal(
+        'nodejs26.x'
+      );
+    });
+
+    it('should accept `functions[].runtime: nodejs26.x`', async () => {
+      const {
+        awsNaming: localNaming,
+        cfTemplate: { Resources: localResources },
+      } = await runServerless({
+        fixture: 'function',
+        command: 'package',
+        configExt: {
+          functions: {
+            basic: {
+              runtime: 'nodejs26.x',
+            },
+          },
+        },
+      });
+
+      expect(localResources[localNaming.getLambdaLogicalId('basic')].Properties.Runtime).to.equal(
+        'nodejs26.x'
+      );
+      expect(localResources[localNaming.getLambdaLogicalId('other')].Properties.Runtime).to.equal(
+        'nodejs20.x'
+      );
+    });
+
+    it('should accept `provider.runtime: python3.15`', async () => {
+      const {
+        awsNaming: localNaming,
+        cfTemplate: { Resources: localResources },
+      } = await runServerless({
+        fixture: 'function',
+        command: 'package',
+        configExt: {
+          provider: {
+            runtime: 'python3.15',
+          },
+        },
+      });
+
+      expect(localResources[localNaming.getLambdaLogicalId('basic')].Properties.Runtime).to.equal(
+        'python3.15'
+      );
+      expect(localResources[localNaming.getLambdaLogicalId('other')].Properties.Runtime).to.equal(
+        'python3.15'
+      );
+    });
+
+    it('should accept `functions[].runtime: python3.15`', async () => {
+      const {
+        awsNaming: localNaming,
+        cfTemplate: { Resources: localResources },
+      } = await runServerless({
+        fixture: 'function',
+        command: 'package',
+        configExt: {
+          functions: {
+            basic: {
+              runtime: 'python3.15',
+            },
+          },
+        },
+      });
+
+      expect(localResources[localNaming.getLambdaLogicalId('basic')].Properties.Runtime).to.equal(
+        'python3.15'
+      );
+      expect(localResources[localNaming.getLambdaLogicalId('other')].Properties.Runtime).to.equal(
+        'nodejs20.x'
+      );
+    });
+
     it('should reject deprecated `provider.runtime` values', () => {
       return expect(
         runServerless({

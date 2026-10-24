@@ -36,7 +36,7 @@ functions:
     tracing: PassThrough # optional, overwrite, can be 'Active' or 'PassThrough'
 ```
 
-If `provider.runtime` is omitted for AWS services, osls defaults to the latest supported Node.js Lambda runtime. Today that is `nodejs24.x`.
+If `provider.runtime` is omitted for AWS services, osls defaults to the latest generally available Node.js Lambda runtime. Today that is `nodejs24.x`.
 
 We still recommend explicitly setting the runtime you want to deploy, either at `provider.runtime` or per function, so your service does not change runtimes when that default advances.
 
