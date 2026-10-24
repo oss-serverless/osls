@@ -1481,6 +1481,85 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
     expect(headBucketStub).to.be.calledOnce;
   });
 
+  it('with existing stack - with custom deployment bucket forbidding HeadBucket', async () => {
+    const headBucketStub = sinon.stub().throws(
+      Object.assign(new Error('Forbidden'), {
+        providerError: { code: 'Forbidden', statusCode: 403, region: 'us-east-1' },
+      })
+    );
+    const awsRequestStubMap = {
+      ...baseAwsRequestStubMap,
+      ECR: {
+        describeRepositories: sinon.stub().throws({
+          providerError: { code: 'RepositoryNotFoundException' },
+        }),
+      },
+      Lambda: {
+        getFunction: {
+          Configuration: { LastModified: '2020-05-20T15:31:44.359Z' },
+        },
+      },
+      S3: {
+        headBucket: headBucketStub,
+        listObjectsV2: { Contents: [] },
+      },
+      CloudFormation: {
+        describeStacks: { Stacks: [{}] },
+        validateTemplate: {},
+      },
+    };
+
+    await runServerless({
+      fixture: 'function',
+      command: 'deploy',
+      awsRequestStubMap,
+      lastLifecycleHookName: 'aws:deploy:deploy:checkForChanges',
+      configExt: {
+        provider: {
+          deploymentBucket: 'bucket-name',
+        },
+      },
+    });
+
+    expect(headBucketStub).to.be.calledOnce;
+  });
+
+  it('with existing stack - with custom deployment bucket unreachable', async () => {
+    const awsRequestStubMap = {
+      ...baseAwsRequestStubMap,
+      ECR: {
+        describeRepositories: sinon.stub().throws({
+          providerError: { code: 'RepositoryNotFoundException' },
+        }),
+      },
+      S3: {
+        headBucket: () => {
+          throw Object.assign(new Error('Inaccessible host'), {
+            providerError: { code: 'UnknownEndpoint', region: 'us-east-1' },
+          });
+        },
+      },
+      CloudFormation: {
+        describeStacks: { Stacks: [{}] },
+        validateTemplate: {},
+      },
+    };
+
+    await expect(
+      runServerless({
+        fixture: 'function',
+        command: 'deploy',
+        awsRequestStubMap,
+        lastLifecycleHookName: 'aws:deploy:deploy:checkForChanges',
+        configExt: {
+          provider: {
+            deploymentBucket: 'bucket-name',
+          },
+        },
+      })
+    ).to.eventually.have.been.rejected.and.have.property('code', 'DEPLOYMENT_BUCKET_NOT_FOUND');
+  });
+
   it('with existing stack - with custom deployment bucket in different region', async () => {
     const awsRequestStubMap = {
       ...baseAwsRequestStubMap,
@@ -1499,6 +1578,45 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
           return {
             BucketRegion: 'us-west-1',
           };
+        },
+      },
+      CloudFormation: {
+        describeStacks: { Stacks: [{}] },
+        validateTemplate: {},
+      },
+    };
+
+    await expect(
+      runServerless({
+        fixture: 'function',
+        command: 'deploy',
+        awsRequestStubMap,
+        lastLifecycleHookName: 'aws:deploy:deploy:checkForChanges',
+        configExt: {
+          provider: {
+            deploymentBucket: 'bucket-name',
+          },
+        },
+      })
+    ).to.eventually.have.been.rejected.and.have.property(
+      'code',
+      'DEPLOYMENT_BUCKET_INVALID_REGION'
+    );
+  });
+
+  it('with existing stack - with custom deployment bucket in different region forbidding HeadBucket', async () => {
+    const awsRequestStubMap = {
+      ...baseAwsRequestStubMap,
+      ECR: {
+        describeRepositories: sinon.stub().throws({
+          providerError: { code: 'RepositoryNotFoundException' },
+        }),
+      },
+      S3: {
+        headBucket: () => {
+          throw Object.assign(new Error('Forbidden'), {
+            providerError: { code: 'Forbidden', statusCode: 403, region: 'us-west-1' },
+          });
         },
       },
       CloudFormation: {
