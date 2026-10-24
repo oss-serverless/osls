@@ -151,14 +151,14 @@ deleteFoo:
 
 The `runtime` property (set at `provider.runtime` or per function) accepts a fixed set of identifiers that map to the [AWS Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html). The supported identifiers, grouped by language, are:
 
-- **Node.js:** `nodejs20.x`, `nodejs22.x`, `nodejs24.x`, `nodejs26.x`
+- **Node.js:** `nodejs22.x`, `nodejs24.x`, `nodejs26.x`
 - **Python:** `python3.10`, `python3.11`, `python3.12`, `python3.13`, `python3.14`, `python3.15`
 - **Java:** `java8.al2`, `java8.al2023`, `java11`, `java11.al2023`, `java17`, `java17.al2023`, `java21`, `java25`
 - **Ruby:** `ruby3.3`, `ruby3.4`, `ruby4.0`
-- **.NET:** `dotnet8`, `dotnet9`, `dotnet10`
-- **Custom (OS-only):** `provided.al2`, `provided.al2023`
+- **.NET:** `dotnet8`, `dotnet10`
+- **Custom (OS-only):** `provided.al2023`
 
-Use `provided.al2` or `provided.al2023` together with [Lambda Layers](#layers) to ship your own custom runtime. Any other value is rejected during schema validation.
+Use `provided.al2023` together with [Lambda Layers](#layers) to ship your own custom runtime. Any other value is rejected during schema validation.
 
 `nodejs26.x` and `python3.15` are AWS public preview runtimes. They are not covered by the Lambda SLA or AWS Support, and AWS recommends against using them for production workloads. When AWS makes them generally available, functions using them move over automatically because the identifiers stay the same.
 

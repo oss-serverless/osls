@@ -3,7 +3,7 @@ configValidationMode: error
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
 
 custom:
   importedFile: ${file(config.json)}

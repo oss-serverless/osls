@@ -52,7 +52,6 @@ export type AwsLambdaMemorySize = number;
 export type AwsLambdaRole = string | AwsCfSub | AwsCfImport | AwsCfGetAtt;
 export type AwsLambdaRuntime =
   | 'dotnet8'
-  | 'dotnet9'
   | 'dotnet10'
   | 'java25'
   | 'java21'
@@ -62,11 +61,9 @@ export type AwsLambdaRuntime =
   | 'java11'
   | 'java8.al2023'
   | 'java8.al2'
-  | 'nodejs20.x'
   | 'nodejs22.x'
   | 'nodejs24.x'
   | 'nodejs26.x'
-  | 'provided.al2'
   | 'provided.al2023'
   | 'python3.10'
   | 'python3.11'

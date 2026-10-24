@@ -53,7 +53,7 @@ describe('lib/plugins/aws/package/compile/layers/index.test.js', () => {
           layerTwo: {
             description: 'Layer two example',
             path: 'layer',
-            compatibleRuntimes: ['nodejs20.x'],
+            compatibleRuntimes: ['nodejs22.x'],
             compatibleArchitectures: ['arm64'],
             licenseInfo: 'GPL',
             allowedAccounts: ['123456789012', '123456789013'],
@@ -258,7 +258,7 @@ describe('lib/plugins/aws/package/compile/layers/index.test.js', () => {
     const layerOne = cfResources[layerResourceName];
 
     expect(layerOne.Type).to.equals('AWS::Lambda::LayerVersion');
-    expect(layerOne.Properties.CompatibleRuntimes).to.deep.equals(['nodejs20.x']);
+    expect(layerOne.Properties.CompatibleRuntimes).to.deep.equals(['nodejs22.x']);
   });
 
   it('should accept `layers[].compatibleRuntimes: [java25]`', async () => {

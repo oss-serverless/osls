@@ -43,7 +43,7 @@ describe('Integration test - Packaging - CloudFormation', () => {
         Role: {
           'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'],
         },
-        Runtime: 'nodejs20.x',
+        Runtime: 'nodejs22.x',
         Timeout: 6,
       },
       DependsOn: ['HelloLogGroup'],
@@ -74,7 +74,7 @@ describe('Integration test - Packaging - CloudFormation', () => {
         Role: {
           'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'],
         },
-        Runtime: 'nodejs20.x',
+        Runtime: 'nodejs22.x',
         Timeout: 6,
       },
       DependsOn: ['HelloLogGroup'],
@@ -108,7 +108,7 @@ describe('Integration test - Packaging - CloudFormation', () => {
         Role: {
           'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'],
         },
-        Runtime: 'nodejs20.x',
+        Runtime: 'nodejs22.x',
         Timeout: 6,
       },
       DependsOn: ['HelloLogGroup'],

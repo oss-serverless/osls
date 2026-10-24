@@ -312,7 +312,7 @@ describe('test/unit/commands/plugin-uninstall.test.js', async () => {
         '',
         'provider:',
         '  name: aws',
-        '  runtime: nodejs20.x',
+        '  runtime: nodejs22.x',
         '',
       ].join('\n');
 
@@ -357,7 +357,7 @@ describe('test/unit/commands/plugin-uninstall.test.js', async () => {
         '',
         'provider:',
         '  name: aws',
-        '  runtime: nodejs20.x',
+        '  runtime: nodejs22.x',
         '',
       ].join('\n');
 
@@ -403,7 +403,7 @@ describe('test/unit/commands/plugin-uninstall.test.js', async () => {
         '',
         'provider:',
         '  name: aws',
-        '  runtime: nodejs20.x',
+        '  runtime: nodejs22.x',
         '',
       ].join('\n');
 
@@ -448,7 +448,7 @@ describe('test/unit/commands/plugin-uninstall.test.js', async () => {
         '',
         'provider:',
         '  name: aws',
-        '  runtime: nodejs20.x',
+        '  runtime: nodejs22.x',
         '',
       ].join('\n');
 

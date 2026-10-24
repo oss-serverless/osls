@@ -43,7 +43,7 @@ describe('test/unit/lib/plugins/aws/package/lib/stripNullPropsFromTemplateResour
                 Code: {
                   S3Bucket: 's3-containing-lambda',
                 },
-                Runtime: 'nodejs20.x',
+                Runtime: 'nodejs22.x',
               },
             },
             resourceWithNullProperties: {
