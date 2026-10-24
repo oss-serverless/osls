@@ -23,6 +23,8 @@ const foreignSqsImportArn = { 'Fn::ImportValue': 'ForeignSQS' };
 const someDdbTableStreamRef = { Ref: 'SomeDdbTableStreamArn' };
 const foreignKinesisStreamRef = { Ref: 'ForeignKinesisStreamArn' };
 const someSnsRef = { Ref: 'SomeSNSArn' };
+const s3DestinationArn = 'arn:aws:s3:::failed-batches';
+const s3GetAttArn = { 'Fn::GetAtt': ['FailedBatchesBucket', 'Arn'] };
 const foreignSqsRef = { Ref: 'ForeignSQSArn' };
 
 function createJoinedKinesisArn() {
@@ -470,6 +472,25 @@ describe('test/unit/lib/plugins/aws/package/compile/events/stream.test.js', () =
                     },
                   },
                 },
+                {
+                  stream: {
+                    arn: 'arn:aws:dynamodb:region:account:table/s3string/stream/1',
+                    destinations: {
+                      onFailure: s3DestinationArn,
+                    },
+                  },
+                },
+                {
+                  stream: {
+                    arn: 'arn:aws:dynamodb:region:account:table/s3getatt/stream/1',
+                    destinations: {
+                      onFailure: {
+                        arn: s3GetAttArn,
+                        type: 's3',
+                      },
+                    },
+                  },
+                },
               ],
             },
           },
@@ -644,6 +665,17 @@ describe('test/unit/lib/plugins/aws/package/compile/events/stream.test.js', () =
       ).to.equal(kinesisOptionsDestinationArn);
     });
 
+    it('should support S3 for `destinations.onFailure`', () => {
+      expect(
+        getStreamResource('destinationVariants', 'dynamodb', 's3string').Properties
+          .DestinationConfig.OnFailure.Destination
+      ).to.equal(s3DestinationArn);
+      expect(
+        getStreamResource('destinationVariants', 'dynamodb', 's3getatt').Properties
+          .DestinationConfig.OnFailure.Destination
+      ).to.deep.equal(s3GetAttArn);
+    });
+
     it('should support Fn::GetAtt for `destinations.onFailure`', () => {
       expect(
         getStreamResource('destinationVariants', 'dynamodb', 'foo').Properties.DestinationConfig
@@ -710,7 +742,7 @@ describe('test/unit/lib/plugins/aws/package/compile/events/stream.test.js', () =
       );
       const streamStatements = getIamStatements().filter(({ Action }) => {
         const actions = Array.isArray(Action) ? Action : [Action];
-        return actions.some((action) => /^(dynamodb|kinesis|sns|sqs):/.test(action));
+        return actions.some((action) => /^(dynamodb|kinesis|sns|sqs|s3):/.test(action));
       });
       const expectedStreamStatements = [
         {
@@ -866,6 +898,8 @@ describe('test/unit/lib/plugins/aws/package/compile/events/stream.test.js', () =
             'arn:aws:dynamodb:region:account:table/bar/stream/1',
             'arn:aws:dynamodb:region:account:table/buzz/stream/1',
             'arn:aws:dynamodb:region:account:table/fizz/stream/1',
+            'arn:aws:dynamodb:region:account:table/s3string/stream/1',
+            'arn:aws:dynamodb:region:account:table/s3getatt/stream/1',
           ],
         },
         {
@@ -877,6 +911,16 @@ describe('test/unit/lib/plugins/aws/package/compile/events/stream.test.js', () =
           Effect: 'Allow',
           Action: ['sqs:ListQueues', 'sqs:SendMessage'],
           Resource: [createJoinedSqsArn(), foreignSqsRef],
+        },
+        {
+          Effect: 'Allow',
+          Action: ['s3:PutObject', 's3:ListBucket'],
+          Resource: [
+            s3DestinationArn,
+            `${s3DestinationArn}/*`,
+            s3GetAttArn,
+            { 'Fn::Join': ['', [s3GetAttArn, '/*']] },
+          ],
         },
       ];
 
