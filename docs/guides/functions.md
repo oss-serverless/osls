@@ -973,7 +973,7 @@ When intention is to invoke function asynchronously you may want to configure fo
 
 [destination targets](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#invocation-async-destinations)
 
-Target can be the other lambdas you also deploy with a service or other qualified target (externally managed lambda, EventBridge event bus, SQS queue or SNS topic) which you can address via its ARN or reference
+Target can be the other lambdas you also deploy with a service or other qualified target (externally managed lambda, EventBridge event bus, SQS queue, SNS topic or, for `onFailure` only, S3 bucket) which you can address via its ARN or reference
 
 ```yaml
 functions:
@@ -986,7 +986,7 @@ functions:
     handler: handler.asyncGoodBye
     destinations:
       onFailure:
-        # For the case using CF intrinsic function for `arn`, to ensure target execution permission exactly, you have to specify `type` from 'sns', 'sqs', 'eventBus', 'function'.
+        # For the case using CF intrinsic function for `arn`, to ensure target execution permission exactly, you have to specify `type` from 's3' (onFailure only), 'sns', 'sqs', 'eventBus', 'function'.
         type: sns
         arn:
           Ref: SomeTopicName

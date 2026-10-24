@@ -695,7 +695,7 @@ export interface AWS {
           | string
           | {
               arn: AwsCfFunction;
-              type: 'function' | 'sns' | 'sqs' | 'eventBus';
+              type: 'function' | 's3' | 'sns' | 'sqs' | 'eventBus';
             };
       };
       disableLogs?: boolean;

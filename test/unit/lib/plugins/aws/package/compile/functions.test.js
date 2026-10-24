@@ -2499,6 +2499,21 @@ describe('AwsCompileFunctions', () => {
       });
     });
 
+    it('should reject S3 onSuccess destinations', async () => {
+      useFunctions({
+        source: {
+          destinations: { onSuccess: 'arn:aws:s3:::bucket' },
+        },
+      });
+
+      const error = await expectCompileError();
+
+      expect(error).to.have.property('code', 'UNSUPPORTED_DESTINATION_TARGET');
+      expect(error.message).to.equal(
+        'Function "source" cannot configure an S3 bucket as "destinations.onSuccess". AWS Lambda supports S3 bucket destinations only for "destinations.onFailure".'
+      );
+    });
+
     it('should preserve existing errors for unknown string destinations', async () => {
       useFunctions({
         source: {
@@ -3430,6 +3445,16 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
                 onFailure: { type: 'sns', arn: { Ref: 'SomeSNSArn' } },
               },
             },
+            fnDestinationsArnS3: {
+              handler: 'trigger.handler',
+              destinations: { onFailure: 'arn:aws:s3:::failed-invocations' },
+            },
+            fnDestinationsRefS3: {
+              handler: 'trigger.handler',
+              destinations: {
+                onFailure: { type: 's3', arn: { Ref: 'SomeBucketArn' } },
+              },
+            },
             fnDisabledLogs: { handler: 'trigger.handler', disableLogs: true },
             fnMaximumEventAge: { handler: 'trigger.handler', maximumEventAge: 3600 },
             fnMaximumRetryAttempts: { handler: 'trigger.handler', maximumRetryAttempts: 0 },
@@ -4276,6 +4301,40 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         Effect: 'Allow',
         Action: 'sns:Publish',
         Resource: property.arn,
+      });
+    });
+
+    it('should support `functions[].destinations.onFailure` referencing S3 bucket arn', () => {
+      const destinationConfig =
+        cfResources[naming.getLambdaEventConfigLogicalId('fnDestinationsArnS3')].Properties
+          .DestinationConfig;
+
+      const arn = serviceConfig.functions.fnDestinationsArnS3.destinations.onFailure;
+      expect(destinationConfig).to.deep.equal({
+        OnFailure: { Destination: arn },
+      });
+
+      expect(iamRolePolicyStatements).to.deep.include({
+        Effect: 'Allow',
+        Action: ['s3:PutObject', 's3:ListBucket'],
+        Resource: [arn, `${arn}/*`],
+      });
+    });
+
+    it('should support `functions[].destinations.onFailure` as `Ref` for `s3`', () => {
+      const destinationConfig =
+        cfResources[naming.getLambdaEventConfigLogicalId('fnDestinationsRefS3')].Properties
+          .DestinationConfig;
+
+      const property = serviceConfig.functions.fnDestinationsRefS3.destinations.onFailure;
+      expect(destinationConfig).to.deep.equal({
+        OnFailure: { Destination: property.arn },
+      });
+
+      expect(iamRolePolicyStatements).to.deep.include({
+        Effect: 'Allow',
+        Action: ['s3:PutObject', 's3:ListBucket'],
+        Resource: [property.arn, { 'Fn::Join': ['', [property.arn, '/*']] }],
       });
     });
 
