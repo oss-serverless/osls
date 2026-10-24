@@ -25,6 +25,7 @@
     "sls": "bin/serverless.js",
     "osls": "bin/serverless.js"
   },
+  "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^15.3.5",
     "@aws-sdk/client-api-gateway": "^3.1077.0",
