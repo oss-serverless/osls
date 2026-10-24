@@ -1215,7 +1215,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
               providerCfIfEnvVar: { 'Fn::If': ['cond', 'first', 'second'] },
             },
             memorySize: 4096,
-            runtime: 'nodejs20.x',
+            runtime: 'nodejs22.x',
             runtimeManagement: {
               mode: 'manual',
               arn: 'arn:aws:lambda:us-east-1:111111111111::runtime:7b620fc2e66107a1046b140b9d320295811af3ad5d4c6a011fad1fa65127e9e6I',
@@ -1238,7 +1238,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
                 sharedEnvVar: 'valueFromFunction',
               },
               memorySize: 2048,
-              runtime: 'nodejs20.x',
+              runtime: 'nodejs22.x',
               runtimeManagement: 'onFunctionUpdate',
               versionFunction: true,
             },
@@ -1488,7 +1488,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         'java25'
       );
       expect(localResources[localNaming.getLambdaLogicalId('other')].Properties.Runtime).to.equal(
-        'nodejs20.x'
+        'nodejs22.x'
       );
     });
 
@@ -1534,7 +1534,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         'ruby4.0'
       );
       expect(localResources[localNaming.getLambdaLogicalId('other')].Properties.Runtime).to.equal(
-        'nodejs20.x'
+        'nodejs22.x'
       );
     });
 
@@ -1624,7 +1624,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         'java17.al2023'
       );
       expect(localResources[localNaming.getLambdaLogicalId('other')].Properties.Runtime).to.equal(
-        'nodejs20.x'
+        'nodejs22.x'
       );
     });
 
@@ -1670,7 +1670,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         'nodejs26.x'
       );
       expect(localResources[localNaming.getLambdaLogicalId('other')].Properties.Runtime).to.equal(
-        'nodejs20.x'
+        'nodejs22.x'
       );
     });
 
@@ -1716,7 +1716,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         'python3.15'
       );
       expect(localResources[localNaming.getLambdaLogicalId('other')].Properties.Runtime).to.equal(
-        'nodejs20.x'
+        'nodejs22.x'
       );
     });
 
@@ -2203,7 +2203,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
               ExternalLambdaLayer: {
                 Type: 'AWS::Lambda::LayerVersion',
                 Properties: {
-                  CompatibleRuntimes: ['nodejs20.x'],
+                  CompatibleRuntimes: ['nodejs22.x'],
                   Content: {
                     S3Bucket: 'bucket',
                     S3Key: 'key',
@@ -2334,7 +2334,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
 
     it('should default to the fixture provider runtime', () => {
       const funcResource = cfResources[naming.getLambdaLogicalId('target')];
-      expect(funcResource.Properties.Runtime).to.equal('nodejs20.x');
+      expect(funcResource.Properties.Runtime).to.equal('nodejs22.x');
     });
 
     it.skip('TODO: should support `functions[].runtime`', () => {
