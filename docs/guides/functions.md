@@ -543,7 +543,7 @@ Use `osls deploy` after code or durable configuration changes so CloudFormation 
 
 Functions currently configured with `durableConfig` are skipped by osls function pruning because durable executions may depend on retained versions for replay.
 
-osls supports durable functions for managed runtimes `nodejs22.x`, `nodejs24.x`, `python3.13`, `python3.14`, `java17`, `java21`, and `java25`, plus compatible container images. Durable functions with `snapStart: true` are limited to the runtime intersection supported by both features: `python3.13`, `python3.14`, `java17`, `java21`, and `java25`. Durable functions with SnapStart cannot use container images, EFS, provisioned concurrency, or ephemeral storage larger than 512 MB.
+osls supports durable functions for managed runtimes `nodejs22.x`, `nodejs24.x`, `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`, plus compatible container images. Durable functions with `snapStart: true` are limited to the runtime intersection supported by both features: `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`. Durable functions with SnapStart cannot use container images, EFS, provisioned concurrency, or ephemeral storage larger than 512 MB.
 
 ## Recursive Loop Detection
 

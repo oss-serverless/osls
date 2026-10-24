@@ -1552,6 +1552,27 @@ describe('AwsCompileFunctions', () => {
       });
     });
 
+    it('should accept durableConfig with the dotnet10 runtime', async () => {
+      const { cfTemplate } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          functions: {
+            basic: {
+              runtime: 'dotnet10',
+              durableConfig: {
+                executionTimeout: 3600,
+              },
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Resources.BasicLambdaFunction.Properties.DurableConfig).to.deep.equal({
+        ExecutionTimeout: 3600,
+      });
+    });
+
     it('should reject durableConfig with maximumRetryAttempts', async () => {
       await expect(
         runServerless({
@@ -1667,6 +1688,31 @@ describe('AwsCompileFunctions', () => {
           DependsOn: awsNaming.getLambdaLogicalId('basic'),
         }
       );
+    });
+
+    it('should accept durableConfig with SnapStart on the dotnet10 runtime', async () => {
+      const { cfTemplate } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          functions: {
+            basic: {
+              runtime: 'dotnet10',
+              durableConfig: {
+                executionTimeout: 3600,
+              },
+              snapStart: true,
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Resources.BasicLambdaFunction.Properties.DurableConfig).to.deep.equal({
+        ExecutionTimeout: 3600,
+      });
+      expect(cfTemplate.Resources.BasicLambdaFunction.Properties.SnapStart).to.deep.equal({
+        ApplyOn: 'PublishedVersions',
+      });
     });
 
     it('should reject durableConfig with SnapStart on unsupported durable SnapStart runtimes', async () => {
