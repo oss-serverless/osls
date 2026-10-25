@@ -806,7 +806,7 @@ functions:
       Name: data-protection-policy
 ```
 
-You can store a function's logs in the CloudWatch Logs [Infrequent Access log class](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch_Logs_Log_Classes.html), which costs less to ingest but supports fewer features, by setting `logs.logGroupClass` to `infrequent_access`. Setting `logs.lambda.logGroupClass` on the provider applies it to every function, and a function can opt back out with `standard`. As with the other `logs` settings, a function that sets its own `logs` doesn't inherit `logGroupClass` from the provider.
+You can store a function's logs in the CloudWatch Logs [Infrequent Access log class](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch_Logs_Log_Classes.html), which costs less to ingest but supports fewer features, by setting `logs.logGroupClass` to `infrequent_access`. Setting `provider.logs.lambda.logGroupClass` applies it to every function, and a function can opt back out with `standard`. As with the other `logs` settings, a function that sets its own `logs` doesn't inherit `logGroupClass` from the provider. You can't combine `logGroupClass` with `logs.logGroup`.
 
 ```yaml
 provider:
@@ -823,9 +823,9 @@ functions:
       logGroupClass: standard
 ```
 
-AWS can't change the class of an existing log group, so osls creates an additional `/aws/lambda/<function name>-ia` log group, with the same retention and data protection policy, and points the function's logging configuration at it. The standard log group and the logs already in it are kept. Functions that use a custom IAM role need permission to write to the new log group, and overrides of `{normalizedFunctionName}LogGroup` in `resources`, such as a KMS key or tags, don't apply to the Infrequent Access log group, so add them to `{normalizedFunctionName}LogGroupIA` as well. Switching a function back to `standard` deletes its Infrequent Access log group along with its logs, while versions published before the switch still point at it, so only switch back once those versions are no longer invoked.
+AWS can't change the class of an existing log group, so osls creates an additional `/aws/lambda/<function name>-ia` log group, with the same retention and data protection policy, and points the function's logging configuration at it. The standard log group and the logs already in it are kept. Functions that use a custom IAM role need permission to write to the new log group. Overrides of `{normalizedFunctionName}LogGroup` in `resources`, such as a KMS key or tags, don't apply to the Infrequent Access log group, so add them to `{normalizedFunctionName}LogGroupIA` as well. Switching a function back to `standard`, or setting `disableLogs`, deletes its Infrequent Access log group along with its logs. Versions published before that still point at it, so only make either change once those versions are no longer invoked.
 
-Subscription filters, including `cloudwatchLog` events, metric filters and the embedded metric format don't work with Infrequent Access log groups, and those on the function's standard log group stop receiving its logs. `osls logs` can't read Infrequent Access log groups either, so use CloudWatch Logs Insights instead, and `logGroupClass` can't be combined with `logs.logGroup`.
+Subscription filters (including `cloudwatchLog` events), metric filters and the embedded metric format don't work with Infrequent Access log groups, and those on the function's standard log group stop receiving its logs. `osls logs` can't read Infrequent Access log groups either, so use CloudWatch Logs Insights instead.
 
 ## Versioning Deployed Functions
 
@@ -1091,3 +1091,5 @@ functions:
       logGroup: helloLoggingLogGroup
       systemLogLevel: DEBUG
 ```
+
+To store a function's logs in the Infrequent Access log class, see [Log Group Resources](#log-group-resources).

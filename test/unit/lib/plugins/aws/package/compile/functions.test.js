@@ -4925,8 +4925,8 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
       ]);
     });
 
-    it('should not route logs to an Infrequent Access log group when `functions[].disableLogs` is set', async () => {
-      const { cfTemplate, awsNaming } = await runServerless({
+    it('should support `provider.logs.lambda.logGroupClass`', async () => {
+      const { cfTemplate, awsNaming, serverless } = await runServerless({
         fixture: 'function',
         configExt: {
           provider: {
@@ -4945,6 +4945,17 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         command: 'package',
       });
 
+      const { Properties, DependsOn } = cfTemplate.Resources[awsNaming.getLambdaLogicalId('other')];
+
+      expect(Properties.LoggingConfig).to.deep.equal({
+        LogGroup: awsNaming.getInfrequentAccessLogGroupName(
+          serverless.service.getFunction('other').name
+        ),
+      });
+      expect(DependsOn).to.deep.equal([
+        awsNaming.getLogGroupLogicalId('other'),
+        awsNaming.getInfrequentAccessLogGroupLogicalId('other'),
+      ]);
       expect(
         cfTemplate.Resources[awsNaming.getLambdaLogicalId('basic')].Properties
       ).to.not.have.property('LoggingConfig');
@@ -4968,7 +4979,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         })
       ).to.be.eventually.rejected.and.have.property(
         'code',
-        'FUNCTION_LOG_GROUP_CLASS_CUSTOM_LOG_GROUP_CONFLICT'
+        'FUNCTION_BOTH_LOG_GROUP_AND_LOG_GROUP_CLASS_DEFINED_ERROR'
       );
     });
 
@@ -5135,16 +5146,24 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
           },
         });
 
-        const { cfTemplate: updatedTemplate } = await runServerless({
+        const {
+          cfTemplate: updatedTemplate,
+          awsNaming,
+          serverless,
+        } = await runServerless({
           cwd: serviceDir,
           command: 'package',
         });
 
         const updatedVersionArn = updatedTemplate.Outputs.BasicLambdaFunctionQualifiedArn.Value.Ref;
 
-        expect(updatedTemplate.Resources.BasicLambdaFunction.Properties).to.have.property(
-          'LoggingConfig'
-        );
+        expect(
+          updatedTemplate.Resources.BasicLambdaFunction.Properties.LoggingConfig
+        ).to.deep.equal({
+          LogGroup: awsNaming.getInfrequentAccessLogGroupName(
+            serverless.service.getFunction('basic').name
+          ),
+        });
 
         expect(originalVersionArn).to.not.equal(updatedVersionArn);
       });

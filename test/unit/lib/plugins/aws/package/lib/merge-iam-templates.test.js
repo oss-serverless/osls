@@ -482,6 +482,12 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
                 handler: 'index.handler',
                 disableLogs: true,
               },
+              fnLogFormat: {
+                handler: 'index.handler',
+                logs: {
+                  logFormat: 'JSON',
+                },
+              },
             },
           },
         });
@@ -494,6 +500,9 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
         );
         expect(cfTemplate.Resources).to.not.have.property(
           awsNaming.getInfrequentAccessLogGroupLogicalId('fnDisableLogs')
+        );
+        expect(cfTemplate.Resources).to.not.have.property(
+          awsNaming.getInfrequentAccessLogGroupLogicalId('fnLogFormat')
         );
       });
 
@@ -557,6 +566,11 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
                 handler: 'index.handler',
                 condition: 'CreateFunctionCondition',
                 logRetentionInDays: 5,
+                logDataProtectionPolicy: {
+                  Name: 'data-protection-policy',
+                  Version: '2021-06-01',
+                  Statement: [],
+                },
                 logs: {
                   logGroupClass: 'infrequent_access',
                 },
@@ -652,6 +666,11 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
           Properties: {
             LogGroupName: naming.getInfrequentAccessLogGroupName(functionName),
             RetentionInDays: 5,
+            DataProtectionPolicy: {
+              Name: 'data-protection-policy',
+              Version: '2021-06-01',
+              Statement: [],
+            },
             LogGroupClass: 'INFREQUENT_ACCESS',
           },
         });
@@ -661,6 +680,11 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
           Properties: {
             LogGroupName: naming.getLogGroupName(functionName),
             RetentionInDays: 5,
+            DataProtectionPolicy: {
+              Name: 'data-protection-policy',
+              Version: '2021-06-01',
+              Statement: [],
+            },
           },
         });
       });
@@ -705,7 +729,7 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
           })
         ).to.be.eventually.rejected.and.have.property(
           'code',
-          'FUNCTION_INFREQUENT_ACCESS_LOG_GROUP_NAME_CONFLICT'
+          'FUNCTION_INFREQUENT_ACCESS_LOG_GROUP_NAME_ALREADY_IN_USE'
         );
       });
 
@@ -730,7 +754,7 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
           })
         ).to.be.eventually.rejected.and.have.property(
           'code',
-          'FUNCTION_INFREQUENT_ACCESS_LOG_GROUP_NAME_CONFLICT'
+          'FUNCTION_INFREQUENT_ACCESS_LOG_GROUP_NAME_ALREADY_IN_USE'
         );
       });
 
