@@ -11,7 +11,7 @@ import { InvokeCommand } from '@aws-sdk/client-lambda';
 
 const expect = chai.expect;
 
-describe('test/unit/lib/plugins/aws/invoke.test.js', () => {
+describe('test/unit/lib/plugins/aws/invoke.test.ts', () => {
   describe('Common', () => {
     let lambdaInvokeStub;
     let result;

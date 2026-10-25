@@ -3,7 +3,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import glob from '../../../../../../../lib/utils/glob.ts';
 import * as sandbox from 'sinon';
-import proxyquire from 'proxyquire';
 import normalizeFiles from '../../../../../../../lib/plugins/aws/lib/normalize-files.ts';
 import AwsProvider from '../../../../../../../lib/plugins/aws/provider.ts';
 import AwsDeploy from '../../../../../../../lib/plugins/aws/deploy/index.ts';
@@ -12,7 +11,6 @@ import ServerlessError from '../../../../../../../lib/serverless-error.ts';
 import runServerless from '../../../../../../utils/run-serverless.ts';
 import { S3Client, ListObjectsV2Command, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda';
-
 import {
   CloudWatchLogsClient,
   DeleteSubscriptionFilterCommand,
@@ -20,10 +18,12 @@ import {
 } from '@aws-sdk/client-cloudwatch-logs';
 
 import { CloudFormationClient, DescribeStackResourceCommand } from '@aws-sdk/client-cloudformation';
-import releasePendingRequestsUntilSettled from '../../../../../../utils/release-pending-requests-until-settled.ts';
 
+import releasePendingRequestsUntilSettled from '../../../../../../utils/release-pending-requests-until-settled.ts';
 // Configure chai
 import { expect } from 'chai';
+
+import esmock from 'esmock';
 
 const fsp = fs.promises;
 
@@ -59,7 +59,7 @@ describe('checkForChanges', () => {
   let cryptoStub;
   let getHashForFilePathStub;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const options = {
       stage: 'dev',
       region: 'us-east-1',
@@ -88,13 +88,12 @@ describe('checkForChanges', () => {
     getHashForFilePathStub = sandbox
       .stub()
       .callsFake(async () => cryptoStub.createHash().update().digest('base64'));
-    const checkForChanges = proxyquire(
-      '../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.js',
-      {
+    const checkForChanges = (
+      await esmock('../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.ts', {
         'crypto': cryptoStub,
-        '../../../../utils/get-hash-for-file-path': getHashForFilePathStub,
-      }
-    );
+        '../../../../../../../lib/utils/get-hash-for-file-path.ts': getHashForFilePathStub,
+      })
+    ).default;
     Object.assign(awsDeploy, checkForChanges);
   });
 
@@ -455,15 +454,14 @@ describe('checkForChanges', () => {
           return { Configuration: { LastModified: '2021-05-20T15:34:16.494+0000' } };
         }
       }
-      const checkForChanges = proxyquire(
-        '../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.js',
-        {
+      const checkForChanges = (
+        await esmock('../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.ts', {
           '@aws-sdk/client-lambda': {
             LambdaClient: FakeLambdaClient,
             GetFunctionCommand: FakeGetFunctionCommand,
           },
-        }
-      );
+        })
+      ).default;
       const awsDeployWithClientStub = createAwsDeployTestInstance();
       Object.assign(awsDeployWithClientStub, checkForChanges);
       const getAllFunctions = sandbox
@@ -601,16 +599,15 @@ describe('checkForChanges', () => {
           ],
         };
       }
-      const checkForChanges = proxyquire(
-        '../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.js',
-        {
+      const checkForChanges = (
+        await esmock('../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.ts', {
           '@aws-sdk/client-s3': {
             S3Client: FakeS3Client,
             HeadObjectCommand: FakeHeadObjectCommand,
             paginateListObjectsV2,
           },
-        }
-      );
+        })
+      ).default;
       const awsDeployWithClientStub = createAwsDeployTestInstance();
       awsDeployWithClientStub.bucketName = 'deployment-bucket';
       Object.assign(awsDeployWithClientStub, checkForChanges);
@@ -706,14 +703,13 @@ describe('checkForChanges', () => {
         return (...args) => callback(...args);
       };
       const hashStub = sandbox.stub().resolves('local-hash-zip-file-1');
-      const checkForChanges = proxyquire(
-        '../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.js',
-        {
+      const checkForChanges = (
+        await esmock('../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.ts', {
           'crypto': cryptoStub,
           'ext/promise/limit': fakeLimit,
-          '../../../../utils/get-hash-for-file-path': hashStub,
-        }
-      );
+          '../../../../../../../lib/utils/get-hash-for-file-path.ts': hashStub,
+        })
+      ).default;
       globSyncStub.returns(['my-service.zip']);
       cryptoStub.createHash().update().digest.onCall(0).returns('local-hash-cf-template');
 
@@ -1341,7 +1337,7 @@ const packageCheckForChangesFixture = async (configExt = {}) => {
   return { ...result, serverless };
 };
 
-describe('test/unit/lib/plugins/aws/deploy/lib/checkForChanges.test.js', () => {
+describe('test/unit/lib/plugins/aws/deploy/lib/checkForChanges.test.ts', () => {
   // Note: Deploy is skipped if:
   // 1. Generated cloudFormation stack is same as one previously deployed (with normalization applied that clears random and time generated values)
   // 2. Collection of generated artifacts (any in package folder) is exactly same (hashes are compared) as one uploaded to S3 bucket with last deployment
@@ -2119,9 +2115,8 @@ describe('test/unit/lib/plugins/aws/deploy/lib/checkForChanges.test.js', () => {
           return { StackResourceDetail: { PhysicalResourceId: filterName } };
         }
       }
-      const checkForChanges = proxyquire(
-        '../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.js',
-        {
+      const checkForChanges = (
+        await esmock('../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.ts', {
           '@aws-sdk/client-cloudwatch-logs': {
             CloudWatchLogsClient: FakeCloudWatchLogsClient,
             DeleteSubscriptionFilterCommand: FakeDeleteSubscriptionFilterCommand,
@@ -2131,8 +2126,8 @@ describe('test/unit/lib/plugins/aws/deploy/lib/checkForChanges.test.js', () => {
             CloudFormationClient: FakeCloudFormationClient,
             DescribeStackResourceCommand: FakeDescribeStackResourceCommand,
           },
-        }
-      );
+        })
+      ).default;
       Object.assign(awsDeploy, checkForChanges);
       const getAwsSdkV3ConfigStub = sandbox.stub(awsDeploy.provider, 'getAwsSdkV3Config').resolves({
         credentials,
@@ -2205,9 +2200,8 @@ describe('test/unit/lib/plugins/aws/deploy/lib/checkForChanges.test.js', () => {
           return { StackResourceDetail: { PhysicalResourceId: filterName } };
         }
       }
-      const checkForChanges = proxyquire(
-        '../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.js',
-        {
+      const checkForChanges = (
+        await esmock('../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.ts', {
           '@aws-sdk/client-cloudwatch-logs': {
             CloudWatchLogsClient: FakeCloudWatchLogsClient,
             DeleteSubscriptionFilterCommand: FakeDeleteSubscriptionFilterCommand,
@@ -2217,8 +2211,8 @@ describe('test/unit/lib/plugins/aws/deploy/lib/checkForChanges.test.js', () => {
             CloudFormationClient: FakeCloudFormationClient,
             DescribeStackResourceCommand: FakeDescribeStackResourceCommand,
           },
-        }
-      );
+        })
+      ).default;
       Object.assign(awsDeploy, checkForChanges);
 
       await Promise.all([

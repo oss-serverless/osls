@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import ServerlessError from '../../../lib/serverless-error.ts';
 
-describe('test/unit/lib/serverless-error.test.js', () => {
+describe('test/unit/lib/serverless-error.test.ts', () => {
   it('should store message', () => {
     const error = new ServerlessError('Some message');
     expect(error.message).to.be.equal('Some message');

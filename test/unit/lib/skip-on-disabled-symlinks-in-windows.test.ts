@@ -2,7 +2,7 @@ import * as sinon from 'sinon';
 import { expect } from 'chai';
 import skipOnDisabledSymlinksInWindows from '../../lib/skip-on-disabled-symlinks-in-windows.ts';
 
-describe('test/unit/lib/skip-on-disabled-symlinks-in-windows.test.js', () => {
+describe('test/unit/lib/skip-on-disabled-symlinks-in-windows.test.ts', () => {
   const originalPlatformDescriptor = Object.getOwnPropertyDescriptor(process, 'platform');
 
   const setPlatform = (platform) => {

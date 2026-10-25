@@ -1,14 +1,14 @@
 import * as chai from 'chai';
 import net from 'node:net';
-import proxyquire from 'proxyquire';
 import { NodeHttpHandler } from '@smithy/node-http-handler';
 import { overrideEnv } from '../../../utils/process.ts';
 import { buildHttpOptions } from '../../../../lib/aws/config.ts';
+import esmock from 'esmock';
 
 const { expect } = chai;
 
-describe('test/unit/lib/aws/config.test.js', () => {
-  function loadConfig() {
+describe('test/unit/lib/aws/config.test.ts', () => {
+  async function loadConfig() {
     function FakeNodeHttpHandler(options) {
       this.options = options;
     }
@@ -24,11 +24,13 @@ describe('test/unit/lib/aws/config.test.js', () => {
       }
     }
 
-    return proxyquire('../../../../lib/aws/config', {
-      '@smithy/node-http-handler': { NodeHttpHandler: FakeNodeHttpHandler },
-      'https-proxy-agent': { HttpsProxyAgent: FakeHttpsProxyAgent },
-      'https': { Agent: FakeHttpsAgent },
-    });
+    return (
+      await esmock('../../../../lib/aws/config.ts', {
+        '@smithy/node-http-handler': { NodeHttpHandler: FakeNodeHttpHandler },
+        'https-proxy-agent': { HttpsProxyAgent: FakeHttpsProxyAgent },
+        'https': { Agent: FakeHttpsAgent },
+      })
+    ).default;
   }
 
   it('preserves explicit maxAttempts values including zero', async () => {

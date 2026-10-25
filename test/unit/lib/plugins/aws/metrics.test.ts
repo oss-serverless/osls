@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import AwsMetrics from '../../../../../lib/plugins/aws/metrics.ts';
 import ServerlessError from '../../../../../lib/serverless-error.ts';
 import { CloudWatchClient, GetMetricStatisticsCommand } from '@aws-sdk/client-cloudwatch';
 import releasePendingRequestsUntilSettled from '../../../../utils/release-pending-requests-until-settled.ts';
 import { formatDisplayTime } from '../../../../../lib/plugins/aws/utils/time.ts';
+import esmock from 'esmock';
 
 const toLocalDateString = (date) =>
   `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -516,18 +516,18 @@ describe('AwsMetrics', () => {
   });
 
   describe('#showMetrics()', () => {
-    it('aggregates datapoints across functions and prints rounded output', () => {
+    it('aggregates datapoints across functions and prints rounded output', async () => {
       const writeTextStub = sinon.stub();
-      const AwsMetricsProxy = proxyquire
-        .noCallThru()
-        .load('../../../../../lib/plugins/aws/metrics', {
-          '../../utils/serverless-utils/log': {
+      const AwsMetricsProxy = (
+        await esmock('../../../../../lib/plugins/aws/metrics.ts', {
+          '../../../../../lib/utils/serverless-utils/log.ts': {
             writeText: writeTextStub,
             style: {
               aside: (value) => value,
             },
           },
-        });
+        })
+      ).default;
 
       const proxiedMetrics = new AwsMetricsProxy(serverless, {
         stage: 'dev',
@@ -561,18 +561,18 @@ describe('AwsMetrics', () => {
       expect(writeTextStub.firstCall.args[0]).to.include('duration (avg.): 116.67ms');
     });
 
-    it('prints the empty-state message when there are no metrics', () => {
+    it('prints the empty-state message when there are no metrics', async () => {
       const writeTextStub = sinon.stub();
-      const AwsMetricsProxy = proxyquire
-        .noCallThru()
-        .load('../../../../../lib/plugins/aws/metrics', {
-          '../../utils/serverless-utils/log': {
+      const AwsMetricsProxy = (
+        await esmock('../../../../../lib/plugins/aws/metrics.ts', {
+          '../../../../../lib/utils/serverless-utils/log.ts': {
             writeText: writeTextStub,
             style: {
               aside: (value) => value,
             },
           },
-        });
+        })
+      ).default;
 
       const proxiedMetrics = new AwsMetricsProxy(serverless, {
         stage: 'dev',

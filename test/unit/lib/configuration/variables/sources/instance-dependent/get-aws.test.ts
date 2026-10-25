@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import resolveMeta from '../../../../../../../lib/configuration/variables/resolve-meta.ts';
 import resolve from '../../../../../../../lib/configuration/variables/resolve.ts';
 import selfSource from '../../../../../../../lib/configuration/variables/sources/self.ts';
 import mergePlainObjects from '../../../../../../../lib/utils/merge-plain-objects.ts';
+import esmock from 'esmock';
 
-describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-aws.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-aws.test.ts', () => {
   let configuration;
   let variablesMeta;
   let sends;
@@ -20,7 +20,7 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-a
     }
   }
 
-  function loadSource(handler) {
+  async function loadSource(handler) {
     sends = [];
     clientInstances = [];
     credentials = sinon.stub();
@@ -41,11 +41,14 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-a
       }
     }
 
-    return proxyquire
-      .noCallThru()
-      .load('../../../../../../../lib/configuration/variables/sources/instance-dependent/get-aws', {
-        '@aws-sdk/client-sts': { STSClient, GetCallerIdentityCommand },
-      });
+    return (
+      await esmock(
+        '../../../../../../../lib/configuration/variables/sources/instance-dependent/get-aws.ts',
+        {
+          '@aws-sdk/client-sts': { STSClient, GetCallerIdentityCommand },
+        }
+      )
+    ).default;
   }
 
   const createServerlessInstance = () => ({

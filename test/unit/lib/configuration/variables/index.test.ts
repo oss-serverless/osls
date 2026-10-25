@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { promises as fsp } from 'node:fs';
 import resolve from '../../../../../lib/configuration/variables/index.ts';
 
-describe('test/unit/lib/configuration/variables/index.test.js', () => {
+describe('test/unit/lib/configuration/variables/index.test.ts', () => {
   let configuration;
   before(async () => {
     process.env.ENV_SOURCE_TEST = 'foobar';

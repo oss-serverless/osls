@@ -4,7 +4,7 @@ import { toCacheKey, canonicalize } from '../../../../lib/utils/to-cache-key.ts'
 
 const expect = chai.expect;
 
-describe('test/unit/lib/utils/to-cache-key.test.js', () => {
+describe('test/unit/lib/utils/to-cache-key.test.ts', () => {
   it('is stable regardless of key ordering', () => {
     expect(toCacheKey({ b: 1, a: { d: 4, c: 3 } })).to.equal(
       toCacheKey({ a: { c: 3, d: 4 }, b: 1 })

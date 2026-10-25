@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import path from 'node:path';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
+import esmock from 'esmock';
 
 describe('#moveArtifactsToPackage()', () => {
   let artifacts;
@@ -33,13 +33,13 @@ describe('#moveArtifactsToPackage()', () => {
     };
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     removeSync = sinon.stub();
-    artifacts = proxyquire
-      .noCallThru()
-      .load('../../../../../../../lib/plugins/aws/common/lib/artifacts', {
-        '../../../../utils/fs/remove': { removeSync },
-      });
+    artifacts = (
+      await esmock('../../../../../../../lib/plugins/aws/common/lib/artifacts.ts', {
+        '../../../../../../../lib/utils/fs/remove.ts': { removeSync },
+      })
+    ).default;
   });
 
   it('should resolve if servicePath is not present', async () => {
@@ -172,13 +172,13 @@ describe('#moveArtifactsToTemp()', () => {
     };
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     removeSync = sinon.stub();
-    artifacts = proxyquire
-      .noCallThru()
-      .load('../../../../../../../lib/plugins/aws/common/lib/artifacts', {
-        '../../../../utils/fs/remove': { removeSync },
-      });
+    artifacts = (
+      await esmock('../../../../../../../lib/plugins/aws/common/lib/artifacts.ts', {
+        '../../../../../../../lib/utils/fs/remove.ts': { removeSync },
+      })
+    ).default;
   });
 
   it('should resolve if servicePath is not present', async () => {

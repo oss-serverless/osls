@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import parseS3URI from '../../../../../../lib/plugins/aws/utils/parse-s3-uri.ts';
 
-describe('test/unit/lib/plugins/aws/utils/parse-s3-uri.test.js', () => {
+describe('test/unit/lib/plugins/aws/utils/parse-s3-uri.test.ts', () => {
   it('should parse an S3 URI', () => {
     const expected = {
       Bucket: 'test-bucket',

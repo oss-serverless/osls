@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import resolveMeta from '../../../../../lib/configuration/variables/resolve-meta.ts';
 import isPropertyResolved from '../../../../../lib/configuration/variables/is-property-resolved.ts';
 
-describe('test/unit/lib/configuration/variables/is-property-resolved.test.js', () => {
+describe('test/unit/lib/configuration/variables/is-property-resolved.test.ts', () => {
   let variablesMeta;
   before(() => {
     variablesMeta = resolveMeta({

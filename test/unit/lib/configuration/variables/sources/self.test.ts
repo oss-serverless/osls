@@ -3,7 +3,7 @@ import resolveMeta from '../../../../../../lib/configuration/variables/resolve-m
 import resolve from '../../../../../../lib/configuration/variables/resolve.ts';
 import selfSource from '../../../../../../lib/configuration/variables/sources/self.ts';
 
-describe('test/unit/lib/configuration/variables/sources/self.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/self.test.ts', () => {
   it('should resolve "self" sources', async () => {
     const configuration = {
       nest: {

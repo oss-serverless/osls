@@ -3,7 +3,7 @@ import runServerless from '../../../../../../utils/run-serverless.ts';
 
 const expect = chai.expect;
 
-describe('test/unit/lib/plugins/aws/package/lib/stripNullPropsFromTemplateResources.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/lib/stripNullPropsFromTemplateResources.test.ts', () => {
   let finalTemplate;
 
   before(async () => {

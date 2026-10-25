@@ -3,7 +3,7 @@ import renderCommandHelp from '../../../../../lib/cli/render-help/command.ts';
 import commandsSchema from '../../../../../lib/cli/commands-schema/index.ts';
 import observeOutput from '../../../../lib/observe-output.ts';
 
-describe('test/unit/lib/cli/render-help/command.test.js', () => {
+describe('test/unit/lib/cli/render-help/command.test.ts', () => {
   it('should show help', async () => {
     const output = await observeOutput(() => renderCommandHelp('deploy'));
     expect(output).to.have.string('deploy');

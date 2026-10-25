@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import ServerlessError from '../../../../lib/serverless-error.ts';
 import awsSdkV3Error from '../../../../lib/aws/aws-sdk-v3-error.ts';
 
-describe('test/unit/lib/aws/aws-sdk-v3-error.test.js', () => {
+describe('test/unit/lib/aws/aws-sdk-v3-error.test.ts', () => {
   it('extracts error codes from legacy and SDK v3 error shapes', () => {
     expect(awsSdkV3Error.getAwsErrorCode({ providerError: { code: 'LegacyCode' } })).to.equal(
       'LegacyCode'

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import ensureValidLayerPath from '../../../../lib/utils/ensure-valid-layer-path.ts';
 
-describe('test/unit/lib/utils/ensure-valid-layer-path.test.js', () => {
+describe('test/unit/lib/utils/ensure-valid-layer-path.test.ts', () => {
   for (const layerPath of ['layer', '/tmp/layer', undefined]) {
     it(`accepts ${JSON.stringify(layerPath)}`, () => {
       expect(() => ensureValidLayerPath('myLayer', layerPath)).to.not.throw();

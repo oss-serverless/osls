@@ -1,11 +1,11 @@
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import { overrideEnv, overrideCwd, overrideStdoutWrite } from '../../../utils/process.ts';
 import { expect } from 'chai';
 import provisionTmpDir from '../../../lib/provision-tmp-dir.ts';
 import { outputFile, remove, writeJsonFile } from '../../../utils/fs.ts';
+import esmock from 'esmock';
 
 const createProgressFooter = () => ({
   shouldAddProgressAnimationPrefix: false,
@@ -22,19 +22,26 @@ const writeFakeComposeBin = async (rootDir) => {
   return composeBinPath;
 };
 
-const loadRunCompose = ({ spawnStub, inquirerStub, progressFooterFactoryStub, fsStub } = {}) => {
+const loadRunCompose = async ({
+  spawnStub,
+  inquirerStub,
+  progressFooterFactoryStub,
+  fsStub,
+} = {}) => {
   const modulePath = '../../../../lib/cli/run-compose';
   delete require.cache[require.resolve(modulePath)];
 
-  return proxyquire.noCallThru().load(modulePath, {
-    '../utils/spawn': spawnStub,
-    '../utils/serverless-utils/inquirer': inquirerStub,
-    '../utils/progress-footer': progressFooterFactoryStub,
-    ...(fsStub ? { fs: fsStub } : {}),
-  });
+  return (
+    await esmock(modulePath, {
+      '../utils/spawn': spawnStub,
+      '../utils/serverless-utils/inquirer': inquirerStub,
+      '../utils/progress-footer': progressFooterFactoryStub,
+      ...(fsStub ? { fs: fsStub } : {}),
+    })
+  ).default;
 };
 
-describe('test/unit/lib/cli/run-compose.test.js', () => {
+describe('test/unit/lib/cli/run-compose.test.ts', () => {
   let serviceDir;
   let stdout;
   let restoreEnv;

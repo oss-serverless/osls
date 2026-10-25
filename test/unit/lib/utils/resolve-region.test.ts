@@ -3,7 +3,7 @@ import resolveRegion from '../../../../lib/utils/resolve-region.ts';
 
 const expect = chai.expect;
 
-describe('test/unit/lib/utils/resolve-region.test.js', () => {
+describe('test/unit/lib/utils/resolve-region.test.ts', () => {
   it('should return `region` from options first if it is present', () => {
     const result = resolveRegion({
       configuration: { provider: { region: 'fromprovider' } },

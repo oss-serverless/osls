@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import {
   LambdaClient,
   GetFunctionCommand,
@@ -13,6 +12,7 @@ import CLI from '../../../../../lib/classes/cli.ts';
 import AwsRollbackFunction from '../../../../../lib/plugins/aws/rollback-function.ts';
 import configureAwsSdkV3Stub from '../../../../lib/configure-aws-sdk-v3-stub.ts';
 import runServerless from '../../../../utils/run-serverless.ts';
+import esmock from 'esmock';
 
 describe('AwsRollbackFunction', () => {
   let serverless;
@@ -298,10 +298,12 @@ describe('AwsRollbackFunction', () => {
             getFunction: { function: 'hello' },
           },
         });
-        const ProxyquiredAwsRollbackFunction = proxyquire(
-          '../../../../../lib/plugins/aws/rollback-function.js',
-          awsSdkV3Stub.modulesCacheStub
-        );
+        const ProxyquiredAwsRollbackFunction = (
+          await esmock(
+            '../../../../../lib/plugins/aws/rollback-function.ts',
+            awsSdkV3Stub.modulesCacheStub
+          )
+        ).default;
         const rollbackFunction = new ProxyquiredAwsRollbackFunction(serverless, {
           'stage': 'dev',
           'region': 'us-east-1',
@@ -530,10 +532,12 @@ describe('AwsRollbackFunction', () => {
           updateFunctionCode: {},
         },
       });
-      const ProxyquiredAwsRollbackFunction = proxyquire(
-        '../../../../../lib/plugins/aws/rollback-function.js',
-        awsSdkV3Stub.modulesCacheStub
-      );
+      const ProxyquiredAwsRollbackFunction = (
+        await esmock(
+          '../../../../../lib/plugins/aws/rollback-function.ts',
+          awsSdkV3Stub.modulesCacheStub
+        )
+      ).default;
       const rollbackFunction = new ProxyquiredAwsRollbackFunction(serverless, {
         stage: 'dev',
         region: 'us-east-1',

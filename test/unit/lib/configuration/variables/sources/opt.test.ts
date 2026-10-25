@@ -4,7 +4,7 @@ import resolve from '../../../../../../lib/configuration/variables/resolve.ts';
 import selfSource from '../../../../../../lib/configuration/variables/sources/self.ts';
 import optSource from '../../../../../../lib/configuration/variables/sources/opt.ts';
 
-describe('test/unit/lib/configuration/variables/sources/opt.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/opt.test.ts', () => {
   let configuration;
   let variablesMeta;
 

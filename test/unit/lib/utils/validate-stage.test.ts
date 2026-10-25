@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import validateStage from '../../../../lib/utils/validate-stage.ts';
 
-describe('test/unit/lib/utils/validate-stage.test.js', () => {
+describe('test/unit/lib/utils/validate-stage.test.ts', () => {
   it('exports the shared stage pattern', () => {
     expect(validateStage.STAGE_NAME_PATTERN).to.equal('^[A-Za-z0-9-]+$');
   });

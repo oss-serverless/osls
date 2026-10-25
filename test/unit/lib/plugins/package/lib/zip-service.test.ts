@@ -6,13 +6,13 @@ import JsZip from 'jszip';
 import glob from '../../../../../../lib/utils/glob.ts';
 import fs from 'node:fs';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import isObject from 'type/object/is.js';
 import Utils from '../../../../../../lib/classes/utils.ts';
 import { getTmpDirPath } from '../../../../../utils/fs.ts';
-
 // Configure chai
 import { expect } from 'chai';
+
+import esmock from 'esmock';
 
 const describeLargeZipSmoke = process.env.SERVERLESS_LARGE_ZIP_SMOKE ? describe : describe.skip;
 
@@ -63,15 +63,19 @@ describe('zipService', () => {
   let packagePlugin;
   let params;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     tmpDirPath = getTmpDirPath();
     spawnExtStub = sinon.stub().resolves({ stdoutBuffer: Buffer.alloc(0) });
-    const zipService = proxyquire('../../../../../../lib/plugins/package/lib/zip-service', {
-      '../../../utils/spawn': spawnExtStub,
-    });
-    Package = proxyquire('../../../../../../lib/plugins/package/package', {
-      './lib/zip-service': zipService,
-    });
+    const zipService = (
+      await esmock('../../../../../../lib/plugins/package/lib/zip-service.ts', {
+        '../../../../../../lib/utils/spawn.ts': spawnExtStub,
+      })
+    ).default;
+    Package = (
+      await esmock('../../../../../../lib/plugins/package/package.ts', {
+        '../../../../../../lib/plugins/package/lib/zip-service.ts': zipService,
+      })
+    ).default;
     serverless = createServerlessLike(tmpDirPath);
     packagePlugin = new Package(serverless, {});
     params = {
@@ -188,14 +192,16 @@ describe('zipService', () => {
         fs.promises.open.restore();
       });
 
-      it('does not add async helpers to core modules when loaded', () => {
+      it('does not add async helpers to core modules when loaded', async () => {
         const fakeFs = { promises: { readFile: () => {} } };
         const fakeSpawn = () => {};
 
-        proxyquire.noCallThru().load('../../../../../../lib/plugins/package/lib/zip-service', {
-          'fs': fakeFs,
-          '../../../utils/spawn': fakeSpawn,
-        });
+        (
+          await esmock('../../../../../../lib/plugins/package/lib/zip-service.ts', {
+            'fs': fakeFs,
+            '../../../../../../lib/utils/spawn.ts': fakeSpawn,
+          })
+        ).default;
 
         expect(fakeSpawn).to.not.have.property('spawnAsync');
         expect(fakeFs).to.not.have.property('readFileAsync');
@@ -1443,17 +1449,19 @@ describe('zipService', () => {
         packagePlugin.zipFiles([], path.resolve(import.meta.dirname, 'tmp.zip'))
       ).to.be.rejectedWith(Error, 'No files to package'));
 
-    it('configures metadata stat concurrency with ext/promise/limit', () => {
+    it('configures metadata stat concurrency with ext/promise/limit', async () => {
       let configuredLimit;
       const fakeLimit = function (limitValue, callback) {
         configuredLimit = limitValue;
         return (...args) => callback(...args);
       };
 
-      proxyquire('../../../../../../lib/plugins/package/lib/zip-service', {
-        'ext/promise/limit': fakeLimit,
-        '../../../utils/spawn': spawnExtStub,
-      });
+      (
+        await esmock('../../../../../../lib/plugins/package/lib/zip-service.ts', {
+          'ext/promise/limit': fakeLimit,
+          '../../../../../../lib/utils/spawn.ts': spawnExtStub,
+        })
+      ).default;
 
       expect(configuredLimit).to.equal(64);
     });
@@ -1499,14 +1507,18 @@ describe('zipService', () => {
         return fakeOutput;
       });
 
-      const zipService = proxyquire('../../../../../../lib/plugins/package/lib/zip-service', {
-        'yazl': { ZipFile: FakeZipFile },
-        'fs': fakeFs,
-        '../../../utils/spawn': spawnExtStub,
-      });
-      const TestPackage = proxyquire('../../../../../../lib/plugins/package/package', {
-        './lib/zip-service': zipService,
-      });
+      const zipService = (
+        await esmock('../../../../../../lib/plugins/package/lib/zip-service.ts', {
+          'yazl': { ZipFile: FakeZipFile },
+          'fs': fakeFs,
+          '../../../../../../lib/utils/spawn.ts': spawnExtStub,
+        })
+      ).default;
+      const TestPackage = (
+        await esmock('../../../../../../lib/plugins/package/package.ts', {
+          '../../../../../../lib/plugins/package/lib/zip-service.ts': zipService,
+        })
+      ).default;
       const defaultPackagePlugin = new TestPackage(serverless, {});
 
       await defaultPackagePlugin.zipFiles(['handler.js'], 'default.zip');

@@ -5,7 +5,7 @@ import resolveFinalCommandsSchema from '../../../../../lib/cli/commands-schema/r
 import renderHelp from '../../../../../lib/cli/render-help/index.ts';
 import observeOutput from '../../../../lib/observe-output.ts';
 
-describe('test/unit/lib/cli/render-help/index.test.js', () => {
+describe('test/unit/lib/cli/render-help/index.test.ts', () => {
   class TestPlugin {
     constructor() {
       this.commands = {

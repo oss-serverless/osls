@@ -1,7 +1,5 @@
 import * as chai from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
-
 import {
   APIGatewayClient,
   CreateStageCommand,
@@ -14,10 +12,12 @@ import {
 } from '@aws-sdk/client-api-gateway';
 
 import { CloudWatchLogsClient, DeleteLogGroupCommand } from '@aws-sdk/client-cloudwatch-logs';
+
 import Serverless from '../../../../../../../../../../../lib/serverless.ts';
 import AwsProvider from '../../../../../../../../../../../lib/plugins/aws/provider.ts';
 import updateStage2 from '../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/update-stage.ts';
 import runServerless from '../../../../../../../../../../utils/run-serverless.ts';
+import esmock from 'esmock';
 
 const { updateStage, defaultApiGatewayLogLevel } = updateStage2;
 
@@ -817,25 +817,27 @@ describe('#updateStage()', () => {
         throw new Error(`Unexpected CloudWatchLogs command: ${command.constructor.name}`);
       }
     }
-    const { updateStage: updateStageWithClientStubs } = proxyquire(
-      '../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/update-stage',
-      {
-        '@aws-sdk/client-api-gateway': {
-          APIGatewayClient: FakeAPIGatewayClient,
-          CreateStageCommand: FakeCreateStageCommand,
-          GetDeploymentsCommand: FakeGetDeploymentsCommand,
-          GetRestApisCommand: FakeGetRestApisCommand,
-          GetStageCommand: FakeGetStageCommand,
-          TagResourceCommand: FakeTagResourceCommand,
-          UntagResourceCommand: FakeUntagResourceCommand,
-          UpdateStageCommand: FakeUpdateStageCommand,
-        },
-        '@aws-sdk/client-cloudwatch-logs': {
-          CloudWatchLogsClient: FakeCloudWatchLogsClient,
-          DeleteLogGroupCommand: FakeDeleteLogGroupCommand,
-        },
-      }
-    );
+    const { updateStage: updateStageWithClientStubs } = (
+      await esmock(
+        '../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/update-stage.ts',
+        {
+          '@aws-sdk/client-api-gateway': {
+            APIGatewayClient: FakeAPIGatewayClient,
+            CreateStageCommand: FakeCreateStageCommand,
+            GetDeploymentsCommand: FakeGetDeploymentsCommand,
+            GetRestApisCommand: FakeGetRestApisCommand,
+            GetStageCommand: FakeGetStageCommand,
+            TagResourceCommand: FakeTagResourceCommand,
+            UntagResourceCommand: FakeUntagResourceCommand,
+            UpdateStageCommand: FakeUpdateStageCommand,
+          },
+          '@aws-sdk/client-cloudwatch-logs': {
+            CloudWatchLogsClient: FakeCloudWatchLogsClient,
+            DeleteLogGroupCommand: FakeDeleteLogGroupCommand,
+          },
+        }
+      )
+    ).default;
     const getAwsSdkV3ConfigStub = sinon.stub(awsProvider, 'getAwsSdkV3Config');
     getAwsSdkV3ConfigStub.onFirstCall().resolves(apiGatewayConfig);
     getAwsSdkV3ConfigStub.onSecondCall().resolves(cloudWatchLogsConfig);
@@ -1087,7 +1089,7 @@ describe('#updateStage()', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/package/compile/events/apiGateway/lib/hack/updateStage.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/apiGateway/lib/hack/updateStage.test.ts', () => {
   it('should correctly add and remove stage tags during update', async () => {
     const tagResourceStub = sinon.stub();
     const untagResourceStub = sinon.stub();

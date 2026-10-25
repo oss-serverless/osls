@@ -5,7 +5,7 @@ import selfSource from '../../../../../../../lib/configuration/variables/sources
 import getSlsSource from '../../../../../../../lib/configuration/variables/sources/instance-dependent/get-sls.ts';
 import mergePlainObjects from '../../../../../../../lib/utils/merge-plain-objects.ts';
 
-describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-sls.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-sls.test.ts', () => {
   let configuration;
   let variablesMeta;
   let serverlessInstance;

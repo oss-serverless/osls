@@ -3,8 +3,7 @@ import glob from '../../../../../../lib/utils/glob.ts';
 import requireUncached from '../../../../../utils/require-uncached.ts';
 import { listZipFiles } from '../../../../../utils/fs.ts';
 import { expect } from 'chai';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru().noPreserveCache();
+import esmock from 'esmock';
 
 // The directory that holds the files that generateZip zips up
 const resourcesDir = path.resolve(
@@ -14,7 +13,7 @@ const resourcesDir = path.resolve(
 const generateZipPath = '../../../../../../lib/plugins/aws/custom-resources/generate-zip';
 const escapedPathSep = path.sep.replace(/\\/g, '\\\\');
 
-describe('test/unit/lib/plugins/aws/customResources/generateZip.test.js', () => {
+describe('test/unit/lib/plugins/aws/customResources/generateZip.test.ts', () => {
   describe('when generating a zip file', () => {
     it('should generate a zip file with the contents of the resources directory', async () => {
       const zipFilePath = await requireUncached(async () =>
@@ -52,22 +51,24 @@ describe('test/unit/lib/plugins/aws/customResources/generateZip.test.js', () => 
 
     it('should change the cache directory when resource content changes', async () => {
       const artifactVersions = [];
-      const makeGenerateZip = (content) =>
-        proxyquire(generateZipPath, {
-          'fs': {
-            readdirSync: () => [
-              {
-                name: 'handler.js',
-                isDirectory: () => false,
-              },
-            ],
-            readFileSync: () => Buffer.from(content),
-          },
-          '../../../utils/ensure-artifact': async (artifactName, generate, options) => {
-            artifactVersions.push(options.artifactVersion);
-            return path.resolve('/tmp/cache', options.artifactVersion);
-          },
-        });
+      const makeGenerateZip = async (content) =>
+        (
+          await esmock(generateZipPath, {
+            'fs': {
+              readdirSync: () => [
+                {
+                  name: 'handler.js',
+                  isDirectory: () => false,
+                },
+              ],
+              readFileSync: () => Buffer.from(content),
+            },
+            '../../../utils/ensure-artifact': async (artifactName, generate, options) => {
+              artifactVersions.push(options.artifactVersion);
+              return path.resolve('/tmp/cache', options.artifactVersion);
+            },
+          })
+        ).default;
 
       await makeGenerateZip('first')();
       await makeGenerateZip('second')();

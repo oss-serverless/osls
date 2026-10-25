@@ -486,7 +486,7 @@ describe('AwsRollback', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/rollback.test.js', () => {
+describe('test/unit/lib/plugins/aws/rollback.test.ts', () => {
   it('Should gently handle error of listing objects from S3 bucket', async () => {
     await expect(
       runServerless({

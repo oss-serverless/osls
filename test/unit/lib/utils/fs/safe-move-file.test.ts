@@ -1,5 +1,4 @@
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import provisionTempDir from '../../../../lib/provision-tmp-dir.ts';
 import { join } from 'node:path';
 import { expect } from 'chai';
@@ -7,6 +6,7 @@ import { promises as fsp } from 'node:fs';
 import fs from 'node:fs';
 import safeMoveFile from '../../../../../lib/utils/fs/safe-move-file.ts';
 import { ensureFileSync, remove } from '../../../../utils/fs.ts';
+import esmock from 'esmock';
 
 /**
  * Returns and Error object that resembles the EXDEV errors that are thrown
@@ -41,7 +41,7 @@ const createFakeEpermError = () => {
  */
 const artifactName = 'foo-bar.zip';
 
-describe('test/unit/lib/utils/fs/safeMoveFile.test.js', () => {
+describe('test/unit/lib/utils/fs/safeMoveFile.test.ts', () => {
   let sourceDir;
   let destinationDir;
   let sourceFile;
@@ -158,10 +158,12 @@ describe('test/unit/lib/utils/fs/safeMoveFile.test.js', () => {
       });
     };
 
-    const loadSafeMoveFileWithStubbedSleep = () => {
-      safeMoveFileWithStubbedSleep = proxyquire('../../../../../lib/utils/fs/safe-move-file', {
-        '../sleep': sleepStub,
-      });
+    const loadSafeMoveFileWithStubbedSleep = async () => {
+      safeMoveFileWithStubbedSleep = (
+        await esmock('../../../../../lib/utils/fs/safe-move-file.ts', {
+          '../../../../../lib/utils/sleep.ts': sleepStub,
+        })
+      ).default;
     };
 
     beforeEach(() => {

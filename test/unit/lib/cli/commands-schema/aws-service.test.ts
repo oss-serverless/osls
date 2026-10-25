@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import awsServiceCommands from '../../../../../lib/cli/commands-schema/aws-service.ts';
 
-describe('test/unit/lib/cli/commands-schema/aws-service.test.js', () => {
+describe('test/unit/lib/cli/commands-schema/aws-service.test.ts', () => {
   it('should expose no service commands', () =>
     expect(awsServiceCommands.get('create')).to.have.property('options'));
   it('should expose service commands', () =>

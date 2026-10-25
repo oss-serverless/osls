@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import isSupportedNodeVersion from '../../../../lib/cli/is-supported-node-version.ts';
 
-describe('test/unit/lib/cli/is-supported-node-version.test.js', () => {
+describe('test/unit/lib/cli/is-supported-node-version.test.ts', () => {
   it('rejects Node 18', () => {
     expect(isSupportedNodeVersion('v18.20.0')).to.equal(false);
   });

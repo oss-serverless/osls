@@ -3,8 +3,7 @@ import * as chai from 'chai';
 import AwsProvider from '../../../../../../../../lib/plugins/aws/provider.ts';
 import Serverless from '../../../../../../../../lib/serverless.ts';
 import runServerless from '../../../../../../../utils/run-serverless.ts';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
 const { expect } = chai;
 
@@ -228,16 +227,18 @@ describe('AwsCompileCognitoUserPoolEvents', () => {
   let awsCompileCognitoUserPoolEvents;
   let addCustomResourceToServiceStub;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     addCustomResourceToServiceStub = sinon.stub().resolves();
-    const AwsCompileCognitoUserPoolEvents = proxyquire(
-      '../../../../../../../../lib/plugins/aws/package/compile/events/cognito-user-pool',
-      {
-        '../../../custom-resources': {
-          addCustomResourceToService: addCustomResourceToServiceStub,
-        },
-      }
-    );
+    const AwsCompileCognitoUserPoolEvents = (
+      await esmock(
+        '../../../../../../../../lib/plugins/aws/package/compile/events/cognito-user-pool.ts',
+        {
+          '../../../../../../../../lib/plugins/aws/custom-resources/index.ts': {
+            addCustomResourceToService: addCustomResourceToServiceStub,
+          },
+        }
+      )
+    ).default;
     serverless = new Serverless({ commands: [], options: {} });
     serverless.service.provider.compiledCloudFormationTemplate = { Resources: {} };
     serverless.setProvider('aws', new AwsProvider(serverless));
@@ -1123,7 +1124,7 @@ describe('AwsCompileCognitoUserPoolEvents', () => {
   });
 });
 
-describe('lib/plugins/aws/package/compile/events/cognito-user-pool.test.js', () => {
+describe('lib/plugins/aws/package/compile/events/cognito-user-pool.test.ts', () => {
   let cfResources;
   let naming;
   let serverlessInstance;

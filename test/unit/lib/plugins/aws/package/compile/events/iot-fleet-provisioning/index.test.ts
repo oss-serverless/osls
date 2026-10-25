@@ -4,7 +4,7 @@ import templateBody from '../../../../../../../../fixtures/programmatic/iot-flee
 
 const { expect } = chai;
 
-describe('lib/plugins/aws/package/compile/events/iotFleetProvisioning/index.test.js', () => {
+describe('lib/plugins/aws/package/compile/events/iotFleetProvisioning/index.test.ts', () => {
   describe('nominal configurations', () => {
     const functionName = 'iotFleetProvisioningBasic';
     const disabledFunctionName = 'iotFleetProvisioningDisabled';

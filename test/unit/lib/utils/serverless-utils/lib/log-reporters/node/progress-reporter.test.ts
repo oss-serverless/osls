@@ -1,15 +1,15 @@
 import * as chai from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
+import esmock from 'esmock';
 
 const expect = chai.expect;
 
-describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/progress-reporter.test.js', () => {
+describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/progress-reporter.test.ts', () => {
   afterEach(() => {
     sinon.restore();
   });
 
-  const loadProgressReporter = () => {
+  const loadProgressReporter = async () => {
     const handlers = new Map();
     const cliProgressFooter = {
       shouldAddProgressAnimationPrefix: false,
@@ -24,24 +24,28 @@ describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/progress-r
       noticeSymbol: sinon.stub().callsFake((value) => value),
     };
 
-    const load = proxyquire
-      .noCallThru()
-      .load(
-        '../../../../../../../../lib/utils/serverless-utils/lib/log-reporters/node/progress-reporter',
+    const load = (
+      await esmock(
+        '../../../../../../../../lib/utils/serverless-utils/lib/log-reporters/node/progress-reporter.ts',
         {
-          '../../../../progress-footer': sinon.stub().returns(cliProgressFooter),
-          '../../log/get-progress-reporter': {
+          '../../../../../../../../lib/utils/progress-footer.ts': sinon
+            .stub()
+            .returns(cliProgressFooter),
+          '../../../../../../../../lib/utils/serverless-utils/lib/log/get-progress-reporter.ts': {
             emitter: {
               on: sinon.stub().callsFake((eventName, handler) => {
                 handlers.set(eventName, handler);
               }),
             },
           },
-          '../../../log': { progress, log },
-          '../../log/join-text-tokens': joinTextTokens,
-          './style': style,
+          '../../../../../../../../lib/utils/serverless-utils/log.ts': { progress, log },
+          '../../../../../../../../lib/utils/serverless-utils/lib/log/join-text-tokens.ts':
+            joinTextTokens,
+          '../../../../../../../../lib/utils/serverless-utils/lib/log-reporters/node/style.ts':
+            style,
         }
-      );
+      )
+    ).default;
 
     return { load, handlers, cliProgressFooter, progress, log, joinTextTokens, style };
   };

@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import logEmitter from 'log/lib/emitter.js';
 import { UpdateTerminationProtectionCommand } from '@aws-sdk/client-cloudformation';
 import AwsDeletionProtection from '../../../../../lib/plugins/aws/deletion-protection.ts';
 import ServerlessError from '../../../../../lib/serverless-error.ts';
 import retry from '../../../../../lib/aws/retry.ts';
+import esmock from 'esmock';
 const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
@@ -14,10 +14,11 @@ const fastRetry = {
 };
 const createThrottlingError = () =>
   Object.assign(new Error('Rate exceeded'), { name: 'Throttling' });
-const AwsDeletionProtectionWithFastRetry = proxyquire(
-  '../../../../../lib/plugins/aws/deletion-protection',
-  { '../../aws/retry': fastRetry }
-);
+const AwsDeletionProtectionWithFastRetry = (
+  await esmock('../../../../../lib/plugins/aws/deletion-protection.ts', {
+    '../../../../../lib/aws/retry.ts': fastRetry,
+  })
+).default;
 
 describe('AwsDeletionProtection', () => {
   let serverless;

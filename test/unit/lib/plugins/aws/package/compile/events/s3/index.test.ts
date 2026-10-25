@@ -3,8 +3,7 @@ import * as chai from 'chai';
 import AwsProvider from '../../../../../../../../../lib/plugins/aws/provider.ts';
 import Serverless from '../../../../../../../../../lib/serverless.ts';
 import runServerless from '../../../../../../../../utils/run-serverless.ts';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
 const { expect } = chai;
 
@@ -13,16 +12,18 @@ describe('AwsCompileS3Events', () => {
   let awsCompileS3Events;
   let addCustomResourceToServiceStub;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     addCustomResourceToServiceStub = sinon.stub().resolves();
-    const AwsCompileS3Events = proxyquire(
-      '../../../../../../../../../lib/plugins/aws/package/compile/events/s3/index',
-      {
-        '../../../../custom-resources': {
-          addCustomResourceToService: addCustomResourceToServiceStub,
-        },
-      }
-    );
+    const AwsCompileS3Events = (
+      await esmock(
+        '../../../../../../../../../lib/plugins/aws/package/compile/events/s3/index.ts',
+        {
+          '../../../../../../../../../lib/plugins/aws/custom-resources/index.ts': {
+            addCustomResourceToService: addCustomResourceToServiceStub,
+          },
+        }
+      )
+    ).default;
     serverless = new Serverless({ commands: [], options: {} });
     serverless.service.provider.compiledCloudFormationTemplate = { Resources: {} };
     serverless.setProvider('aws', new AwsProvider(serverless));
@@ -995,7 +996,7 @@ describe('AwsCompileS3Events', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/package/compile/events/s3/index.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/s3/index.test.ts', () => {
   let cfResources;
   let naming;
   let serverlessInstance;

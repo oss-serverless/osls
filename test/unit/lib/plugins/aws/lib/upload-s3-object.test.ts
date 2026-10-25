@@ -1,21 +1,20 @@
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import ServerlessError from '../../../../../../lib/serverless-error.ts';
+import esmock from 'esmock';
 
-describe('test/unit/lib/plugins/aws/lib/upload-s3-object.test.js', () => {
+describe('test/unit/lib/plugins/aws/lib/upload-s3-object.test.ts', () => {
   let doneStub;
   let s3Clients;
   let uploadOptions;
   let uploadS3Object;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     doneStub = sinon.stub().resolves({ ETag: 'etag' });
     s3Clients = [];
     uploadOptions = [];
-    uploadS3Object = proxyquire
-      .noCallThru()
-      .load('../../../../../../lib/plugins/aws/lib/upload-s3-object', {
+    uploadS3Object = (
+      await esmock('../../../../../../lib/plugins/aws/lib/upload-s3-object.ts', {
         '@aws-sdk/client-s3': {
           S3Client: class S3Client {
             constructor(config) {
@@ -35,7 +34,8 @@ describe('test/unit/lib/plugins/aws/lib/upload-s3-object.test.js', () => {
             }
           },
         },
-      });
+      })
+    ).default;
   });
 
   function createProvider({ accelerate = false } = {}) {

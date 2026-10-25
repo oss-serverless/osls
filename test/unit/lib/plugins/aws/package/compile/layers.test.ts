@@ -2,12 +2,12 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as chai from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import { getTmpDirPath } from '../../../../../../utils/fs.ts';
 import runServerless from '../../../../../../utils/run-serverless.ts';
 import releasePendingRequestsUntilSettled from '../../../../../../utils/release-pending-requests-until-settled.ts';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
+import esmock from 'esmock';
 
 const expect = chai.expect;
 
@@ -26,7 +26,7 @@ const awsSdkV3StubMap = {
   },
 };
 
-describe('lib/plugins/aws/package/compile/layers/index.test.js', () => {
+describe('lib/plugins/aws/package/compile/layers/index.test.ts', () => {
   const allowedAccount = 'arn:aws:iam::123456789012:root';
   let cfResources;
   let naming;
@@ -112,12 +112,11 @@ describe('lib/plugins/aws/package/compile/layers/index.test.js', () => {
     Object.defineProperty(fakeFs, 'promises', { value: { readFile: readFileStub } });
     fakeFs.createReadStream = createReadStreamStub;
 
-    const AwsCompileLayers = proxyquire(
-      '../../../../../../../lib/plugins/aws/package/compile/layers',
-      {
+    const AwsCompileLayers = (
+      await esmock('../../../../../../../lib/plugins/aws/package/compile/layers.ts', {
         fs: fakeFs,
-      }
-    );
+      })
+    ).default;
 
     const layerObject = { path: 'layer' };
     const testNaming = {

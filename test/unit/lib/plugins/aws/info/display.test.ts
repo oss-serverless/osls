@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import runServerless from '../../../../../utils/run-serverless.ts';
 
-describe('test/unit/lib/plugins/aws/info/display.test.js', () => {
+describe('test/unit/lib/plugins/aws/info/display.test.ts', () => {
   let serverless;
   let serviceName;
 

@@ -1,7 +1,6 @@
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
 describe('serverless-utils/inquirer/confirm', () => {
   afterEach(() => {
@@ -10,9 +9,11 @@ describe('serverless-utils/inquirer/confirm', () => {
 
   it('returns the configured confirmation result', async () => {
     const prompt = sinon.stub().resolves({ shouldConfirm: true });
-    const confirm = proxyquire('../../../../../lib/utils/serverless-utils/inquirer/confirm', {
-      './': { prompt },
-    });
+    const confirm = (
+      await esmock('../../../../../lib/utils/serverless-utils/inquirer/confirm.ts', {
+        '../../../../../lib/utils/serverless-utils/inquirer/index.ts': { prompt },
+      })
+    ).default;
 
     expect(await confirm('Should?', { name: 'shouldConfirm' })).to.equal(true);
     expect(
@@ -26,9 +27,11 @@ describe('serverless-utils/inquirer/confirm', () => {
 
   it('defaults the answer name to isConfirmed', async () => {
     const prompt = sinon.stub().resolves({ isConfirmed: false });
-    const confirm = proxyquire('../../../../../lib/utils/serverless-utils/inquirer/confirm', {
-      './': { prompt },
-    });
+    const confirm = (
+      await esmock('../../../../../lib/utils/serverless-utils/inquirer/confirm.ts', {
+        '../../../../../lib/utils/serverless-utils/inquirer/index.ts': { prompt },
+      })
+    ).default;
 
     expect(await confirm('Should?')).to.equal(false);
     expect(

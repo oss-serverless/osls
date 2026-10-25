@@ -234,7 +234,7 @@ describe('AwsCompileStreamEvents', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/package/compile/events/stream.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/stream.test.ts', () => {
   describe('regular configuration', () => {
     let awsNaming;
     let cfTemplate;

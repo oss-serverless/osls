@@ -5,7 +5,7 @@ import resolveCliInput from '../../../../../lib/cli/resolve-input.ts';
 import resolveMeta from '../../../../../lib/configuration/variables/resolve-meta.ts';
 import eventuallyReportResolutionErrors from '../../../../../lib/configuration/variables/eventually-report-resolution-errors.ts';
 
-describe('test/unit/lib/configuration/variables/eventually-report-resolution-errors.test.js', () => {
+describe('test/unit/lib/configuration/variables/eventually-report-resolution-errors.test.ts', () => {
   beforeEach(() => {
     resolveCliInput.clear();
   });

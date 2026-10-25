@@ -1,5 +1,4 @@
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import AwsLogs from '../../../../../lib/plugins/aws/logs.ts';
 import ServerlessError from '../../../../../lib/serverless-error.ts';
 import {
@@ -7,9 +6,10 @@ import {
   DescribeLogStreamsCommand,
   FilterLogEventsCommand,
 } from '@aws-sdk/client-cloudwatch-logs';
-
 // Configure chai
 import { expect } from 'chai';
+
+import esmock from 'esmock';
 
 function createServerlessContext(options) {
   const provider = {
@@ -408,9 +408,11 @@ describe('AwsLogs', () => {
       ];
 
       const timersSleep = sinon.stub().rejects();
-      const MockedAwsLogs = proxyquire('../../../../../lib/plugins/aws/logs', {
-        '../../utils/sleep': timersSleep,
-      });
+      const MockedAwsLogs = (
+        await esmock('../../../../../lib/plugins/aws/logs.ts', {
+          '../../../../../lib/utils/sleep.ts': timersSleep,
+        })
+      ).default;
 
       const options = {
         stage: 'dev',
@@ -452,9 +454,11 @@ describe('AwsLogs', () => {
       const lastEventTimestamp = 1469687512311;
       const stopError = new Error('stop tail loop');
       const sleepStub = sinon.stub().onFirstCall().resolves().onSecondCall().rejects(stopError);
-      const MockedAwsLogs = proxyquire('../../../../../lib/plugins/aws/logs', {
-        '../../utils/sleep': sleepStub,
-      });
+      const MockedAwsLogs = (
+        await esmock('../../../../../lib/plugins/aws/logs.ts', {
+          '../../../../../lib/utils/sleep.ts': sleepStub,
+        })
+      ).default;
 
       const options = {
         stage: 'dev',
@@ -518,14 +522,16 @@ describe('AwsLogs', () => {
           throw new Error(`Unexpected command ${command.constructor.name}`);
         }
       }
-      const MockedAwsLogs = proxyquire('../../../../../lib/plugins/aws/logs', {
-        '../../utils/sleep': sleepStub,
-        '@aws-sdk/client-cloudwatch-logs': {
-          CloudWatchLogsClient: FakeCloudWatchLogsClient,
-          DescribeLogStreamsCommand: FakeDescribeLogStreamsCommand,
-          FilterLogEventsCommand: FakeFilterLogEventsCommand,
-        },
-      });
+      const MockedAwsLogs = (
+        await esmock('../../../../../lib/plugins/aws/logs.ts', {
+          '../../../../../lib/utils/sleep.ts': sleepStub,
+          '@aws-sdk/client-cloudwatch-logs': {
+            CloudWatchLogsClient: FakeCloudWatchLogsClient,
+            DescribeLogStreamsCommand: FakeDescribeLogStreamsCommand,
+            FilterLogEventsCommand: FakeFilterLogEventsCommand,
+          },
+        })
+      ).default;
       const mockedAwsLogs = new MockedAwsLogs(serverless, {
         stage: 'dev',
         region: 'us-east-1',

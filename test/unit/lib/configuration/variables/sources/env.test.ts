@@ -4,7 +4,7 @@ import resolve from '../../../../../../lib/configuration/variables/resolve.ts';
 import selfSource from '../../../../../../lib/configuration/variables/sources/self.ts';
 import envSource from '../../../../../../lib/configuration/variables/sources/env.ts';
 
-describe('test/unit/lib/configuration/variables/sources/env.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/env.test.ts', () => {
   let configuration;
   let variablesMeta;
   before(async () => {

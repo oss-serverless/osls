@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import schema from '../../../lib/config-schema.ts';
 import STAGE_NAME_PATTERN from '../../../lib/utils/stage-pattern.ts';
 
-describe('test/unit/lib/configSchema.test.js', () => {
+describe('test/unit/lib/configSchema.test.ts', () => {
   const cases = [
     {
       isValid: true,

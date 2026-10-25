@@ -136,7 +136,7 @@ describe('#compileApiKeys()', () => {
   });
 });
 
-describe('lib/plugins/aws/package/compile/events/apiGateway/lib/apiKeys.test.js', () => {
+describe('lib/plugins/aws/package/compile/events/apiGateway/lib/apiKeys.test.ts', () => {
   let cfResources;
   let naming;
   let serverlessInstance;

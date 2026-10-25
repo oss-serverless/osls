@@ -238,7 +238,7 @@ describe('Serverless', () => {
   });
 });
 
-describe('test/unit/lib/serverless.test.js', () => {
+describe('test/unit/lib/serverless.test.ts', () => {
   describe('Legacy API interface', () => {
     let serverless;
 

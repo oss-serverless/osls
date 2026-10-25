@@ -1,9 +1,9 @@
 import * as sinon from 'sinon';
 import * as chai from 'chai';
-import proxyquire from 'proxyquire';
 import { S3Client, ListObjectsV2Command, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import cleanupS3BucketMixin from '../../../../../../../lib/plugins/aws/deploy/lib/cleanup-s3-bucket.ts';
 import retry from '../../../../../../../lib/aws/retry.ts';
+import esmock from 'esmock';
 const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
@@ -12,10 +12,11 @@ const fastRetry = {
 };
 const createThrottlingError = () =>
   Object.assign(new Error('Rate exceeded'), { name: 'Throttling' });
-const cleanupS3BucketWithFastRetry = proxyquire(
-  '../../../../../../../lib/plugins/aws/deploy/lib/cleanup-s3-bucket',
-  { '../../../../aws/retry': fastRetry }
-);
+const cleanupS3BucketWithFastRetry = (
+  await esmock('../../../../../../../lib/plugins/aws/deploy/lib/cleanup-s3-bucket.ts', {
+    '../../../../../../../lib/aws/retry.ts': fastRetry,
+  })
+).default;
 
 const expect = chai.expect;
 
@@ -131,16 +132,15 @@ describe('cleanupS3Bucket', () => {
         throw new Error(`Unexpected S3 command ${command.constructor.name}`);
       }
     }
-    const cleanupS3BucketWithFakeS3 = proxyquire(
-      '../../../../../../../lib/plugins/aws/deploy/lib/cleanup-s3-bucket',
-      {
+    const cleanupS3BucketWithFakeS3 = (
+      await esmock('../../../../../../../lib/plugins/aws/deploy/lib/cleanup-s3-bucket.ts', {
         '@aws-sdk/client-s3': {
           S3Client: FakeS3Client,
           DeleteObjectsCommand: FakeDeleteObjectsCommand,
           ListObjectsV2Command: FakeListObjectsV2Command,
         },
-      }
-    );
+      })
+    ).default;
     Object.assign(awsDeploy, cleanupS3BucketWithFakeS3);
 
     const objectsToRemove = await awsDeploy.getObjectsToRemove();

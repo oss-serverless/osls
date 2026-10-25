@@ -2,7 +2,7 @@ import runServerless from '../../../../../../../utils/run-serverless.ts';
 import { expect } from 'chai';
 import naming from '../../../../../../../../lib/plugins/aws/lib/naming.ts';
 
-describe('test/unit/lib/plugins/aws/package/compile/events/alias.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/alias.test.ts', () => {
   let lambdaResourceCount = 0;
 
   before(async () => {

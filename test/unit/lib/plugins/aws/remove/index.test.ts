@@ -1,12 +1,12 @@
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import logEmitter from 'log/lib/emitter.js';
 import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import emptyS3Bucket from '../../../../../../lib/plugins/aws/remove/lib/bucket.ts';
 import runServerless from '../../../../../utils/run-serverless.ts';
 import { expect } from 'chai';
+import esmock from 'esmock';
 
-describe('test/unit/lib/plugins/aws/remove/index.test.js', () => {
+describe('test/unit/lib/plugins/aws/remove/index.test.ts', () => {
   const deleteObjectsStub = sinon.stub().resolves();
   const deleteStackStub = sinon.stub().resolves();
   const describeStackEventsStub = sinon.stub().resolves({
@@ -169,14 +169,16 @@ describe('test/unit/lib/plugins/aws/remove/index.test.js', () => {
         throw new Error(`Unexpected S3 command ${command.constructor.name}`);
       }
     }
-    const bucket = proxyquire('../../../../../../lib/plugins/aws/remove/lib/bucket', {
-      '@aws-sdk/client-s3': {
-        S3Client: FakeS3Client,
-        DeleteObjectsCommand: FakeDeleteObjectsCommand,
-        ListObjectsV2Command: FakeListObjectsV2Command,
-        ListObjectVersionsCommand: FakeListObjectVersionsCommand,
-      },
-    });
+    const bucket = (
+      await esmock('../../../../../../lib/plugins/aws/remove/lib/bucket.ts', {
+        '@aws-sdk/client-s3': {
+          S3Client: FakeS3Client,
+          DeleteObjectsCommand: FakeDeleteObjectsCommand,
+          ListObjectsV2Command: FakeListObjectsV2Command,
+          ListObjectVersionsCommand: FakeListObjectVersionsCommand,
+        },
+      })
+    ).default;
     const context = {
       bucketName: 'bucket',
       provider: {

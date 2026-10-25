@@ -1,7 +1,6 @@
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
 describe('serverless-utils/inquirer', () => {
   afterEach(() => {
@@ -16,11 +15,13 @@ describe('serverless-utils/inquirer', () => {
       close,
     });
 
-    const inquirer = proxyquire('../../../../../lib/utils/serverless-utils/inquirer', {
-      'node:readline/promises': {
-        createInterface,
-      },
-    });
+    const inquirer = (
+      await esmock('../../../../../lib/utils/serverless-utils/inquirer/index.ts', {
+        'node:readline/promises': {
+          createInterface,
+        },
+      })
+    ).default;
 
     const result = await inquirer.prompt({
       message: 'Should?',
@@ -40,11 +41,13 @@ describe('serverless-utils/inquirer', () => {
       close: sinon.stub(),
     });
 
-    const inquirer = proxyquire('../../../../../lib/utils/serverless-utils/inquirer', {
-      'node:readline/promises': {
-        createInterface,
-      },
-    });
+    const inquirer = (
+      await esmock('../../../../../lib/utils/serverless-utils/inquirer/index.ts', {
+        'node:readline/promises': {
+          createInterface,
+        },
+      })
+    ).default;
 
     const result = await inquirer.prompt({
       message: 'Should?',
@@ -62,11 +65,13 @@ describe('serverless-utils/inquirer', () => {
       close: sinon.stub(),
     });
 
-    const inquirer = proxyquire('../../../../../lib/utils/serverless-utils/inquirer', {
-      'node:readline/promises': {
-        createInterface,
-      },
-    });
+    const inquirer = (
+      await esmock('../../../../../lib/utils/serverless-utils/inquirer/index.ts', {
+        'node:readline/promises': {
+          createInterface,
+        },
+      })
+    ).default;
 
     const result = await inquirer.prompt({
       message: 'Should?',
@@ -89,11 +94,13 @@ describe('serverless-utils/inquirer', () => {
       close,
     });
 
-    const inquirer = proxyquire('../../../../../lib/utils/serverless-utils/inquirer', {
-      'node:readline/promises': {
-        createInterface,
-      },
-    });
+    const inquirer = (
+      await esmock('../../../../../lib/utils/serverless-utils/inquirer/index.ts', {
+        'node:readline/promises': {
+          createInterface,
+        },
+      })
+    ).default;
 
     const result = await inquirer.prompt({
       message: 'Should?',

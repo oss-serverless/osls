@@ -5,7 +5,7 @@ import { readJson, writeJson } from '../../../../../lib/utils/fs/json-file.ts';
 import { getTmpDirPath } from '../../../../utils/fs.ts';
 const fsp = fs.promises;
 
-describe('test/unit/lib/utils/fs/json-file.test.js', () => {
+describe('test/unit/lib/utils/fs/json-file.test.ts', () => {
   let tmpDir;
 
   beforeEach(() => {

@@ -7,7 +7,7 @@ import buildFetchDispatcher from '../../../../lib/utils/build-fetch-dispatcher.t
 
 const { expect } = chai;
 
-describe('test/unit/lib/utils/build-fetch-dispatcher.test.js', () => {
+describe('test/unit/lib/utils/build-fetch-dispatcher.test.ts', () => {
   it('uses standard environment proxy handling by default', async () => {
     await overrideEnv(async () => {
       const dispatcher = buildFetchDispatcher();

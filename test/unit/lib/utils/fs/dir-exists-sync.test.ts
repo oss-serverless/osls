@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import dirExistsSync from '../../../../../lib/utils/fs/dir-exists-sync.ts';
 import { getTmpDirPath } from '../../../../utils/fs.ts';
 
-describe('test/unit/lib/utils/fs/dir-exists-sync.test.js', () => {
+describe('test/unit/lib/utils/fs/dir-exists-sync.test.ts', () => {
   let tmpDir;
 
   beforeEach(() => {

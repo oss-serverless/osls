@@ -1,20 +1,20 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import { ECRClient, DescribeRepositoriesCommand } from '@aws-sdk/client-ecr';
+import esmock from 'esmock';
 
-describe('test/unit/lib/plugins/aws/lib/check-if-ecr-repository-exists.test.js', () => {
+describe('test/unit/lib/plugins/aws/lib/check-if-ecr-repository-exists.test.ts', () => {
   let context;
   let describeRepositoriesStub;
   let warningStub;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     warningStub = sinon.stub();
-    const checkIfEcrRepositoryExists = proxyquire
-      .noCallThru()
-      .load('../../../../../../lib/plugins/aws/lib/check-if-ecr-repository-exists', {
-        '../../../utils/serverless-utils/log': { log: { warning: warningStub } },
-      });
+    const checkIfEcrRepositoryExists = (
+      await esmock('../../../../../../lib/plugins/aws/lib/check-if-ecr-repository-exists.ts', {
+        '../../../../../../lib/utils/serverless-utils/log.ts': { log: { warning: warningStub } },
+      })
+    ).default;
     context = {
       provider: {
         getAccountId: sinon.stub().resolves('123456789012'),
@@ -135,22 +135,23 @@ describe('test/unit/lib/plugins/aws/lib/check-if-ecr-repository-exists.test.js',
         throw new Error(`Unexpected ECR command ${command.constructor.name}`);
       }
     }
-    const checkIfEcrRepositoryExists = proxyquire(
-      '../../../../../../lib/plugins/aws/lib/check-if-ecr-repository-exists',
-      {
+    const checkIfEcrRepositoryExists = (
+      await esmock('../../../../../../lib/plugins/aws/lib/check-if-ecr-repository-exists.ts', {
         '@aws-sdk/client-ecr': {
           ECRClient: FakeECRClient,
           DescribeRepositoriesCommand: FakeDescribeRepositoriesCommand,
         },
-        '../../../utils/serverless-utils/log': { log: { warning: warningStub } },
-      }
-    );
-    const removeEcrRepository = proxyquire('../../../../../../lib/plugins/aws/remove/lib/ecr', {
-      '@aws-sdk/client-ecr': {
-        ECRClient: FakeECRClient,
-        DeleteRepositoryCommand: FakeDeleteRepositoryCommand,
-      },
-    });
+        '../../../../../../lib/utils/serverless-utils/log.ts': { log: { warning: warningStub } },
+      })
+    ).default;
+    const removeEcrRepository = (
+      await esmock('../../../../../../lib/plugins/aws/remove/lib/ecr.ts', {
+        '@aws-sdk/client-ecr': {
+          ECRClient: FakeECRClient,
+          DeleteRepositoryCommand: FakeDeleteRepositoryCommand,
+        },
+      })
+    ).default;
     const sharedContext = {
       provider: {
         getAccountId: sinon.stub().resolves('123456789012'),

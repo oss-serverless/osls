@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
 import checkIfBucketExists from '../../../../../../lib/plugins/aws/lib/check-if-bucket-exists.ts';
 
-describe('test/unit/lib/plugins/aws/lib/check-if-bucket-exists.test.js', () => {
+describe('test/unit/lib/plugins/aws/lib/check-if-bucket-exists.test.ts', () => {
   let context;
   let headBucketStub;
 

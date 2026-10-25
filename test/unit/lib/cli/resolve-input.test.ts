@@ -5,7 +5,7 @@ import commandsSchema from '../../../../lib/cli/commands-schema/index.ts';
 import resolveFinalCommandsSchema from '../../../../lib/cli/commands-schema/resolve-final.ts';
 import noService from '../../../../lib/cli/commands-schema/no-service.ts';
 
-describe('test/unit/lib/cli/resolve-input.test.js', () => {
+describe('test/unit/lib/cli/resolve-input.test.ts', () => {
   afterEach(() => {
     resolveInput.clear();
   });

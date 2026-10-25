@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import ServerlessError from '../../../../../lib/serverless-error.ts';
 import parse from '../../../../../lib/configuration/variables/parse.ts';
 
-describe('test/unit/lib/configuration/variables/parse.test.js', () => {
+describe('test/unit/lib/configuration/variables/parse.test.ts', () => {
   describe('Valid', () => {
     it('should support partially variable value at begin of a string', () =>
       expect(parse('${type:address}foo')).to.deep.equal([

@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import AwsInfo from '../../../../../../lib/plugins/aws/info/index.ts';
 import retry from '../../../../../../lib/aws/retry.ts';
 import {
@@ -9,6 +8,7 @@ import {
 } from '@aws-sdk/client-cloudformation';
 import { APIGatewayClient, GetApiKeyCommand } from '@aws-sdk/client-api-gateway';
 import releasePendingRequestsUntilSettled from '../../../../../utils/release-pending-requests-until-settled.ts';
+import esmock from 'esmock';
 const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
@@ -196,10 +196,11 @@ describe('#getApiKeyValues()', () => {
       .rejects(createThrottlingError())
       .onSecondCall()
       .resolves({ name: 'foo', value: 'valueForKeyFoo' });
-    const getApiKeyValuesWithFastRetry = proxyquire(
-      '../../../../../../lib/plugins/aws/info/get-api-key-values',
-      { '../../../aws/retry': fastRetry }
-    );
+    const getApiKeyValuesWithFastRetry = (
+      await esmock('../../../../../../lib/plugins/aws/info/get-api-key-values.ts', {
+        '../../../../../../lib/aws/retry.ts': fastRetry,
+      })
+    ).default;
 
     await getApiKeyValuesWithFastRetry.getApiKeyValues.call(awsInfo);
 

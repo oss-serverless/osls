@@ -1,15 +1,14 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import utils from '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
 describe('Custom resource Cognito user pool permissions', () => {
   let sentCommands;
   let addPermission;
   let removePermission;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sentCommands = [];
 
     class LambdaClient {
@@ -35,16 +34,18 @@ describe('Custom resource Cognito user pool permissions', () => {
       }
     }
 
-    ({ addPermission, removePermission } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions',
-      {
-        '@aws-sdk/client-lambda': {
-          LambdaClient,
-          AddPermissionCommand,
-          RemovePermissionCommand,
-        },
-      }
-    ));
+    ({ addPermission, removePermission } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts',
+        {
+          '@aws-sdk/client-lambda': {
+            LambdaClient,
+            AddPermissionCommand,
+            RemovePermissionCommand,
+          },
+        }
+      )
+    ).default);
   });
 
   it('should pass qualifier when adding Lambda permission', async () => {
@@ -84,7 +85,7 @@ describe('Custom resource Cognito user pool handler', () => {
     return `${functionName}-${userPoolName.toLowerCase().replace(/[.:*\s]/g, '')}`;
   }
 
-  function makeHandler({
+  async function makeHandler({
     findUserPoolByName = sinon.stub().resolves({ Id: 'us-east-1_abc123' }),
     addPermission = sinon.stub().resolves(),
     updateConfiguration = sinon.stub().resolves(),
@@ -92,30 +93,34 @@ describe('Custom resource Cognito user pool handler', () => {
     removeConfiguration = sinon.stub().resolves(),
     getStatementId: resolveStatementId = getStatementId,
   } = {}) {
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': {
-          addPermission,
-          removePermission,
-          getStatementId: resolveStatementId,
-        },
-        './lib/user-pool': {
-          findUserPoolByName,
-          updateConfiguration,
-          removeConfiguration,
-        },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts':
+            {
+              addPermission,
+              removePermission,
+              getStatementId: resolveStatementId,
+            },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts':
+            {
+              findUserPoolByName,
+              updateConfiguration,
+              removeConfiguration,
+            },
+        }
+      )
+    ).default;
 
     return {
       handler,
@@ -233,26 +238,30 @@ describe('Custom resource Cognito user pool handler', () => {
     const removePermission = sinon.stub().resolves();
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/user-pool': {
-          findUserPoolByName,
-          updateConfiguration,
-          removeConfiguration,
-        },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts':
+            { addPermission, removePermission },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts':
+            {
+              findUserPoolByName,
+              updateConfiguration,
+              removeConfiguration,
+            },
+        }
+      )
+    ).default;
 
     await expect(
       handler(
@@ -279,26 +288,30 @@ describe('Custom resource Cognito user pool handler', () => {
     const removePermission = sinon.stub().resolves();
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/user-pool': {
-          findUserPoolByName,
-          updateConfiguration,
-          removeConfiguration,
-        },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts':
+            { addPermission, removePermission },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts':
+            {
+              findUserPoolByName,
+              updateConfiguration,
+              removeConfiguration,
+            },
+        }
+      )
+    ).default;
 
     await expect(
       handler(
@@ -337,26 +350,30 @@ describe('Custom resource Cognito user pool handler', () => {
     const removePermission = sinon.stub().resolves();
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/user-pool': {
-          findUserPoolByName,
-          updateConfiguration,
-          removeConfiguration,
-        },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts':
+            { addPermission, removePermission },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts':
+            {
+              findUserPoolByName,
+              updateConfiguration,
+              removeConfiguration,
+            },
+        }
+      )
+    ).default;
 
     await handler(
       {
@@ -398,26 +415,30 @@ describe('Custom resource Cognito user pool handler', () => {
     });
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/user-pool': {
-          findUserPoolByName,
-          updateConfiguration,
-          removeConfiguration,
-        },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts':
+            { addPermission, removePermission },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts':
+            {
+              findUserPoolByName,
+              updateConfiguration,
+              removeConfiguration,
+            },
+        }
+      )
+    ).default;
 
     await handler(
       {
@@ -483,26 +504,30 @@ describe('Custom resource Cognito user pool handler', () => {
     });
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission, getStatementId },
-        './lib/user-pool': {
-          findUserPoolByName,
-          updateConfiguration,
-          removeConfiguration,
-        },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts':
+            { addPermission, removePermission, getStatementId },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts':
+            {
+              findUserPoolByName,
+              updateConfiguration,
+              removeConfiguration,
+            },
+        }
+      )
+    ).default;
 
     await handler(
       {
@@ -580,26 +605,30 @@ describe('Custom resource Cognito user pool handler', () => {
     const removePermission = sinon.stub().resolves();
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/user-pool': {
-          findUserPoolByName,
-          updateConfiguration,
-          removeConfiguration,
-        },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts':
+            { addPermission, removePermission },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts':
+            {
+              findUserPoolByName,
+              updateConfiguration,
+              removeConfiguration,
+            },
+        }
+      )
+    ).default;
 
     await handler(
       {
@@ -644,26 +673,30 @@ describe('Custom resource Cognito user pool handler', () => {
     const removePermission = sinon.stub().rejects({ name: 'ResourceNotFoundException' });
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/user-pool': {
-          findUserPoolByName,
-          updateConfiguration,
-          removeConfiguration,
-        },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts':
+            { addPermission, removePermission },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts':
+            {
+              findUserPoolByName,
+              updateConfiguration,
+              removeConfiguration,
+            },
+        }
+      )
+    ).default;
 
     await handler(
       {
@@ -689,26 +722,30 @@ describe('Custom resource Cognito user pool handler', () => {
       .rejects(Object.assign(new Error('denied'), { name: 'AccessDeniedException' }));
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/user-pool': {
-          findUserPoolByName,
-          updateConfiguration,
-          removeConfiguration,
-        },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/permissions.ts':
+            { addPermission, removePermission },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts':
+            {
+              findUserPoolByName,
+              updateConfiguration,
+              removeConfiguration,
+            },
+        }
+      )
+    ).default;
 
     await expect(
       handler(
@@ -729,7 +766,7 @@ describe('Custom resource Cognito user pool handler', () => {
 });
 
 describe('Custom resource Cognito user pool configuration', () => {
-  const makeUserPoolLib = (responses) => {
+  const makeUserPoolLib = async (responses) => {
     const sentCommands = [];
 
     class CognitoIdentityProviderClient {
@@ -765,17 +802,19 @@ describe('Custom resource Cognito user pool configuration', () => {
 
     return {
       sentCommands,
-      lib: proxyquire(
-        '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool',
-        {
-          '@aws-sdk/client-cognito-identity-provider': {
-            CognitoIdentityProviderClient,
-            ListUserPoolsCommand,
-            DescribeUserPoolCommand,
-            UpdateUserPoolCommand,
-          },
-        }
-      ),
+      lib: (
+        await esmock(
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/cognito-user-pool/lib/user-pool.ts',
+          {
+            '@aws-sdk/client-cognito-identity-provider': {
+              CognitoIdentityProviderClient,
+              ListUserPoolsCommand,
+              DescribeUserPoolCommand,
+              UpdateUserPoolCommand,
+            },
+          }
+        )
+      ).default,
     };
   };
 

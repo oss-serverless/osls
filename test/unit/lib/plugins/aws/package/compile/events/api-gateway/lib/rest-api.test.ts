@@ -254,7 +254,7 @@ describe('#compileRestApi()', () => {
   });
 });
 
-describe('lib/plugins/aws/package/compile/events/apiGateway/lib/restApi.test.js', () => {
+describe('lib/plugins/aws/package/compile/events/apiGateway/lib/restApi.test.ts', () => {
   it('should not disable the default execute-api endpoint by default', async () => {
     const { cfTemplate } = await runServerless({
       fixture: 'api-gateway',

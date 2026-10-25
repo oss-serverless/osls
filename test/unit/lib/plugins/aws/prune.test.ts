@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import logEmitter from 'log/lib/emitter.js';
 import { ListVersionsByFunctionCommand } from '@aws-sdk/client-lambda';
 import AwsPrune from '../../../../../lib/plugins/aws/prune.ts';
 import ServerlessError from '../../../../../lib/serverless-error.ts';
 import retry from '../../../../../lib/aws/retry.ts';
+import esmock from 'esmock';
 const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
@@ -14,9 +14,11 @@ const fastRetry = {
 };
 const createThrottlingError = () =>
   Object.assign(new Error('Rate exceeded'), { name: 'Throttling' });
-const AwsPruneWithFastRetry = proxyquire('../../../../../lib/plugins/aws/prune', {
-  '../../aws/retry': fastRetry,
-});
+const AwsPruneWithFastRetry = (
+  await esmock('../../../../../lib/plugins/aws/prune.ts', {
+    '../../../../../lib/aws/retry.ts': fastRetry,
+  })
+).default;
 
 describe('AwsPrune', () => {
   let serverless;

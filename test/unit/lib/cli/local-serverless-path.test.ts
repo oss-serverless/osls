@@ -5,7 +5,7 @@ import { promises as fsp } from 'node:fs';
 import { ensureDir, ensureFile } from '../../../utils/fs.ts';
 import localServerlessPath from '../../../../lib/cli/local-serverless-path.ts';
 
-describe('test/unit/lib/cli/local-serverless-path.test.js', () => {
+describe('test/unit/lib/cli/local-serverless-path.test.ts', () => {
   const resolveLocalServerlessPath = localServerlessPath;
 
   it('should resolve with `null` when no local installation is found', () => {

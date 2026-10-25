@@ -10,7 +10,7 @@ const createStdin = ({ chunks = [], isTTY = false, setEncoding = sinon.spy() } =
   },
 });
 
-describe('test/unit/lib/utils/get-stdin.test.js', () => {
+describe('test/unit/lib/utils/get-stdin.test.ts', () => {
   it('returns an empty string for TTY stdin', async () => {
     const setEncoding = sinon.spy();
     const stdin = createStdin({ isTTY: true, chunks: ['ignored'], setEncoding });

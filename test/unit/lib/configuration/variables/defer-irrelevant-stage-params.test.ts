@@ -3,7 +3,7 @@ import deferIrrelevantStageParams from '../../../../../lib/configuration/variabl
 
 const p = (...keys) => keys.join('\0');
 
-describe('test/unit/lib/configuration/variables/defer-irrelevant-stage-params.test.js', () => {
+describe('test/unit/lib/configuration/variables/defer-irrelevant-stage-params.test.ts', () => {
   const buildPredicate = ({
     params = { dev: {}, prod: {}, default: {} },
     provider,

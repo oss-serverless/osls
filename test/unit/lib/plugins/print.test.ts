@@ -1,12 +1,11 @@
 import * as chai from 'chai';
 import * as sinon from 'sinon';
 import runServerless from '../../../utils/run-serverless.ts';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
 const expect = chai.expect;
 
-describe('test/unit/lib/plugins/print.test.js', () => {
+describe('test/unit/lib/plugins/print.test.ts', () => {
   it('correctly prints config', async () => {
     const { output } = await runServerless({
       fixture: 'aws',
@@ -18,9 +17,11 @@ describe('test/unit/lib/plugins/print.test.js', () => {
 
   it('resolves own unsafe path segments and supports falsy values', async () => {
     const writeText = sinon.spy();
-    const Print = proxyquire('../../../../lib/plugins/print', {
-      '../utils/serverless-utils/log': { writeText },
-    });
+    const Print = (
+      await esmock('../../../../lib/plugins/print.ts', {
+        '../../../../lib/utils/serverless-utils/log.ts': { writeText },
+      })
+    ).default;
     const serverless = {
       configurationInput: {
         custom: {
@@ -45,9 +46,11 @@ describe('test/unit/lib/plugins/print.test.js', () => {
 
   it('resolves own array properties like length', async () => {
     const writeText = sinon.spy();
-    const Print = proxyquire('../../../../lib/plugins/print', {
-      '../utils/serverless-utils/log': { writeText },
-    });
+    const Print = (
+      await esmock('../../../../lib/plugins/print.ts', {
+        '../../../../lib/utils/serverless-utils/log.ts': { writeText },
+      })
+    ).default;
     const serverless = {
       configurationInput: {
         custom: {
@@ -63,9 +66,11 @@ describe('test/unit/lib/plugins/print.test.js', () => {
 
   it('does not resolve inherited path segments', async () => {
     const writeText = sinon.spy();
-    const Print = proxyquire('../../../../lib/plugins/print', {
-      '../utils/serverless-utils/log': { writeText },
-    });
+    const Print = (
+      await esmock('../../../../lib/plugins/print.ts', {
+        '../../../../lib/utils/serverless-utils/log.ts': { writeText },
+      })
+    ).default;
     const serverless = { configurationInput: { custom: {} } };
 
     try {
@@ -78,9 +83,11 @@ describe('test/unit/lib/plugins/print.test.js', () => {
 
   it('resolves Proxy-backed virtual path segments', async () => {
     const writeText = sinon.spy();
-    const Print = proxyquire('../../../../lib/plugins/print', {
-      '../utils/serverless-utils/log': { writeText },
-    });
+    const Print = (
+      await esmock('../../../../lib/plugins/print.ts', {
+        '../../../../lib/utils/serverless-utils/log.ts': { writeText },
+      })
+    ).default;
     const serverless = {
       configurationInput: {
         custom: {
@@ -107,9 +114,11 @@ describe('test/unit/lib/plugins/print.test.js', () => {
 
   it('does not resolve unsafe path segments on Proxy-backed values', async () => {
     const writeText = sinon.spy();
-    const Print = proxyquire('../../../../lib/plugins/print', {
-      '../utils/serverless-utils/log': { writeText },
-    });
+    const Print = (
+      await esmock('../../../../lib/plugins/print.ts', {
+        '../../../../lib/utils/serverless-utils/log.ts': { writeText },
+      })
+    ).default;
     const serverless = {
       configurationInput: {
         custom: {

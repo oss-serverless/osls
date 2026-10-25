@@ -6,7 +6,7 @@ import triage from '../../../../../lib/cli/triage.ts';
 
 const fixturesDirname = path.resolve(import.meta.dirname, 'fixtures');
 
-describe('test/unit/lib/cli/triage/index.test.js', () => {
+describe('test/unit/lib/cli/triage/index.test.ts', () => {
   before(() => overrideEnv({ variables: { SLS_GEO_LOCATION: 'us' } }));
 
   describe('CLI params', () => {

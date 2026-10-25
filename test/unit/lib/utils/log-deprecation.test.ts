@@ -1,14 +1,14 @@
 import { promises as fsp } from 'node:fs';
 import path from 'node:path';
-import proxyquire from 'proxyquire';
 import * as sandbox from 'sinon';
 import { expect } from 'chai';
 import { overrideEnv } from '../../../utils/process.ts';
 import { getTmpDirPath, pathExists } from '../../../utils/fs.ts';
 import ServerlessError from '../../../../lib/serverless-error.ts';
 import logDeprecation2 from '../../../../lib/utils/log-deprecation.ts';
+import esmock from 'esmock';
 
-describe('test/unit/lib/utils/logDeprecation.test.js', () => {
+describe('test/unit/lib/utils/logDeprecation.test.ts', () => {
   let restoreEnv;
 
   beforeEach(() => {
@@ -98,9 +98,11 @@ describe('test/unit/lib/utils/logDeprecation.test.js', () => {
       '.serverless',
       'last-command-health-status'
     );
-    const logDeprecation = proxyquire('../../../../lib/utils/log-deprecation', {
-      './health-status-filename': healthStatusFilename,
-    });
+    const logDeprecation = (
+      await esmock('../../../../lib/utils/log-deprecation.ts', {
+        '../../../../lib/utils/health-status-filename.ts': healthStatusFilename,
+      })
+    ).default;
 
     expect(await pathExists(path.dirname(healthStatusFilename))).to.equal(false);
 

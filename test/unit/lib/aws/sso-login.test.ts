@@ -1,11 +1,10 @@
 import * as chai from 'chai';
 import * as sinon from 'sinon';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
 const { expect } = chai;
 
-describe('test/unit/lib/aws/sso-login.test.js', () => {
+describe('test/unit/lib/aws/sso-login.test.ts', () => {
   let originalEnv;
   let originalStdinIsTTY;
   let originalStdoutIsTTY;
@@ -112,7 +111,7 @@ describe('test/unit/lib/aws/sso-login.test.js', () => {
     return { wrappedProvider, ...loaded };
   }
 
-  function loadSsoLogin({
+  async function loadSsoLogin({
     profiles = {},
     sessions = {},
     parseKnownFiles,
@@ -131,26 +130,28 @@ describe('test/unit/lib/aws/sso-login.test.js', () => {
     const writeFileAtomicStub = writeFileAtomic || sinon.stub().resolves();
     const writeTextStub = writeText || sinon.stub();
 
-    const ssoLogin = proxyquire('../../../../lib/aws/sso-login', {
-      '@aws-sdk/client-sso-oidc': {
-        CreateTokenCommand,
-        RegisterClientCommand,
-        SSOOIDCClient: FakeSSOOIDCClient,
-        StartDeviceAuthorizationCommand,
-      },
-      '@smithy/core/config': {
-        getSSOTokenFilepath: getTokenPath,
-        loadSsoSessionData: loadSsoSessionData || sinon.stub().resolves(sessions),
-        parseKnownFiles: parseKnownFiles || sinon.stub().resolves(profiles),
-      },
-      '../utils/serverless-utils/log': { writeText: writeTextStub },
-      'fs': {
-        promises: {
-          mkdir: mkdirStub,
+    const ssoLogin = (
+      await esmock('../../../../lib/aws/sso-login.ts', {
+        '@aws-sdk/client-sso-oidc': {
+          CreateTokenCommand,
+          RegisterClientCommand,
+          SSOOIDCClient: FakeSSOOIDCClient,
+          StartDeviceAuthorizationCommand,
         },
-      },
-      'write-file-atomic': writeFileAtomicStub,
-    });
+        '@smithy/core/config': {
+          getSSOTokenFilepath: getTokenPath,
+          loadSsoSessionData: loadSsoSessionData || sinon.stub().resolves(sessions),
+          parseKnownFiles: parseKnownFiles || sinon.stub().resolves(profiles),
+        },
+        '../../../../lib/utils/serverless-utils/log.ts': { writeText: writeTextStub },
+        'fs': {
+          promises: {
+            mkdir: mkdirStub,
+          },
+        },
+        'write-file-atomic': writeFileAtomicStub,
+      })
+    ).default;
 
     return {
       mkdir: mkdirStub,

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import resolveMeta from '../../../../../lib/configuration/variables/resolve-meta.ts';
 
-describe('test/unit/lib/configuration/variables/resolve-meta.test.js', () => {
+describe('test/unit/lib/configuration/variables/resolve-meta.test.ts', () => {
   it('should resolve variables map', () => {
     const meta = Array.from(
       resolveMeta({

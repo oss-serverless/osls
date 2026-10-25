@@ -5,7 +5,7 @@ import ensureFile from '../../../../../lib/utils/fs/ensure-file.ts';
 import { getTmpDirPath } from '../../../../utils/fs.ts';
 const fsp = fs.promises;
 
-describe('test/unit/lib/utils/fs/ensure-file.test.js', () => {
+describe('test/unit/lib/utils/fs/ensure-file.test.ts', () => {
   let tmpDir;
 
   beforeEach(() => {

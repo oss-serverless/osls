@@ -3,14 +3,14 @@ import path from 'node:path';
 import fs from 'node:fs';
 import yazl from 'yazl';
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import { extractZip, isZipBuffer } from '../../../../lib/utils/extract-zip.ts';
 import { pathExists, remove } from '../../../utils/fs.ts';
+import esmock from 'esmock';
 const fsp = fs.promises;
 
-const loadExtractZipWithFs = (fsStub) =>
-  proxyquire.noCallThru().load('../../../../lib/utils/extract-zip', { fs: fsStub });
+const loadExtractZipWithFs = async (fsStub) =>
+  (await esmock('../../../../lib/utils/extract-zip.ts', { fs: fsStub })).default;
 
 const createZipBuffer = (entries) =>
   new Promise((resolve, reject) => {

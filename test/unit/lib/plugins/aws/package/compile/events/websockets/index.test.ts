@@ -105,7 +105,7 @@ describe('AwsCompileWebsocketsEvents', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/package/compile/events/websockets/index.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/websockets/index.test.ts', () => {
   describe('regular configuration', () => {
     let cfTemplate;
     let awsNaming;

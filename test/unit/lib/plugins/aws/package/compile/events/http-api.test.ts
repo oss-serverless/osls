@@ -3,7 +3,7 @@ import runServerless from '../../../../../../../utils/run-serverless.ts';
 
 const { expect } = chai;
 
-describe('lib/plugins/aws/package/compile/events/httpApi.test.js', () => {
+describe('lib/plugins/aws/package/compile/events/httpApi.test.ts', () => {
   it('should not configure HTTP API resources when no events are configured', async () =>
     runServerless({
       config: { service: 'irrelevant', provider: 'aws' },

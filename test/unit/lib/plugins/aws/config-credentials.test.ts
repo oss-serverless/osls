@@ -230,7 +230,7 @@ describe('AwsConfigCredentials', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/configCredentials.test.js', () => {
+describe('test/unit/lib/plugins/aws/configCredentials.test.ts', () => {
   it('should fail if profile is already set and overwrite is not set', async () => {
     const credentialsFilePath = path.join(os.homedir(), '.aws', 'credentials');
     const credentialsFileContent = [

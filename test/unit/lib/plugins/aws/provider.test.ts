@@ -1,7 +1,6 @@
 import * as chai from 'chai';
 import path from 'node:path';
 import fs from 'node:fs';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import { overrideEnv } from '../../../../utils/process.ts';
 import AwsProvider from '../../../../../lib/plugins/aws/provider.ts';
@@ -9,7 +8,6 @@ import awsCredentialsDocsUrl from '../../../../../lib/aws/credentials-help-url.t
 import Serverless from '../../../../../lib/serverless.ts';
 import ServerlessError from '../../../../../lib/serverless-error.ts';
 import runServerless from '../../../../utils/run-serverless.ts';
-
 import {
   CloudFormationClient,
   DescribeStackResourceCommand,
@@ -17,6 +15,8 @@ import {
 } from '@aws-sdk/client-cloudformation';
 
 import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
+
+import esmock from 'esmock';
 
 const expect = chai.expect;
 const spawnModulePath = path.resolve(import.meta.dirname, '../../../../../lib/utils/spawn.js');
@@ -510,15 +510,15 @@ describe('AwsProvider', () => {
         .resolves({ accessKeyId: 'key', secretAccessKey: 'secret' });
       const getAwsSdkV3CredentialsProviderStub = sinon.stub().returns(credentialsProvider);
       const getAwsSdkV3CredentialsProviderCacheKeyStub = sinon.stub().returns('cache-key');
-      const AwsProviderProxyquired = proxyquire
-        .noCallThru()
-        .load('../../../../../lib/plugins/aws/provider.js', {
-          '../../aws/config': { buildClientConfig: buildClientConfigStub },
-          '../../aws/credentials': {
+      const AwsProviderProxyquired = (
+        await esmock('../../../../../lib/plugins/aws/provider.ts', {
+          '../../../../../lib/aws/config.ts': { buildClientConfig: buildClientConfigStub },
+          '../../../../../lib/aws/credentials.ts': {
             getAwsSdkV3CredentialsProviderCacheKey: getAwsSdkV3CredentialsProviderCacheKeyStub,
             getAwsSdkV3CredentialsProvider: getAwsSdkV3CredentialsProviderStub,
           },
-        });
+        })
+      ).default;
       const provider = new AwsProviderProxyquired(serverless, options);
 
       const config = await provider.getAwsSdkV3Config({
@@ -552,14 +552,14 @@ describe('AwsProvider', () => {
     it('normalizes generic SDK v3 missing credentials errors', async () => {
       const missingCredentialsError = new Error('Could not load credentials from any providers');
       const credentialsProvider = sinon.stub().rejects(missingCredentialsError);
-      const AwsProviderProxyquired = proxyquire
-        .noCallThru()
-        .load('../../../../../lib/plugins/aws/provider.js', {
-          '../../aws/credentials': {
+      const AwsProviderProxyquired = (
+        await esmock('../../../../../lib/plugins/aws/provider.ts', {
+          '../../../../../lib/aws/credentials.ts': {
             getAwsSdkV3CredentialsProviderCacheKey: sinon.stub().returns('cache-key'),
             getAwsSdkV3CredentialsProvider: sinon.stub().returns(credentialsProvider),
           },
-        });
+        })
+      ).default;
       const provider = new AwsProviderProxyquired(serverless, options);
 
       const config = await provider.getAwsSdkV3Config();
@@ -581,14 +581,14 @@ describe('AwsProvider', () => {
         { name: 'CredentialsProviderError' }
       );
       const credentialsProvider = sinon.stub().rejects(profileError);
-      const AwsProviderProxyquired = proxyquire
-        .noCallThru()
-        .load('../../../../../lib/plugins/aws/provider.js', {
-          '../../aws/credentials': {
+      const AwsProviderProxyquired = (
+        await esmock('../../../../../lib/plugins/aws/provider.ts', {
+          '../../../../../lib/aws/credentials.ts': {
             getAwsSdkV3CredentialsProviderCacheKey: sinon.stub().returns('cache-key'),
             getAwsSdkV3CredentialsProvider: sinon.stub().returns(credentialsProvider),
           },
-        });
+        })
+      ).default;
       const provider = new AwsProviderProxyquired(serverless, options);
 
       const config = await provider.getAwsSdkV3Config();
@@ -607,14 +607,14 @@ describe('AwsProvider', () => {
         message: 'Could not load credentials from any providers',
       });
       const credentialsProvider = sinon.stub().rejects(inheritedMissingCredentialsError);
-      const AwsProviderProxyquired = proxyquire
-        .noCallThru()
-        .load('../../../../../lib/plugins/aws/provider.js', {
-          '../../aws/credentials': {
+      const AwsProviderProxyquired = (
+        await esmock('../../../../../lib/plugins/aws/provider.ts', {
+          '../../../../../lib/aws/credentials.ts': {
             getAwsSdkV3CredentialsProviderCacheKey: sinon.stub().returns('cache-key'),
             getAwsSdkV3CredentialsProvider: sinon.stub().returns(credentialsProvider),
           },
-        });
+        })
+      ).default;
       const provider = new AwsProviderProxyquired(serverless, options);
 
       const config = await provider.getAwsSdkV3Config();
@@ -633,14 +633,14 @@ describe('AwsProvider', () => {
         name: 'CredentialsProviderError',
       });
       const credentialsProvider = sinon.stub().rejects(ssoError);
-      const AwsProviderProxyquired = proxyquire
-        .noCallThru()
-        .load('../../../../../lib/plugins/aws/provider.js', {
-          '../../aws/credentials': {
+      const AwsProviderProxyquired = (
+        await esmock('../../../../../lib/plugins/aws/provider.ts', {
+          '../../../../../lib/aws/credentials.ts': {
             getAwsSdkV3CredentialsProviderCacheKey: sinon.stub().returns('cache-key'),
             getAwsSdkV3CredentialsProvider: sinon.stub().returns(credentialsProvider),
           },
-        });
+        })
+      ).default;
       const provider = new AwsProviderProxyquired(serverless, options);
 
       const config = await provider.getAwsSdkV3Config();
@@ -657,14 +657,14 @@ describe('AwsProvider', () => {
     it('does not mask credential provider errors with non-string messages', async () => {
       const nonStringMessageError = { message: { text: 'Could not load credentials' } };
       const credentialsProvider = sinon.stub().rejects(nonStringMessageError);
-      const AwsProviderProxyquired = proxyquire
-        .noCallThru()
-        .load('../../../../../lib/plugins/aws/provider.js', {
-          '../../aws/credentials': {
+      const AwsProviderProxyquired = (
+        await esmock('../../../../../lib/plugins/aws/provider.ts', {
+          '../../../../../lib/aws/credentials.ts': {
             getAwsSdkV3CredentialsProviderCacheKey: sinon.stub().returns('cache-key'),
             getAwsSdkV3CredentialsProvider: sinon.stub().returns(credentialsProvider),
           },
-        });
+        })
+      ).default;
       const provider = new AwsProviderProxyquired(serverless, options);
 
       const config = await provider.getAwsSdkV3Config();
@@ -680,14 +680,14 @@ describe('AwsProvider', () => {
     it('memoizes credential resolution across clients sharing a provider', async () => {
       const resolvedCredentials = { accessKeyId: 'accessKeyId', secretAccessKey: 'secret' };
       const baseProvider = sinon.stub().resolves(resolvedCredentials);
-      const AwsProviderProxyquired = proxyquire
-        .noCallThru()
-        .load('../../../../../lib/plugins/aws/provider.js', {
-          '../../aws/credentials': {
+      const AwsProviderProxyquired = (
+        await esmock('../../../../../lib/plugins/aws/provider.ts', {
+          '../../../../../lib/aws/credentials.ts': {
             getAwsSdkV3CredentialsProviderCacheKey: sinon.stub().returns('cache-key'),
             getAwsSdkV3CredentialsProvider: sinon.stub().returns(baseProvider),
           },
-        });
+        })
+      ).default;
       const provider = new AwsProviderProxyquired(serverless, options);
 
       const credentialsProvider = provider.getAwsSdkV3CredentialsProvider();
@@ -1066,7 +1066,7 @@ describe('AwsProvider', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/provider.test.js', () => {
+describe('test/unit/lib/plugins/aws/provider.test.ts', () => {
   describe('#getProviderName', () => {
     it('`AwsProvider.getProviderName()` should resolve provider name', () => {
       expect(AwsProvider.getProviderName()).to.equal('aws');

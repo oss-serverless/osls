@@ -337,7 +337,7 @@ describe('AwsCompileCloudFrontEvents', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/package/compile/events/cloudFront.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/cloudFront.test.ts', () => {
   describe('Removal notice', () => {
     let warningStub;
 

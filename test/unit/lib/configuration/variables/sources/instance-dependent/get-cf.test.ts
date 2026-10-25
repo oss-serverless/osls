@@ -1,11 +1,11 @@
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import resolveMeta from '../../../../../../../lib/configuration/variables/resolve-meta.ts';
 import resolve from '../../../../../../../lib/configuration/variables/resolve.ts';
 import selfSource from '../../../../../../../lib/configuration/variables/sources/self.ts';
+import esmock from 'esmock';
 
-describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-cf.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-cf.test.ts', () => {
   let configuration;
   let variablesMeta;
   let sends;
@@ -19,7 +19,7 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-c
     }
   }
 
-  function loadSource(handler) {
+  async function loadSource(handler) {
     sends = [];
     clientInstances = [];
     credentials = sinon.stub();
@@ -40,14 +40,17 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-c
       }
     }
 
-    const getCfSource = proxyquire
-      .noCallThru()
-      .load('../../../../../../../lib/configuration/variables/sources/instance-dependent/get-cf', {
-        '@aws-sdk/client-cloudformation': {
-          CloudFormationClient,
-          DescribeStacksCommand,
-        },
-      });
+    const getCfSource = (
+      await esmock(
+        '../../../../../../../lib/configuration/variables/sources/instance-dependent/get-cf.ts',
+        {
+          '@aws-sdk/client-cloudformation': {
+            CloudFormationClient,
+            DescribeStacksCommand,
+          },
+        }
+      )
+    ).default;
 
     return getCfSource({
       getProvider: () => ({ getRegion: () => 'us-east-1', getAwsSdkV3Config }),

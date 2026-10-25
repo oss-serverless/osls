@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import {
   APIGatewayClient,
   GetUsagePlansCommand,
@@ -12,6 +11,7 @@ import AwsProvider from '../../../../../../../../../../../lib/plugins/aws/provid
 import disassociateUsagePlan from '../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/disassociate-usage-plan.ts';
 import releasePendingRequestsUntilSettled from '../../../../../../../../../../utils/release-pending-requests-until-settled.ts';
 import runServerless from '../../../../../../../../../../utils/run-serverless.ts';
+import esmock from 'esmock';
 
 function getApiGatewayMethod(command) {
   if (command instanceof GetUsagePlansCommand) return 'getUsagePlans';
@@ -414,20 +414,22 @@ describe('#disassociateUsagePlan()', () => {
         throw new Error(`Unexpected CloudFormation command: ${command.constructor.name}`);
       }
     }
-    const disassociateUsagePlanWithClientStubs = proxyquire(
-      '../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/disassociate-usage-plan',
-      {
-        '@aws-sdk/client-api-gateway': {
-          APIGatewayClient: FakeAPIGatewayClient,
-          GetUsagePlansCommand: FakeGetUsagePlansCommand,
-          UpdateUsagePlanCommand: FakeUpdateUsagePlanCommand,
-        },
-        '@aws-sdk/client-cloudformation': {
-          CloudFormationClient: FakeCloudFormationClient,
-          DescribeStackResourceCommand: FakeDescribeStackResourceCommand,
-        },
-      }
-    );
+    const disassociateUsagePlanWithClientStubs = (
+      await esmock(
+        '../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/disassociate-usage-plan.ts',
+        {
+          '@aws-sdk/client-api-gateway': {
+            APIGatewayClient: FakeAPIGatewayClient,
+            GetUsagePlansCommand: FakeGetUsagePlansCommand,
+            UpdateUsagePlanCommand: FakeUpdateUsagePlanCommand,
+          },
+          '@aws-sdk/client-cloudformation': {
+            CloudFormationClient: FakeCloudFormationClient,
+            DescribeStackResourceCommand: FakeDescribeStackResourceCommand,
+          },
+        }
+      )
+    ).default;
     const getAwsSdkV3ConfigStub = sinon.stub(awsProvider, 'getAwsSdkV3Config');
     getAwsSdkV3ConfigStub.onFirstCall().resolves({
       credentials,

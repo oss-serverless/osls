@@ -3,7 +3,7 @@ import runServerless from '../../../../../../../utils/run-serverless.ts';
 
 const { expect } = chai;
 
-describe('test/unit/lib/plugins/aws/package/compile/events/kafka.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/kafka.test.ts', () => {
   const saslScram256AuthArn =
     'arn:aws:secretsmanager:us-east-1:01234567890:secret:SaslScram256Auth';
   const clientCertificateTlsAuthArn =

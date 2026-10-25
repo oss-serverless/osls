@@ -4,7 +4,7 @@ import resolve from '../../../../../../../lib/configuration/variables/resolve.ts
 import selfSource from '../../../../../../../lib/configuration/variables/sources/self.ts';
 import getParamSource from '../../../../../../../lib/configuration/variables/sources/instance-dependent/param.ts';
 
-describe('test/unit/lib/configuration/variables/sources/instance-dependent/param.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/instance-dependent/param.test.ts', () => {
   const createServerlessInstance = ({ configuration, cliParameters }) => ({
     configurationInput: configuration,
     processedInput: {

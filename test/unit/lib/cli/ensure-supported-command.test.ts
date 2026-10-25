@@ -6,7 +6,7 @@ import ensureSupportedCommand from '../../../../lib/cli/ensure-supported-command
 import resolveInput from '../../../../lib/cli/resolve-input.ts';
 const { triggeredDeprecations } = logDeprecation;
 
-describe('test/unit/lib/cli/ensure-supported-command.test.js', () => {
+describe('test/unit/lib/cli/ensure-supported-command.test.ts', () => {
   beforeEach(() => {
     triggeredDeprecations.clear();
     resolveInput.clear();

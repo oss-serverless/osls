@@ -10,7 +10,7 @@ import {
   overrideStdoutWrite,
 } from '../../../utils/process.ts';
 
-describe('test/unit/lib/utils/process.test.js', () => {
+describe('test/unit/lib/utils/process.test.ts', () => {
   let originalEnv;
   let originalArgv;
   let originalStdoutWrite;

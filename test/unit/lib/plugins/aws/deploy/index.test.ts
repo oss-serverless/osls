@@ -3,7 +3,7 @@ import logEmitter from 'log/lib/emitter.js';
 import runServerless from '../../../../../utils/run-serverless.ts';
 import { expect } from 'chai';
 
-describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
+describe('test/unit/lib/plugins/aws/deploy/index.test.ts', () => {
   const baseAwsSdkV3StubMap = {
     STS: {
       getCallerIdentity: {

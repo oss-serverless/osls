@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import resolveProviderName from '../../../../lib/configuration/resolve-provider-name.ts';
 import ServerlessError from '../../../../lib/serverless-error.ts';
 
-describe('test/unit/lib/configuration/resolve-provider-name.test.js', () => {
+describe('test/unit/lib/configuration/resolve-provider-name.test.ts', () => {
   it('should read name from "provider"', () => {
     expect(resolveProviderName({ provider: 'foo' })).to.equal('foo');
   });

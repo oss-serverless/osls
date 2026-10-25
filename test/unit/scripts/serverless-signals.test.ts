@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
+import esmock from 'esmock';
 
 const modulePath = '../../../scripts/serverless.js';
 
@@ -19,7 +19,7 @@ const flush = async () => {
   await Promise.resolve();
 };
 
-describe('test/unit/scripts/serverless-signals.test.js', () => {
+describe('test/unit/scripts/serverless-signals.test.ts', () => {
   let sleepDeferred;
   let renderVersionDeferred;
   let onceHandlers;
@@ -32,7 +32,7 @@ describe('test/unit/scripts/serverless-signals.test.js', () => {
     originalStackTraceLimit = Error.stackTraceLimit;
   });
 
-  const loadScript = ({ signals = ['SIGINT', 'SIGTERM'], listenerCount = 0 } = {}) => {
+  const loadScript = async ({ signals = ['SIGINT', 'SIGTERM'], listenerCount = 0 } = {}) => {
     sleepDeferred = deferred();
     renderVersionDeferred = deferred();
     onceHandlers = new Map();
@@ -79,19 +79,21 @@ describe('test/unit/scripts/serverless-signals.test.js', () => {
 
     delete require.cache[require.resolve(modulePath)];
 
-    proxyquire.noCallThru().load(modulePath, {
-      '../lib/utils/serverless-utils/log-reporters/node': {},
-      '../lib/utils/serverless-utils/log': { log, progress },
-      '../lib/cli/handle-error': stubs.handleError,
-      '../lib/utils/log-deprecation': { printSummary: stubs.printSummary },
-      '../lib/utils/sleep': stubs.sleep,
-      'signal-exit/signals': { signals },
-      '../lib/configuration/variables/humanize-property-path-keys': sinon.stub(),
-      '../lib/cli/param-reg-exp': /^-/,
-      '../lib/cli/resolve-input': resolveInput,
-      '../lib/cli/commands-schema/no-service': {},
-      '../lib/cli/render-version': stubs.renderVersion,
-    });
+    (
+      await esmock(modulePath, {
+        '../lib/utils/serverless-utils/log-reporters/node': {},
+        '../lib/utils/serverless-utils/log': { log, progress },
+        '../lib/cli/handle-error': stubs.handleError,
+        '../lib/utils/log-deprecation': { printSummary: stubs.printSummary },
+        '../lib/utils/sleep': stubs.sleep,
+        'signal-exit/signals': { signals },
+        '../lib/configuration/variables/humanize-property-path-keys': sinon.stub(),
+        '../lib/cli/param-reg-exp': /^-/,
+        '../lib/cli/resolve-input': resolveInput,
+        '../lib/cli/commands-schema/no-service': {},
+        '../lib/cli/render-version': stubs.renderVersion,
+      })
+    ).default;
   };
 
   afterEach(async () => {

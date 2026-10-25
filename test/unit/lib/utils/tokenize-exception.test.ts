@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import ServerlessError from '../../../../lib/serverless-error.ts';
 import tokenizeError from '../../../../lib/utils/tokenize-exception.ts';
 
-describe('test/unit/lib/utils/tokenize-exception.test.js', () => {
+describe('test/unit/lib/utils/tokenize-exception.test.ts', () => {
   it('Should tokenize user error', () => {
     const errorTokens = tokenizeError(
       new ServerlessError('Some error', 'ERR_CODE', { decoratedMessage: 'decorated' })

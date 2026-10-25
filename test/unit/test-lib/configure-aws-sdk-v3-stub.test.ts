@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import configureAwsSdkV3Stub from '../../lib/configure-aws-sdk-v3-stub.ts';
 import { createDeployAwsStubMap } from '../../utils/aws-stub-maps.ts';
 
-describe('test/unit/test-lib/configure-aws-sdk-v3-stub.test.js', () => {
+describe('test/unit/test-lib/configure-aws-sdk-v3-stub.test.ts', () => {
   it('stubs client commands and records send context', async () => {
     const awsSdkV3Stub = configureAwsSdkV3Stub({
       S3: {

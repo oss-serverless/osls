@@ -8,7 +8,7 @@ import crypto from 'node:crypto';
 
 const expect = chai.expect;
 
-describe('test/unit/lib/utils/ensureExists.test.js', () => {
+describe('test/unit/lib/utils/ensureExists.test.ts', () => {
   const testCacheDir = getTmpDirPath();
 
   it('Should call generate if file missing', async () => {

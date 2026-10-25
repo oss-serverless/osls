@@ -9,7 +9,7 @@ import resolveInput from '../../../../lib/cli/resolve-input.ts';
 
 const { expect } = chai;
 
-describe('test/unit/lib/cli/resolve-configuration-path.test.js', () => {
+describe('test/unit/lib/cli/resolve-configuration-path.test.ts', () => {
   let configurationPath;
   afterEach(async () => {
     if (!configurationPath) return;

@@ -63,7 +63,7 @@ const createFooter = (options = {}) => {
   return { footer, stdout, stderr };
 };
 
-describe('test/unit/lib/utils/progress-footer.test.js', () => {
+describe('test/unit/lib/utils/progress-footer.test.ts', () => {
   afterEach(() => {
     delete require.cache[require.resolve(modulePath)];
     sinon.restore();

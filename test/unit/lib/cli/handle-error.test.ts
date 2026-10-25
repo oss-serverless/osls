@@ -6,7 +6,7 @@ import ServerlessError from '../../../../lib/serverless-error.ts';
 
 const expect = chai.expect;
 
-describe('test/unit/lib/cli/handle-error.test.js', () => {
+describe('test/unit/lib/cli/handle-error.test.ts', () => {
   it('should output error', async () => {
     const output = await observeOutput(() => handleError(new ServerlessError('Test error')));
     expect(output).to.have.string('Test error');

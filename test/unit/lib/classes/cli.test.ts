@@ -1,8 +1,8 @@
 import * as chai from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import CLI from '../../../../lib/classes/cli.ts';
 import Serverless from '../../../../lib/serverless.ts';
+import esmock from 'esmock';
 
 const { expect } = chai;
 
@@ -42,27 +42,29 @@ describe('CLI', () => {
   });
 
   describe('#log()', () => {
-    it('applies legacy color and text formatting options', () => {
+    it('applies legacy color and text formatting options', async () => {
       const notice = sinon.stub();
-      const CLIWithStubbedWriters = proxyquire.noCallThru().load('../../../../lib/classes/cli', {
-        '../utils/colors': {
-          stdoutColors: {
-            yellow: (text) => `[yellow]${text}[/yellow]`,
+      const CLIWithStubbedWriters = (
+        await esmock('../../../../lib/classes/cli.ts', {
+          '../../../../lib/utils/colors.ts': {
+            stdoutColors: {
+              yellow: (text) => `[yellow]${text}[/yellow]`,
+            },
+            stderrColors: {
+              bold: (text) => `<b>${text}</b>`,
+              underline: (text) => `<u>${text}</u>`,
+              colorize: (text, color) => `[${color}]${text}[/${color}]`,
+            },
           },
-          stderrColors: {
-            bold: (text) => `<b>${text}</b>`,
-            underline: (text) => `<u>${text}</u>`,
-            colorize: (text, color) => `[${color}]${text}[/${color}]`,
+          '../../../../lib/utils/serverless-utils/log.ts': {
+            log: {
+              get: sinon.stub().returns({ notice }),
+            },
           },
-        },
-        '../utils/serverless-utils/log': {
-          log: {
-            get: sinon.stub().returns({ notice }),
-          },
-        },
-        '../cli/resolve-input': sinon.stub().returns({ isHelpRequest: false }),
-        '../cli/render-help': sinon.stub(),
-      });
+          '../../../../lib/cli/resolve-input.ts': sinon.stub().returns({ isHelpRequest: false }),
+          '../../../../lib/cli/render-help/index.ts': sinon.stub(),
+        })
+      ).default;
 
       const localCli = new CLIWithStubbedWriters(serverless);
 
@@ -73,27 +75,29 @@ describe('CLI', () => {
       );
     });
 
-    it('accepts null opts', () => {
+    it('accepts null opts', async () => {
       const notice = sinon.stub();
-      const CLIWithStubbedWriters = proxyquire.noCallThru().load('../../../../lib/classes/cli', {
-        '../utils/colors': {
-          stdoutColors: {
-            yellow: (text) => text,
+      const CLIWithStubbedWriters = (
+        await esmock('../../../../lib/classes/cli.ts', {
+          '../../../../lib/utils/colors.ts': {
+            stdoutColors: {
+              yellow: (text) => text,
+            },
+            stderrColors: {
+              bold: (text) => text,
+              underline: (text) => text,
+              colorize: (text) => text,
+            },
           },
-          stderrColors: {
-            bold: (text) => text,
-            underline: (text) => text,
-            colorize: (text) => text,
+          '../../../../lib/utils/serverless-utils/log.ts': {
+            log: {
+              get: sinon.stub().returns({ notice }),
+            },
           },
-        },
-        '../utils/serverless-utils/log': {
-          log: {
-            get: sinon.stub().returns({ notice }),
-          },
-        },
-        '../cli/resolve-input': sinon.stub().returns({ isHelpRequest: false }),
-        '../cli/render-help': sinon.stub(),
-      });
+          '../../../../lib/cli/resolve-input.ts': sinon.stub().returns({ isHelpRequest: false }),
+          '../../../../lib/cli/render-help/index.ts': sinon.stub(),
+        })
+      ).default;
 
       const localCli = new CLIWithStubbedWriters(serverless);
 

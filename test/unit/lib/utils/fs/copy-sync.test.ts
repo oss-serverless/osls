@@ -5,7 +5,7 @@ import copySync from '../../../../../lib/utils/fs/copy-sync.ts';
 import { getTmpDirPath } from '../../../../utils/fs.ts';
 import skipOnDisabledSymlinksInWindows from '../../../../lib/skip-on-disabled-symlinks-in-windows.ts';
 
-describe('test/unit/lib/utils/fs/copy-sync.test.js', () => {
+describe('test/unit/lib/utils/fs/copy-sync.test.ts', () => {
   let tmpDir;
 
   beforeEach(() => {

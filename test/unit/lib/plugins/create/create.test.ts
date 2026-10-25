@@ -3,16 +3,20 @@ import { promises as fsp } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import AdmZip from 'adm-zip';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import ServerlessError from '../../../../../lib/serverless-error.ts';
 import { ensureDir, getTmpDirPath, remove } from '../../../../utils/fs.ts';
 import runServerless from '../../../../utils/run-serverless.ts';
 import { expect } from 'chai';
+import esmock from 'esmock';
 
 const fixturesPath = path.resolve(import.meta.dirname, '../../../../fixtures/programmatic');
 
-const loadCreate = ({ downloadTemplateFromRepoStub, dirExistsSyncStub, untildifyStub } = {}) => {
+const loadCreate = async ({
+  downloadTemplateFromRepoStub,
+  dirExistsSyncStub,
+  untildifyStub,
+} = {}) => {
   const noticeStub = sinon.stub();
   noticeStub.success = sinon.stub();
   const copyDirContentsSyncStub = sinon.stub();
@@ -41,7 +45,7 @@ const loadCreate = ({ downloadTemplateFromRepoStub, dirExistsSyncStub, untildify
   };
   if (untildifyStub) stubs['../../utils/untildify'] = untildifyStub;
 
-  const Create = proxyquire.noCallThru().load('../../../../../lib/plugins/create/create', stubs);
+  const Create = (await esmock('../../../../../lib/plugins/create/create.ts', stubs)).default;
 
   return {
     Create,
@@ -51,7 +55,7 @@ const loadCreate = ({ downloadTemplateFromRepoStub, dirExistsSyncStub, untildify
   };
 };
 
-describe('test/unit/lib/plugins/create/create.test.js', () => {
+describe('test/unit/lib/plugins/create/create.test.ts', () => {
   it('should generate scaffolding for local template in provided path and rename service', async () => {
     const tmpDir = getTmpDirPath();
     await runServerless({

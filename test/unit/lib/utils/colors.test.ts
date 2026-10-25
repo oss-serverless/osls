@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import colors2 from '../../../../lib/utils/colors.ts';
 const { createColors, getColorLevel } = colors2;
 
-describe('test/unit/lib/utils/colors.test.js', () => {
+describe('test/unit/lib/utils/colors.test.ts', () => {
   it('reports no colors for non-tty streams by default', () => {
     expect(getColorLevel({ stream: { isTTY: false }, env: {} })).to.equal(0);
   });

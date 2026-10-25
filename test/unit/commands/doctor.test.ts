@@ -5,7 +5,7 @@ import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts'
 
 const serverlessPath = path.resolve(import.meta.dirname, '../../../scripts/serverless.js');
 
-describe('test/unit/commands/doctor.test.js', async () => {
+describe('test/unit/commands/doctor.test.ts', async () => {
   before(() => {
     process.env.SLS_DEPRECATION_NOTIFICATION_MODE = 'warn:summary';
   });

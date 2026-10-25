@@ -2,7 +2,7 @@ import runServerless from '../../../../../../../../utils/run-serverless.ts';
 import ServerlessError from '../../../../../../../../../lib/serverless-error.ts';
 import { expect } from 'chai';
 
-describe('test/unit/lib/plugins/aws/package/compile/events/alb/index.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/alb/index.test.ts', () => {
   let cfResources;
   let naming;
 

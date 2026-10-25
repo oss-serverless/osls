@@ -1,8 +1,8 @@
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 
-describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/style.test.js', () => {
-  it('uses stderr colors for shared style decorators', () => {
+describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/style.test.ts', () => {
+  it('uses stderr colors for shared style decorators', async () => {
     const styleState = {
       aside: (value) => value,
       error: (value) => value,
@@ -17,24 +17,29 @@ describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/style.test
       notice: (...tokens) => tokens.join(' '),
     };
 
-    proxyquire
-      .noCallThru()
-      .load('../../../../../../../../lib/utils/serverless-utils/lib/log-reporters/node/style', {
-        'ext/function/identity': (value) => value,
-        '../../../../colors': {
-          stderrColors: {
-            gray: (value) => `stderr-gray(${value})`,
-            brandRed: (value) => `stderr-red(${value})`,
-            underline: (value) => `stderr-underline(${value})`,
-            warning: (value) => `stderr-warning(${value})`,
+    (
+      await esmock(
+        '../../../../../../../../lib/utils/serverless-utils/lib/log-reporters/node/style.ts',
+        {
+          'ext/function/identity': (value) => value,
+          '../../../../../../../../lib/utils/colors.ts': {
+            stderrColors: {
+              gray: (value) => `stderr-gray(${value})`,
+              brandRed: (value) => `stderr-red(${value})`,
+              underline: (value) => `stderr-underline(${value})`,
+              warning: (value) => `stderr-warning(${value})`,
+            },
           },
-        },
-        '../../../log': {
-          style: styleState,
-          log: logState,
-        },
-        '../../log/join-text-tokens': (tokens) => `${tokens.join('')}\n`,
-      });
+          '../../../../../../../../lib/utils/serverless-utils/log.ts': {
+            style: styleState,
+            log: logState,
+          },
+          '../../../../../../../../lib/utils/serverless-utils/lib/log/join-text-tokens.ts': (
+            tokens
+          ) => `${tokens.join('')}\n`,
+        }
+      )
+    ).default;
 
     expect(styleState.aside('x')).to.equal('stderr-gray(x)');
     expect(styleState.error('x')).to.equal('stderr-red(x)');

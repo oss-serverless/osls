@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import glob from '../../../../lib/utils/glob.ts';
 import { outputFile, remove } from '../../../utils/fs.ts';
 
-describe('test/unit/lib/utils/glob.test.js', () => {
+describe('test/unit/lib/utils/glob.test.ts', () => {
   let tmpDir;
 
   beforeEach(async () => {

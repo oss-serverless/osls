@@ -2,8 +2,6 @@ import * as chai from 'chai';
 import * as sinon from 'sinon';
 import path from 'node:path';
 import fs from 'node:fs';
-import proxyquire from 'proxyquire';
-
 import {
   LambdaClient,
   GetFunctionCommand,
@@ -12,10 +10,12 @@ import {
 } from '@aws-sdk/client-lambda';
 
 import { IAMClient, GetRoleCommand } from '@aws-sdk/client-iam';
+
 import AwsProvider from '../../../../../lib/plugins/aws/provider.ts';
 import Serverless from '../../../../../lib/serverless.ts';
 import runServerless from '../../../../utils/run-serverless.ts';
 import { getTmpDirPath } from '../../../../utils/fs.ts';
+import esmock from 'esmock';
 
 const expect = chai.expect;
 
@@ -59,9 +59,11 @@ describe('AwsDeployFunction', () => {
     await serverless.init();
     serverless.setProvider('aws', new AwsProvider(serverless, options));
     getHashForFilePathStub = sinon.stub();
-    AwsDeployFunction = proxyquire('../../../../../lib/plugins/aws/deploy-function', {
-      '../../utils/get-hash-for-file-path': getHashForFilePathStub,
-    });
+    AwsDeployFunction = (
+      await esmock('../../../../../lib/plugins/aws/deploy-function.ts', {
+        '../../../../../lib/utils/get-hash-for-file-path.ts': getHashForFilePathStub,
+      })
+    ).default;
     awsDeployFunction = new AwsDeployFunction(serverless, options);
   });
 
@@ -483,7 +485,7 @@ describe('AwsDeployFunction', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/deployFunction.test.js', () => {
+describe('test/unit/lib/plugins/aws/deployFunction.test.ts', () => {
   const kmsKeyArn = 'arn:aws:kms:us-east-1:123456789012';
   const description = 'func description';
   const handler = 'funcHandler';

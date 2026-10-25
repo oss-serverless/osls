@@ -4,7 +4,7 @@ import resolveMeta from '../../../../../../lib/configuration/variables/resolve-m
 import resolve from '../../../../../../lib/configuration/variables/resolve.ts';
 import fileSource from '../../../../../../lib/configuration/variables/sources/file.ts';
 
-describe('test/unit/lib/configuration/variables/sources/file.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/file.test.ts', () => {
   const serviceDir = path.resolve(import.meta.dirname, 'fixture');
   let configuration;
   let variablesMeta;

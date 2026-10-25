@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import parseDeploymentObjectKey from '../../../../../../lib/plugins/aws/utils/parse-deployment-object-key.ts';
 
-describe('test/unit/lib/plugins/aws/utils/parse-deployment-object-key.test.js', () => {
+describe('test/unit/lib/plugins/aws/utils/parse-deployment-object-key.test.ts', () => {
   it('parses a valid deployment object key', () => {
     expect(
       parseDeploymentObjectKey(

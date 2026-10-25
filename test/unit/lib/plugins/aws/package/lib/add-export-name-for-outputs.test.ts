@@ -3,7 +3,7 @@ import runServerless from '../../../../../../utils/run-serverless.ts';
 
 const expect = chai.expect;
 
-describe('test/unit/lib/plugins/aws/package/lib/addExportNameForOutputs.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/lib/addExportNameForOutputs.test.ts', () => {
   let outputs;
   let service;
   before(async () => {

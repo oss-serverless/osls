@@ -6,7 +6,6 @@ import os from 'node:os';
 import path from 'node:path';
 import AdmZip from 'adm-zip';
 import EventEmitter from 'node:events';
-import proxyquire from 'proxyquire';
 import { overrideEnv } from '../../../../../utils/process.ts';
 import AwsProvider from '../../../../../../lib/plugins/aws/provider.ts';
 import {
@@ -24,6 +23,7 @@ import setupProgrammaticFixture from '../../../../../utils/setup-programmatic-fi
 import spawnExt from '../../../../../../lib/utils/spawn.ts';
 import configureAwsSdkV3Stub from '../../../../../lib/configure-aws-sdk-v3-stub.ts';
 import releasePendingRequestsUntilSettled from '../../../../../utils/release-pending-requests-until-settled.ts';
+import esmock from 'esmock';
 const fsp = fs.promises;
 
 const tmpServicePath = import.meta.dirname;
@@ -88,7 +88,7 @@ describe('AwsInvokeLocal', () => {
   let stdinStub;
   let spawnExtStub;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     options = {
       stage: 'dev',
       region: 'us-east-1',
@@ -102,10 +102,12 @@ describe('AwsInvokeLocal', () => {
     });
 
     stdinStub = sinon.stub().resolves('');
-    AwsInvokeLocal = proxyquire('../../../../../../lib/plugins/aws/invoke-local/index', {
-      '../../../utils/get-stdin': stdinStub,
-      '../../../utils/spawn': spawnExtStub,
-    });
+    AwsInvokeLocal = (
+      await esmock('../../../../../../lib/plugins/aws/invoke-local/index.ts', {
+        '../../../../../../lib/utils/get-stdin.ts': stdinStub,
+        '../../../../../../lib/utils/spawn.ts': spawnExtStub,
+      })
+    ).default;
     serverless = new Serverless({ commands: [], options: {} });
     serverless.serviceDir = 'servicePath';
     serverless.cli = new CLI(serverless);
@@ -643,18 +645,17 @@ describe('AwsInvokeLocal', () => {
           return { Exports: [{ Name: 'some-export', Value: 'imported-value' }] };
         }
       }
-      const AwsInvokeLocalWithStub = proxyquire(
-        '../../../../../../lib/plugins/aws/invoke-local/index',
-        {
-          '../../../utils/get-stdin': stdinStub,
-          '../../../utils/spawn': spawnExtStub,
+      const AwsInvokeLocalWithStub = (
+        await esmock('../../../../../../lib/plugins/aws/invoke-local/index.ts', {
+          '../../../../../../lib/utils/get-stdin.ts': stdinStub,
+          '../../../../../../lib/utils/spawn.ts': spawnExtStub,
           '@aws-sdk/client-cloudformation': {
             CloudFormationClient: StubCloudFormationClient,
             ListExportsCommand,
             ListStackResourcesCommand,
           },
-        }
-      );
+        })
+      ).default;
       const invokeLocal = new AwsInvokeLocalWithStub(serverless, options);
       invokeLocal.provider = {
         ...provider,
@@ -1190,11 +1191,13 @@ describe('AwsInvokeLocal', () => {
 
   describe('#callJavaBridge()', () => {
     let invokeLocalSpawnStubbed;
-    beforeEach(() => {
-      AwsInvokeLocal = proxyquire('../../../../../../lib/plugins/aws/invoke-local/index', {
-        '../../../utils/get-stdin': stdinStub,
-        '../../../utils/spawn': spawnExtStub,
-      });
+    beforeEach(async () => {
+      AwsInvokeLocal = (
+        await esmock('../../../../../../lib/plugins/aws/invoke-local/index.ts', {
+          '../../../../../../lib/utils/get-stdin.ts': stdinStub,
+          '../../../../../../lib/utils/spawn.ts': spawnExtStub,
+        })
+      ).default;
       invokeLocalSpawnStubbed = new AwsInvokeLocal(serverless, {
         stage: 'dev',
         function: 'first',
@@ -1271,11 +1274,13 @@ describe('AwsInvokeLocal', () => {
   describe('#invokeLocalRuby()', () => {
     let invokeLocalSpawnStubbed;
 
-    beforeEach(() => {
-      AwsInvokeLocal = proxyquire('../../../../../../lib/plugins/aws/invoke-local/index', {
-        '../../../utils/get-stdin': stdinStub,
-        '../../../utils/spawn': spawnExtStub,
-      });
+    beforeEach(async () => {
+      AwsInvokeLocal = (
+        await esmock('../../../../../../lib/plugins/aws/invoke-local/index.ts', {
+          '../../../../../../lib/utils/get-stdin.ts': stdinStub,
+          '../../../../../../lib/utils/spawn.ts': spawnExtStub,
+        })
+      ).default;
       invokeLocalSpawnStubbed = new AwsInvokeLocal(serverless, {
         stage: 'dev',
         function: 'first',
@@ -1574,7 +1579,7 @@ describe('AwsInvokeLocal', () => {
       await expect(awsInvokeLocal.getLayerPaths()).to.eventually.deep.equal([]);
     });
 
-    const createRemoteLayerTestContext = ({
+    const createRemoteLayerTestContext = async ({
       awsSdkV3Stub,
       cacheDirPath,
       copyStub,
@@ -1582,22 +1587,24 @@ describe('AwsInvokeLocal', () => {
       downloadStub,
       ensureDirStub,
     }) => {
-      const ProxyquiredAwsInvokeLocal = proxyquire
-        .noCallThru()
-        .load('../../../../../../lib/plugins/aws/invoke-local/index', {
+      const ProxyquiredAwsInvokeLocal = (
+        await esmock('../../../../../../lib/plugins/aws/invoke-local/index.ts', {
           ...awsSdkV3Stub.modulesCacheStub,
-          '../../../utils/get-stdin': sinon.stub().resolves(''),
-          '../../../utils/spawn': sinon.stub().resolves({ stdoutBuffer: Buffer.from('Mocked') }),
+          '../../../../../../lib/utils/get-stdin.ts': sinon.stub().resolves(''),
+          '../../../../../../lib/utils/spawn.ts': sinon
+            .stub()
+            .resolves({ stdoutBuffer: Buffer.from('Mocked') }),
           'fs': {
             promises: {
               mkdir: ensureDirStub,
             },
           },
-          '../../../utils/fs/copy': copyStub,
-          '../../../utils/resolve-cache-dir': sinon.stub().returns(cacheDirPath),
-          '../../../utils/fs/dir-exists': dirExistsStub,
-          '../../../utils/serverless-utils/download': downloadStub,
-        });
+          '../../../../../../lib/utils/fs/copy.ts': copyStub,
+          '../../../../../../lib/utils/resolve-cache-dir.ts': sinon.stub().returns(cacheDirPath),
+          '../../../../../../lib/utils/fs/dir-exists.ts': dirExistsStub,
+          '../../../../../../lib/utils/serverless-utils/download.ts': downloadStub,
+        })
+      ).default;
       const localOptions = {
         stage: 'dev',
         region: 'us-east-1',
@@ -1636,22 +1643,22 @@ describe('AwsInvokeLocal', () => {
         },
       });
 
-      const ProxyquiredAwsInvokeLocal = proxyquire
-        .noCallThru()
-        .load('../../../../../../lib/plugins/aws/invoke-local/index', {
+      const ProxyquiredAwsInvokeLocal = (
+        await esmock('../../../../../../lib/plugins/aws/invoke-local/index.ts', {
           ...awsSdkV3Stub.modulesCacheStub,
-          '../../../utils/get-stdin': sinon.stub().resolves(''),
-          '../../../utils/spawn': spawnExtLocalStub,
+          '../../../../../../lib/utils/get-stdin.ts': sinon.stub().resolves(''),
+          '../../../../../../lib/utils/spawn.ts': spawnExtLocalStub,
           'fs': {
             promises: {
               mkdir: ensureDirStub,
             },
           },
-          '../../../utils/fs/copy': copyStub,
-          '../../../utils/resolve-cache-dir': sinon.stub().returns(cacheDirPath),
-          '../../../utils/fs/dir-exists': dirExistsStub,
-          '../../../utils/serverless-utils/download': downloadStub,
-        });
+          '../../../../../../lib/utils/fs/copy.ts': copyStub,
+          '../../../../../../lib/utils/resolve-cache-dir.ts': sinon.stub().returns(cacheDirPath),
+          '../../../../../../lib/utils/fs/dir-exists.ts': dirExistsStub,
+          '../../../../../../lib/utils/serverless-utils/download.ts': downloadStub,
+        })
+      ).default;
 
       const localOptions = {
         stage: 'dev',
@@ -1858,9 +1865,8 @@ describe('AwsInvokeLocal', () => {
       await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
       const baseUrl = `http://127.0.0.1:${server.address().port}`;
 
-      const ProxyquiredAwsInvokeLocal = proxyquire
-        .noCallThru()
-        .load('../../../../../../lib/plugins/aws/invoke-local/index', {
+      const ProxyquiredAwsInvokeLocal = (
+        await esmock('../../../../../../lib/plugins/aws/invoke-local/index.ts', {
           ...configureAwsSdkV3Stub({
             Lambda: {
               getLayerVersion: {
@@ -1870,14 +1876,15 @@ describe('AwsInvokeLocal', () => {
               },
             },
           }).modulesCacheStub,
-          '../../../utils/get-stdin': sinon.stub().resolves(''),
-          '../../../utils/spawn': sinon.stub().resolves({
+          '../../../../../../lib/utils/get-stdin.ts': sinon.stub().resolves(''),
+          '../../../../../../lib/utils/spawn.ts': sinon.stub().resolves({
             stdoutBuffer: Buffer.from('Mocked output'),
           }),
-          '../../../utils/resolve-cache-dir': sinon
+          '../../../../../../lib/utils/resolve-cache-dir.ts': sinon
             .stub()
             .returns(path.join(tempRoot, 'cache-root')),
-        });
+        })
+      ).default;
 
       try {
         process.chdir(tempRoot);
@@ -1965,22 +1972,24 @@ describe('AwsInvokeLocal', () => {
           },
         },
       });
-      const ProxyquiredAwsInvokeLocal = proxyquire
-        .noCallThru()
-        .load('../../../../../../lib/plugins/aws/invoke-local/index', {
+      const ProxyquiredAwsInvokeLocal = (
+        await esmock('../../../../../../lib/plugins/aws/invoke-local/index.ts', {
           ...awsSdkV3Stub.modulesCacheStub,
-          '../../../utils/get-stdin': sinon.stub().resolves(''),
-          '../../../utils/spawn': sinon.stub().resolves({ stdoutBuffer: Buffer.from('Mocked') }),
+          '../../../../../../lib/utils/get-stdin.ts': sinon.stub().resolves(''),
+          '../../../../../../lib/utils/spawn.ts': sinon
+            .stub()
+            .resolves({ stdoutBuffer: Buffer.from('Mocked') }),
           'fs': {
             promises: {
               mkdir: sinon.stub().resolves(),
             },
           },
-          '../../../utils/fs/copy': sinon.stub().resolves(),
-          '../../../utils/resolve-cache-dir': sinon.stub().returns(cacheDirPath),
-          '../../../utils/fs/dir-exists': sinon.stub().resolves(false),
-          '../../../utils/serverless-utils/download': sinon.stub().resolves(),
-        });
+          '../../../../../../lib/utils/fs/copy.ts': sinon.stub().resolves(),
+          '../../../../../../lib/utils/resolve-cache-dir.ts': sinon.stub().returns(cacheDirPath),
+          '../../../../../../lib/utils/fs/dir-exists.ts': sinon.stub().resolves(false),
+          '../../../../../../lib/utils/serverless-utils/download.ts': sinon.stub().resolves(),
+        })
+      ).default;
       const localOptions = {
         stage: 'dev',
         region: 'us-east-1',
@@ -2141,7 +2150,7 @@ describe('AwsInvokeLocal', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/invokeLocal/index.test.js', () => {
+describe('test/unit/lib/plugins/aws/invokeLocal/index.test.ts', () => {
   const testRuntime = (
     functionName,
     { cliOptions = {}, shouldTestInputResolution = false, shouldAssertNodeEnv = false } = {}

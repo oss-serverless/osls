@@ -4,9 +4,9 @@ import getSchemaHash from '../../../../../lib/classes/config-schema-handler/sche
 import path from 'node:path';
 import os from 'node:os';
 import { promises as fsp } from 'node:fs';
-import proxyquire from 'proxyquire';
 import packageModule from 'ajv/package.json' with { type: 'json' };
 import packageModule2 from 'ajv-formats/package.json' with { type: 'json' };
+import esmock from 'esmock';
 
 const expect = chai.expect;
 
@@ -20,7 +20,7 @@ const getExpectedCachePath = (schemaHash) => {
   );
 };
 
-describe('test/unit/lib/classes/ConfigSchemaHandler/resolveAjvValidate.test.js', () => {
+describe('test/unit/lib/classes/ConfigSchemaHandler/resolveAjvValidate.test.ts', () => {
   const schema = {
     $id: 'https://example.com/person.schema.json',
     $schema: 'http://json-schema.org/draft-07/schema#',
@@ -57,9 +57,8 @@ describe('test/unit/lib/classes/ConfigSchemaHandler/resolveAjvValidate.test.js',
   it('regenerates the cached validator module if removed externally', async () => {
     const realFsp = (await import('node:fs')).default.promises;
     let injectedRemoval = false;
-    const resolveAjvValidateFresh = proxyquire(
-      '../../../../../lib/classes/config-schema-handler/resolve-ajv-validate',
-      {
+    const resolveAjvValidateFresh = (
+      await esmock('../../../../../lib/classes/config-schema-handler/resolve-ajv-validate.ts', {
         fs: {
           promises: {
             ...realFsp,
@@ -72,8 +71,8 @@ describe('test/unit/lib/classes/ConfigSchemaHandler/resolveAjvValidate.test.js',
             },
           },
         },
-      }
-    );
+      })
+    ).default;
 
     const uniqueSchema = { ...schema, title: 'ExternallyRemovedCache' };
     const validate = await resolveAjvValidateFresh(uniqueSchema);

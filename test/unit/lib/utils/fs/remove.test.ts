@@ -5,7 +5,7 @@ import { remove, removeSync } from '../../../../../lib/utils/fs/remove.ts';
 import { getTmpDirPath } from '../../../../utils/fs.ts';
 const fsp = fs.promises;
 
-describe('test/unit/lib/utils/fs/remove.test.js', () => {
+describe('test/unit/lib/utils/fs/remove.test.ts', () => {
   let tmpDir;
 
   beforeEach(() => {

@@ -53,7 +53,7 @@ async function run(events, options = {}) {
   return { scheduleCfResources, iamResource, cfResources };
 }
 
-describe('test/unit/lib/plugins/aws/package/compile/events/schedule.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/schedule.test.ts', () => {
   describe('basic', () => {
     let scheduleCfResources;
     let iamResource;

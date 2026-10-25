@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import createCachedAwsVariableSourceCommandSender from '../../../../../../../lib/configuration/variables/sources/instance-dependent/create-cached-aws-variable-source-command-sender.ts';
 
-describe('test/unit/lib/configuration/variables/sources/instance-dependent/create-cached-aws-variable-source-command-sender.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/instance-dependent/create-cached-aws-variable-source-command-sender.test.ts', () => {
   class TestCommand {
     constructor(input) {
       this.input = input;

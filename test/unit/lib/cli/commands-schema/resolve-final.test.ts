@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import resolveFinal from '../../../../../lib/cli/commands-schema/resolve-final.ts';
 
-describe('test/unit/lib/cli/commands-schema/resolve-final.test.js', () => {
+describe('test/unit/lib/cli/commands-schema/resolve-final.test.ts', () => {
   describe('Non-AWS provider', () => {
     let commands;
     before(() => {

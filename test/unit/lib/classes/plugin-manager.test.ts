@@ -12,10 +12,10 @@ import importModule from '../../../../lib/utils/require-with-import-fallback.ts'
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import { installPlugin } from '../../../utils/plugins.ts';
 import { ensureDirSync, getTmpDirPath, removeSync } from '../../../utils/fs.ts';
 import module from 'node:module';
+import esmock from 'esmock';
 
 const expect = chai.expect;
 
@@ -402,17 +402,19 @@ describe('PluginManager', () => {
   let restoreEnv;
   let serviceDir;
   const servicePluginMocks = new Map();
-  const PluginManager = proxyquire('../../../../lib/classes/plugin-manager', {
-    '../utils/get-require': (directory) => {
-      const resultRequire = module.createRequire(path.resolve(directory, 'req'));
-      resultRequire.resolve = (pluginPath) => resolveStub(directory, pluginPath);
-      return resultRequire;
-    },
-    '../utils/require-with-import-fallback': async (pluginPath) => {
-      if (servicePluginMocks.has(pluginPath)) return servicePluginMocks.get(pluginPath);
-      return importModule(pluginPath);
-    },
-  });
+  const PluginManager = (
+    await esmock('../../../../lib/classes/plugin-manager.ts', {
+      '../utils/get-require': (directory) => {
+        const resultRequire = module.createRequire(path.resolve(directory, 'req'));
+        resultRequire.resolve = (pluginPath) => resolveStub(directory, pluginPath);
+        return resultRequire;
+      },
+      '../utils/require-with-import-fallback': async (pluginPath) => {
+        if (servicePluginMocks.has(pluginPath)) return servicePluginMocks.get(pluginPath);
+        return importModule(pluginPath);
+      },
+    })
+  ).default;
 
   beforeEach(() => {
     ({ restoreEnv } = overrideEnv({ whitelist: ['APPDATA', 'PATH'] }));
@@ -1707,7 +1709,7 @@ describe('PluginManager', () => {
   });
 });
 
-describe('test/unit/lib/classes/PluginManager.test.js', () => {
+describe('test/unit/lib/classes/PluginManager.test.ts', () => {
   it('should load plugins relatively to the working directory', async () => {
     const { servicePath: serviceDir } = await setupProgrammaticFixture('aws');
     const localPluginDir = path.join(serviceDir, 'node_modules', 'local-plugin');

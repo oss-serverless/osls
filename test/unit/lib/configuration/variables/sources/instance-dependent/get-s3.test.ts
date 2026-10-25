@@ -1,12 +1,12 @@
 import { Readable } from 'node:stream';
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import resolveMeta from '../../../../../../../lib/configuration/variables/resolve-meta.ts';
 import resolve from '../../../../../../../lib/configuration/variables/resolve.ts';
 import selfSource from '../../../../../../../lib/configuration/variables/sources/self.ts';
+import esmock from 'esmock';
 
-describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-s3.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-s3.test.ts', () => {
   let configuration;
   let variablesMeta;
   let sends;
@@ -20,7 +20,7 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-s
     }
   }
 
-  function loadSource(handler) {
+  async function loadSource(handler) {
     sends = [];
     clientInstances = [];
     credentials = sinon.stub();
@@ -41,11 +41,14 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-s
       }
     }
 
-    const getS3Source = proxyquire
-      .noCallThru()
-      .load('../../../../../../../lib/configuration/variables/sources/instance-dependent/get-s3', {
-        '@aws-sdk/client-s3': { S3Client, GetObjectCommand },
-      });
+    const getS3Source = (
+      await esmock(
+        '../../../../../../../lib/configuration/variables/sources/instance-dependent/get-s3.ts',
+        {
+          '@aws-sdk/client-s3': { S3Client, GetObjectCommand },
+        }
+      )
+    ).default;
 
     return getS3Source({
       getProvider: () => ({ getRegion: () => 'us-east-1', getAwsSdkV3Config }),

@@ -1,13 +1,13 @@
 import * as chai from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
+import esmock from 'esmock';
 
 const expect = chai.expect;
 
-describe('test/unit/bin/serverless.test.js', () => {
-  const loadBin = (stubs) => {
+describe('test/unit/bin/serverless.test.ts', () => {
+  const loadBin = async (stubs) => {
     delete require.cache[require.resolve('../../../bin/serverless.js')];
-    proxyquire.noCallThru().load('../../../bin/serverless.js', stubs);
+    (await esmock('../../../bin/serverless.ts', stubs)).default;
   };
 
   afterEach(() => {

@@ -1,8 +1,8 @@
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import { CloudFormationClient, SetStackPolicyCommand } from '@aws-sdk/client-cloudformation';
 import retry from '../../../../../../lib/aws/retry.ts';
+import esmock from 'esmock';
 const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
@@ -17,11 +17,13 @@ describe('updateStack', () => {
   let awsPlugin;
   let sendStub;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sendStub = sinon.stub(CloudFormationClient.prototype, 'send').resolves({});
-    const updateStack = proxyquire('../../../../../../lib/plugins/aws/lib/update-stack', {
-      '../../../aws/retry': fastRetry,
-    });
+    const updateStack = (
+      await esmock('../../../../../../lib/plugins/aws/lib/update-stack.ts', {
+        '../../../../../../lib/aws/retry.ts': fastRetry,
+      })
+    ).default;
 
     awsPlugin = {
       bucketName: 'deployment-bucket',

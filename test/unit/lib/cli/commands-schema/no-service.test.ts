@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import noServiceCommands from '../../../../../lib/cli/commands-schema/no-service.ts';
 
-describe('test/unit/lib/cli/commands-schema/no-service.test.js', () => {
+describe('test/unit/lib/cli/commands-schema/no-service.test.ts', () => {
   it('should expose no service commands', () =>
     expect(noServiceCommands.get('create')).to.have.property('options'));
   it('should not expose service commands', () =>

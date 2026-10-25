@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import VariableSourceResolutionError from '../../../../../lib/configuration/variables/source-resolution-error.ts';
 
-describe('test/unit/lib/configuration/variables/source-resolution-error.test.js', () => {
+describe('test/unit/lib/configuration/variables/source-resolution-error.test.ts', () => {
   it('should store message', () => {
     const error = new VariableSourceResolutionError('Some message');
     expect(error.message).to.be.equal('Some message');

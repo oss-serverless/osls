@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import runServerless from '../../utils/run-serverless.ts';
 
-describe('test/lib/run-serverless.test.js', () => {
+describe('test/lib/run-serverless.test.ts', () => {
   it('does not overwrite caller-provided https-proxy-agent module stubs', async () => {
     const createdAgents = [];
 

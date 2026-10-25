@@ -713,7 +713,7 @@ describe('uploadArtifacts', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/deploy/lib/upload-artifacts.test.js', () => {
+describe('test/unit/lib/plugins/aws/deploy/lib/upload-artifacts.test.ts', () => {
   it('should upload state file', async () => {
     const uploadStub = sinon.stub().resolves({});
     const { awsNaming } = await runServerless({

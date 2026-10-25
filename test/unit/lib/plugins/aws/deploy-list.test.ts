@@ -1,5 +1,4 @@
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import { expect } from 'chai';
 import AwsDeployList from '../../../../../lib/plugins/aws/deploy-list.ts';
 import ServerlessError from '../../../../../lib/serverless-error.ts';
@@ -10,6 +9,7 @@ import {
   ListVersionsByFunctionCommand,
 } from '@aws-sdk/client-lambda';
 import releasePendingRequestsUntilSettled from '../../../../utils/release-pending-requests-until-settled.ts';
+import esmock from 'esmock';
 
 function formatDeploymentDate(dateString) {
   const date = new Date(Date.parse(dateString));
@@ -90,16 +90,18 @@ describe('AwsDeployList', () => {
     let writeTextStub;
     let noticeStub;
 
-    function getAwsDeployListWithLogStubs() {
+    async function getAwsDeployListWithLogStubs() {
       writeTextStub = sinon.stub();
       noticeStub = sinon.stub();
       noticeStub.skip = sinon.stub();
-      const AwsDeployListWithLogStubs = proxyquire('../../../../../lib/plugins/aws/deploy-list', {
-        '../../utils/serverless-utils/log': {
-          log: { notice: noticeStub },
-          writeText: writeTextStub,
-        },
-      });
+      const AwsDeployListWithLogStubs = (
+        await esmock('../../../../../lib/plugins/aws/deploy-list.ts', {
+          '../../../../../lib/utils/serverless-utils/log.ts': {
+            log: { notice: noticeStub },
+            writeText: writeTextStub,
+          },
+        })
+      ).default;
       const deployList = new AwsDeployListWithLogStubs(serverless, { stage: 'dev' });
       deployList.bucketName = 'deployment-bucket';
       return deployList;
@@ -561,16 +563,15 @@ describe('AwsDeployList', () => {
           throw new Error(`Unexpected command ${command.constructor.name}`);
         }
       }
-      const AwsDeployListWithClientStubs = proxyquire(
-        '../../../../../lib/plugins/aws/deploy-list',
-        {
+      const AwsDeployListWithClientStubs = (
+        await esmock('../../../../../lib/plugins/aws/deploy-list.ts', {
           '@aws-sdk/client-lambda': {
             LambdaClient: FakeLambdaClient,
             GetFunctionCommand: FakeGetFunctionCommand,
             ListVersionsByFunctionCommand: FakeListVersionsByFunctionCommand,
           },
-        }
-      );
+        })
+      ).default;
       const deployList = new AwsDeployListWithClientStubs(serverless, {
         stage: 'dev',
         region: 'us-east-1',

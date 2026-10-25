@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import ServerlessError from '../../../../../../lib/serverless-error.ts';
 import isS3ListAccessDeniedError from '../../../../../../lib/plugins/aws/utils/is-s3-list-access-denied-error.ts';
 
-describe('test/unit/lib/plugins/aws/utils/is-s3-list-access-denied-error.test.js', () => {
+describe('test/unit/lib/plugins/aws/utils/is-s3-list-access-denied-error.test.ts', () => {
   it('matches explicit access denied codes', () => {
     expect(isS3ListAccessDeniedError({ code: 'AWS_S3_LIST_OBJECTS_V2_ACCESS_DENIED' })).to.equal(
       true

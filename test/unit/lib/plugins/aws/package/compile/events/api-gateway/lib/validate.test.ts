@@ -1603,7 +1603,7 @@ describe('#validate()', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.ts', () => {
   let cfTemplate;
   let cfResources;
   let naming;

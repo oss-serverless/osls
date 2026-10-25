@@ -4,7 +4,7 @@ import ServerlessError from '../../../../../lib/serverless-error.ts';
 import resolveMeta from '../../../../../lib/configuration/variables/resolve-meta.ts';
 import resolve from '../../../../../lib/configuration/variables/resolve.ts';
 
-describe('test/unit/lib/configuration/variables/resolve.test.js', () => {
+describe('test/unit/lib/configuration/variables/resolve.test.ts', () => {
   describe('Complete resolution', () => {
     const configuration = {
       foo: {

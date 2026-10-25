@@ -3,7 +3,7 @@ import resolveStage from '../../../../lib/utils/resolve-stage.ts';
 
 const expect = chai.expect;
 
-describe('test/unit/lib/utils/resolve-stage.test.js', () => {
+describe('test/unit/lib/utils/resolve-stage.test.ts', () => {
   it('should return `stage` from options first if it is present', () => {
     const result = resolveStage({
       configuration: { provider: { stage: 'fromprovider' } },

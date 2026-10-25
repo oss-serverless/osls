@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import ServerlessError from '../../../../../../lib/serverless-error.ts';
 import resolveExternalPluginSources from '../../../../../../lib/configuration/variables/sources/resolve-external-plugin-sources.ts';
 
-describe('test/unit/lib/configuration/variables/sources/resolve-external-plugin-resources.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/resolve-external-plugin-resources.test.ts', () => {
   it('should resolve external plugin sources', () => {
     const sources = {};
     const fulfilledSources = new Set();

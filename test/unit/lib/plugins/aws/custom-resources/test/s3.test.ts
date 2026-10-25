@@ -1,15 +1,14 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import utils from '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
 describe('Custom resource S3 permissions', () => {
   let sentCommands;
   let addPermission;
   let removePermission;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sentCommands = [];
 
     class LambdaClient {
@@ -35,16 +34,18 @@ describe('Custom resource S3 permissions', () => {
       }
     }
 
-    ({ addPermission, removePermission } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/permissions',
-      {
-        '@aws-sdk/client-lambda': {
-          LambdaClient,
-          AddPermissionCommand,
-          RemovePermissionCommand,
-        },
-      }
-    ));
+    ({ addPermission, removePermission } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/permissions.ts',
+        {
+          '@aws-sdk/client-lambda': {
+            LambdaClient,
+            AddPermissionCommand,
+            RemovePermissionCommand,
+          },
+        }
+      )
+    ).default);
   });
 
   it('should pass qualifier when adding Lambda permission', async () => {
@@ -83,33 +84,38 @@ describe('Custom resource S3 handler', () => {
     return `${functionName}-${bucketName.replace(/[.:*]/g, '')}`;
   }
 
-  function makeHandler({
+  async function makeHandler({
     addPermission = sinon.stub().resolves(),
     updateConfiguration = sinon.stub().resolves(),
     removePermission = sinon.stub().resolves(),
     removeConfiguration = sinon.stub().resolves(),
     getStatementId: resolveStatementId = getStatementId,
   } = {}) {
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': {
-          addPermission,
-          removePermission,
-          getStatementId: resolveStatementId,
-        },
-        './lib/bucket': { updateConfiguration, removeConfiguration },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/permissions.ts': {
+            addPermission,
+            removePermission,
+            getStatementId: resolveStatementId,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts': {
+            updateConfiguration,
+            removeConfiguration,
+          },
+        }
+      )
+    ).default;
 
     return { handler, addPermission, updateConfiguration, removePermission, removeConfiguration };
   }
@@ -226,22 +232,30 @@ describe('Custom resource S3 handler', () => {
     });
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/bucket': { updateConfiguration, removeConfiguration },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/permissions.ts': {
+            addPermission,
+            removePermission,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts': {
+            updateConfiguration,
+            removeConfiguration,
+          },
+        }
+      )
+    ).default;
 
     await handler(
       {
@@ -548,22 +562,31 @@ describe('Custom resource S3 handler', () => {
     });
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission, getStatementId },
-        './lib/bucket': { updateConfiguration, removeConfiguration },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/permissions.ts': {
+            addPermission,
+            removePermission,
+            getStatementId,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts': {
+            updateConfiguration,
+            removeConfiguration,
+          },
+        }
+      )
+    ).default;
 
     await handler(
       {
@@ -611,22 +634,30 @@ describe('Custom resource S3 handler', () => {
     const removePermission = sinon.stub().rejects({ name: 'ResourceNotFoundException' });
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/bucket': { updateConfiguration, removeConfiguration },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/permissions.ts': {
+            addPermission,
+            removePermission,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts': {
+            updateConfiguration,
+            removeConfiguration,
+          },
+        }
+      )
+    ).default;
 
     await handler(
       {
@@ -649,22 +680,30 @@ describe('Custom resource S3 handler', () => {
     const removePermission = sinon.stub().resolves();
     const removeConfiguration = sinon.stub().rejects({ name: 'NoSuchBucket' });
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/bucket': { updateConfiguration, removeConfiguration },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/permissions.ts': {
+            addPermission,
+            removePermission,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts': {
+            updateConfiguration,
+            removeConfiguration,
+          },
+        }
+      )
+    ).default;
 
     await handler(
       {
@@ -689,22 +728,30 @@ describe('Custom resource S3 handler', () => {
       .rejects(Object.assign(new Error('denied'), { name: 'AccessDeniedException' }));
     const removeConfiguration = sinon.stub().resolves();
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/bucket': { updateConfiguration, removeConfiguration },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/permissions.ts': {
+            addPermission,
+            removePermission,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts': {
+            updateConfiguration,
+            removeConfiguration,
+          },
+        }
+      )
+    ).default;
 
     await expect(
       handler(
@@ -732,22 +779,30 @@ describe('Custom resource S3 handler', () => {
       .rejects(Object.assign(new Error('denied'), { name: 'AccessDenied' }));
     const log = sinon.stub(console, 'log');
 
-    const { handler } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler',
-      {
-        '../utils': {
-          ...utils,
-          getEnvironment: () => ({
-            Partition: 'aws',
-            Region: 'us-east-1',
-            AccountId: '123456789012',
-          }),
-          handlerWrapper: (wrappedHandler) => wrappedHandler,
-        },
-        './lib/permissions': { addPermission, removePermission },
-        './lib/bucket': { updateConfiguration, removeConfiguration },
-      }
-    );
+    const { handler } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/handler.ts',
+        {
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts': {
+            ...utils,
+            getEnvironment: () => ({
+              Partition: 'aws',
+              Region: 'us-east-1',
+              AccountId: '123456789012',
+            }),
+            handlerWrapper: (wrappedHandler) => wrappedHandler,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/permissions.ts': {
+            addPermission,
+            removePermission,
+          },
+          '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts': {
+            updateConfiguration,
+            removeConfiguration,
+          },
+        }
+      )
+    ).default;
 
     try {
       await handler(
@@ -813,16 +868,18 @@ describe('Custom resource S3 bucket configuration', () => {
       }
     }
 
-    const { updateConfiguration } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket',
-      {
-        '@aws-sdk/client-s3': {
-          S3Client,
-          GetBucketNotificationConfigurationCommand,
-          PutBucketNotificationConfigurationCommand,
-        },
-      }
-    );
+    const { updateConfiguration } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts',
+        {
+          '@aws-sdk/client-s3': {
+            S3Client,
+            GetBucketNotificationConfigurationCommand,
+            PutBucketNotificationConfigurationCommand,
+          },
+        }
+      )
+    ).default;
 
     await updateConfiguration({
       lambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:orders:provisioned',
@@ -894,16 +951,18 @@ describe('Custom resource S3 bucket configuration', () => {
       }
     }
 
-    const { updateConfiguration } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket',
-      {
-        '@aws-sdk/client-s3': {
-          S3Client,
-          GetBucketNotificationConfigurationCommand,
-          PutBucketNotificationConfigurationCommand,
-        },
-      }
-    );
+    const { updateConfiguration } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts',
+        {
+          '@aws-sdk/client-s3': {
+            S3Client,
+            GetBucketNotificationConfigurationCommand,
+            PutBucketNotificationConfigurationCommand,
+          },
+        }
+      )
+    ).default;
 
     await updateConfiguration({
       lambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:orders-v2',
@@ -973,16 +1032,18 @@ describe('Custom resource S3 bucket configuration', () => {
       }
     }
 
-    const { removeConfiguration } = proxyquire(
-      '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket',
-      {
-        '@aws-sdk/client-s3': {
-          S3Client,
-          GetBucketNotificationConfigurationCommand,
-          PutBucketNotificationConfigurationCommand,
-        },
-      }
-    );
+    const { removeConfiguration } = (
+      await esmock(
+        '../../../../../../../lib/plugins/aws/custom-resources/resources/s3/lib/bucket.ts',
+        {
+          '@aws-sdk/client-s3': {
+            S3Client,
+            GetBucketNotificationConfigurationCommand,
+            PutBucketNotificationConfigurationCommand,
+          },
+        }
+      )
+    ).default;
 
     await removeConfiguration({
       functionName: 'orders',

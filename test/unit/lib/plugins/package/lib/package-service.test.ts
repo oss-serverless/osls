@@ -10,10 +10,9 @@ import packageService from '../../../../../../lib/plugins/package/lib/package-se
 // Configure chai
 import { expect } from 'chai';
 
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
-describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
+describe('test/unit/lib/plugins/package/lib/packageService.test.ts', () => {
   const awsSdkV3StubMap = {
     S3: {
       headBucket: {},
@@ -42,12 +41,11 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
 
   describe('#resolveFilePathsFromPatterns()', () => {
     it('preserves file names named like __proto__', async () => {
-      const packageServiceWithStubbedGlob = proxyquire(
-        '../../../../../../lib/plugins/package/lib/package-service',
-        {
-          '../../../utils/glob': sinon.stub().resolves(['__proto__', 'keep.js']),
-        }
-      );
+      const packageServiceWithStubbedGlob = (
+        await esmock('../../../../../../lib/plugins/package/lib/package-service.ts', {
+          '../../../../../../lib/utils/glob.ts': sinon.stub().resolves(['__proto__', 'keep.js']),
+        })
+      ).default;
 
       const filePaths = await packageServiceWithStubbedGlob.resolveFilePathsFromPatterns.call(
         { serverless: { serviceDir: process.cwd() } },

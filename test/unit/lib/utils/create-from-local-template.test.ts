@@ -8,22 +8,23 @@ import createFromLocalTemplate from '../../../../lib/utils/create-from-local-tem
 import ServerlessError from '../../../../lib/serverless-error.ts';
 import { ensureDir, getTmpDirPath, outputFile, pathExists, remove } from '../../../utils/fs.ts';
 import skipOnDisabledSymlinksInWindows from '../../../lib/skip-on-disabled-symlinks-in-windows.ts';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru().noPreserveCache();
+import esmock from 'esmock';
 
 const fixturesPath = path.resolve(import.meta.dirname, '../../../fixtures/programmatic');
 
 const expect = chai.expect;
 
-const loadUntildifyWithHome = (homeDirectory) =>
-  proxyquire('../../../../lib/utils/untildify', {
-    os: {
-      homedir: () => homeDirectory,
-      userInfo: () => ({ username: 'test-user' }),
-    },
-  });
+const loadUntildifyWithHome = async (homeDirectory) =>
+  (
+    await esmock('../../../../lib/utils/untildify.ts', {
+      os: {
+        homedir: () => homeDirectory,
+        userInfo: () => ({ username: 'test-user' }),
+      },
+    })
+  ).default;
 
-describe('test/unit/lib/utils/create-from-local-template.test.js', () => {
+describe('test/unit/lib/utils/create-from-local-template.test.ts', () => {
   describe('Without `projectName` provided', () => {
     it('should create from template referenced locally', async () => {
       const tmpDirPath = path.join(getTmpDirPath(), 'some-service');
@@ -40,12 +41,11 @@ describe('test/unit/lib/utils/create-from-local-template.test.js', () => {
       const templateDirName = 'test-template';
       const homeTemplatePath = path.join(fakeHome, templateDirName);
       const projectDir = path.join(getTmpDirPath(), 'some-service');
-      const createFromLocalTemplateWithFakeHome = proxyquire(
-        '../../../../lib/utils/create-from-local-template',
-        {
-          './untildify': loadUntildifyWithHome(fakeHome),
-        }
-      );
+      const createFromLocalTemplateWithFakeHome = (
+        await esmock('../../../../lib/utils/create-from-local-template.ts', {
+          '../../../../lib/utils/untildify.ts': loadUntildifyWithHome(fakeHome),
+        })
+      ).default;
 
       try {
         await outputFile(path.join(homeTemplatePath, 'serverless.yml'), 'service: source\n');
@@ -69,13 +69,12 @@ describe('test/unit/lib/utils/create-from-local-template.test.js', () => {
         'HOME_DIRECTORY_UNAVAILABLE'
       );
       const copyStub = sinon.stub().resolves();
-      const createFromLocalTemplateWithFailingUntildify = proxyquire(
-        '../../../../lib/utils/create-from-local-template',
-        {
-          './untildify': sinon.stub().throws(expansionError),
-          './fs/copy': copyStub,
-        }
-      );
+      const createFromLocalTemplateWithFailingUntildify = (
+        await esmock('../../../../lib/utils/create-from-local-template.ts', {
+          '../../../../lib/utils/untildify.ts': sinon.stub().throws(expansionError),
+          '../../../../lib/utils/fs/copy.ts': copyStub,
+        })
+      ).default;
 
       try {
         await createFromLocalTemplateWithFailingUntildify({

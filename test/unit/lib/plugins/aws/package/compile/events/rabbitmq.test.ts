@@ -3,7 +3,7 @@ import runServerless from '../../../../../../../utils/run-serverless.ts';
 
 const { expect } = chai;
 
-describe('test/unit/lib/plugins/aws/package/compile/events/rabbitmq.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/rabbitmq.test.ts', () => {
   const brokerArn = 'arn:aws:mq:us-east-1:0000:broker:ExampleMQBroker:b-xxx-xxx';
   const basicAuthArn = 'arn:aws:secretsmanager:us-east-1:01234567890:secret:MyBrokerSecretName';
   const queue = 'TestingQueue';

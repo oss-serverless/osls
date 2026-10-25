@@ -6,7 +6,7 @@ import { getTmpDirPath } from '../../../../utils/fs.ts';
 import skipOnDisabledSymlinksInWindows from '../../../../lib/skip-on-disabled-symlinks-in-windows.ts';
 const fsp = fs.promises;
 
-describe('test/unit/lib/utils/fs/copy.test.js', () => {
+describe('test/unit/lib/utils/fs/copy.test.ts', () => {
   let tmpDir;
 
   beforeEach(() => {

@@ -2,22 +2,24 @@ import * as sinon from 'sinon';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import proxyquire from 'proxyquire';
 import * as chai from 'chai';
 import ServerlessError from '../../../../lib/serverless-error.ts';
 import { getTmpDirPath } from '../../../utils/fs.ts';
 import writeFileSync from '../../../../lib/utils/fs/write-file-sync.ts';
 import readFileSync from '../../../../lib/utils/fs/read-file-sync.ts';
+import esmock from 'esmock';
 
 const { expect } = chai;
 
-const loadUntildifyWithHome = (homeDirectory) =>
-  proxyquire('../../../../lib/utils/untildify', {
-    os: {
-      homedir: () => homeDirectory,
-      userInfo: () => ({ username: 'test-user' }),
-    },
-  });
+const loadUntildifyWithHome = async (homeDirectory) =>
+  (
+    await esmock('../../../../lib/utils/untildify.ts', {
+      os: {
+        homedir: () => homeDirectory,
+        userInfo: () => ({ username: 'test-user' }),
+      },
+    })
+  ).default;
 
 describe('downloadTemplateFromRepo', () => {
   let downloadTemplateFromRepo;
@@ -33,7 +35,7 @@ describe('downloadTemplateFromRepo', () => {
   let serviceDir;
   let newServicePath;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const tmpDir = getTmpDirPath();
     cwd = process.cwd();
 
@@ -64,14 +66,13 @@ describe('downloadTemplateFromRepo', () => {
       .stub()
       .callsFake((targetPath) => fs.rmSync(targetPath, { recursive: true, force: true }));
 
-    const downloadTemplateFromRepoModule = proxyquire(
-      '../../../../lib/utils/download-template-from-repo',
-      {
-        './serverless-utils/download': downloadStub,
-        './spawn': spawnStub,
-        './fs/remove': { removeSync: removeSyncStub },
-      }
-    );
+    const downloadTemplateFromRepoModule = (
+      await esmock('../../../../lib/utils/download-template-from-repo.ts', {
+        '../../../../lib/utils/serverless-utils/download.ts': downloadStub,
+        '../../../../lib/utils/spawn.ts': spawnStub,
+        '../../../../lib/utils/fs/remove.ts': { removeSync: removeSyncStub },
+      })
+    ).default;
     downloadTemplateFromRepo = downloadTemplateFromRepoModule.downloadTemplateFromRepo;
     parseRepoURL = downloadTemplateFromRepoModule.parseRepoURL;
   });
@@ -302,15 +303,14 @@ describe('downloadTemplateFromRepo', () => {
       const fakeHome = getTmpDirPath();
       const downloadPath = '~/nested/custom-target-directory';
       const targetPath = path.join(fakeHome, 'nested', 'custom-target-directory');
-      const downloadTemplateFromRepoWithFakeHome = proxyquire(
-        '../../../../lib/utils/download-template-from-repo',
-        {
-          './serverless-utils/download': downloadStub,
-          './spawn': spawnStub,
-          './fs/remove': { removeSync: removeSyncStub },
-          './untildify': loadUntildifyWithHome(fakeHome),
-        }
-      ).downloadTemplateFromRepo;
+      const downloadTemplateFromRepoWithFakeHome = (
+        await esmock('../../../../lib/utils/download-template-from-repo.ts', {
+          '../../../../lib/utils/serverless-utils/download.ts': downloadStub,
+          '../../../../lib/utils/spawn.ts': spawnStub,
+          '../../../../lib/utils/fs/remove.ts': { removeSync: removeSyncStub },
+          '../../../../lib/utils/untildify.ts': loadUntildifyWithHome(fakeHome),
+        })
+      ).default.downloadTemplateFromRepo;
 
       try {
         downloadStub.callsFake(async (downloadUrl, destinationPath) => {
@@ -337,15 +337,14 @@ describe('downloadTemplateFromRepo', () => {
         'Cannot expand path "~/target": home directory could not be resolved.',
         'HOME_DIRECTORY_UNAVAILABLE'
       );
-      const downloadTemplateFromRepoWithFailingUntildify = proxyquire(
-        '../../../../lib/utils/download-template-from-repo',
-        {
-          './serverless-utils/download': downloadStub,
-          './spawn': spawnStub,
-          './fs/remove': { removeSync: removeSyncStub },
-          './untildify': sinon.stub().throws(expansionError),
-        }
-      ).downloadTemplateFromRepo;
+      const downloadTemplateFromRepoWithFailingUntildify = (
+        await esmock('../../../../lib/utils/download-template-from-repo.ts', {
+          '../../../../lib/utils/serverless-utils/download.ts': downloadStub,
+          '../../../../lib/utils/spawn.ts': spawnStub,
+          '../../../../lib/utils/fs/remove.ts': { removeSync: removeSyncStub },
+          '../../../../lib/utils/untildify.ts': sinon.stub().throws(expansionError),
+        })
+      ).default.downloadTemplateFromRepo;
 
       try {
         await downloadTemplateFromRepoWithFailingUntildify(url, undefined, '~/target');
@@ -364,15 +363,14 @@ describe('downloadTemplateFromRepo', () => {
       const fakeHome = getTmpDirPath();
       const downloadPath = '~/existing-service';
       const expandedPath = path.join(fakeHome, 'existing-service');
-      const downloadTemplateFromRepoWithFakeHome = proxyquire(
-        '../../../../lib/utils/download-template-from-repo',
-        {
-          './serverless-utils/download': downloadStub,
-          './spawn': spawnStub,
-          './fs/remove': { removeSync: removeSyncStub },
-          './untildify': loadUntildifyWithHome(fakeHome),
-        }
-      ).downloadTemplateFromRepo;
+      const downloadTemplateFromRepoWithFakeHome = (
+        await esmock('../../../../lib/utils/download-template-from-repo.ts', {
+          '../../../../lib/utils/serverless-utils/download.ts': downloadStub,
+          '../../../../lib/utils/spawn.ts': spawnStub,
+          '../../../../lib/utils/fs/remove.ts': { removeSync: removeSyncStub },
+          '../../../../lib/utils/untildify.ts': loadUntildifyWithHome(fakeHome),
+        })
+      ).default.downloadTemplateFromRepo;
       fs.mkdirSync(expandedPath, { recursive: true });
 
       try {

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import ServerlessError from '../../../../lib/serverless-error.ts';
 import parseArgs from '../../../../lib/cli/parse-args.ts';
 
-describe('test/unit/lib/cli/parse-args.test.js', () => {
+describe('test/unit/lib/cli/parse-args.test.ts', () => {
   let parsedArgs;
   before(() => {
     parsedArgs = parseArgs(

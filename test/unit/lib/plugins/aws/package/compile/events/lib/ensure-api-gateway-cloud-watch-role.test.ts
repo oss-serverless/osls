@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire2 from 'proxyquire';
-const proxyquire = proxyquire2.noCallThru();
+import esmock from 'esmock';
 
 describe('ensureApiGatewayCloudWatchRole', () => {
   let provider;
@@ -10,16 +9,18 @@ describe('ensureApiGatewayCloudWatchRole', () => {
   let ensureApiGatewayCloudWatchRole;
   const customResourceLogicalId = 'CustomResourceId';
 
-  beforeEach(() => {
+  beforeEach(async () => {
     addCustomResourceToServiceStub = sinon.stub().resolves();
-    ensureApiGatewayCloudWatchRole = proxyquire(
-      '../../../../../../../../../lib/plugins/aws/package/compile/events/lib/ensure-api-gateway-cloud-watch-role',
-      {
-        '../../../../custom-resources': {
-          addCustomResourceToService: addCustomResourceToServiceStub,
-        },
-      }
-    );
+    ensureApiGatewayCloudWatchRole = (
+      await esmock(
+        '../../../../../../../../../lib/plugins/aws/package/compile/events/lib/ensure-api-gateway-cloud-watch-role.ts',
+        {
+          '../../../../../../../../../lib/plugins/aws/custom-resources/index.ts': {
+            addCustomResourceToService: addCustomResourceToServiceStub,
+          },
+        }
+      )
+    ).default;
     resources = {};
     provider = {
       serverless: {

@@ -1,8 +1,8 @@
 import * as chai from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import monitorStack from '../../../../../../lib/plugins/aws/lib/monitor-stack.ts';
 import { CloudFormationClient, DescribeStackEventsCommand } from '@aws-sdk/client-cloudformation';
+import esmock from 'esmock';
 
 const { expect } = chai;
 
@@ -79,16 +79,15 @@ describe('monitorStack', () => {
           };
         }
       }
-      const monitorStackWithStub = proxyquire(
-        '../../../../../../lib/plugins/aws/lib/monitor-stack',
-        {
-          '../../../utils/sleep': sinon.stub().resolves(),
+      const monitorStackWithStub = (
+        await esmock('../../../../../../lib/plugins/aws/lib/monitor-stack.ts', {
+          '../../../../../../lib/utils/sleep.ts': sinon.stub().resolves(),
           '@aws-sdk/client-cloudformation': {
             CloudFormationClient: StubCloudFormationClient,
             DescribeStackEventsCommand,
           },
-        }
-      );
+        })
+      ).default;
       const plugin = {
         provider: {
           getAwsSdkV3Config: sinon.stub().resolves({ region: 'us-west-2', credentials }),
@@ -137,11 +136,10 @@ describe('monitorStack', () => {
       }
       const { retryOnThrottlingError } = (await import('../../../../../../lib/aws/retry.ts'))
         .default;
-      const monitorStackWithStub = proxyquire(
-        '../../../../../../lib/plugins/aws/lib/monitor-stack',
-        {
-          '../../../utils/sleep': sinon.stub().resolves(),
-          '../../../aws/retry': {
+      const monitorStackWithStub = (
+        await esmock('../../../../../../lib/plugins/aws/lib/monitor-stack.ts', {
+          '../../../../../../lib/utils/sleep.ts': sinon.stub().resolves(),
+          '../../../../../../lib/aws/retry.ts': {
             retryOnThrottlingError: (task, options) =>
               retryOnThrottlingError(task, { ...options, delayMs: 1 }),
           },
@@ -149,8 +147,8 @@ describe('monitorStack', () => {
             CloudFormationClient: StubCloudFormationClient,
             DescribeStackEventsCommand,
           },
-        }
-      );
+        })
+      ).default;
       const plugin = {
         provider: {
           getAwsSdkV3Config: sinon.stub().resolves({ region: 'us-east-1' }),
@@ -223,16 +221,15 @@ describe('monitorStack', () => {
           };
         }
       }
-      const monitorStackWithClientStub = proxyquire(
-        '../../../../../../lib/plugins/aws/lib/monitor-stack',
-        {
-          '../../../utils/sleep': sinon.stub().resolves(),
+      const monitorStackWithClientStub = (
+        await esmock('../../../../../../lib/plugins/aws/lib/monitor-stack.ts', {
+          '../../../../../../lib/utils/sleep.ts': sinon.stub().resolves(),
           '@aws-sdk/client-cloudformation': {
             CloudFormationClient: FakeCloudFormationClient,
             DescribeStackEventsCommand: FakeDescribeStackEventsCommand,
           },
-        }
-      );
+        })
+      ).default;
       Object.assign(awsPlugin, monitorStackWithClientStub);
 
       const stackStatus = await awsPlugin.monitorStack(
@@ -765,14 +762,16 @@ describe('monitorStack', () => {
 
     it('should log each event once across pages and subsequent polls', async () => {
       const logInfo = sinon.spy();
-      const pagedMonitorStack = proxyquire('../../../../../../lib/plugins/aws/lib/monitor-stack', {
-        '../../../utils/sleep': sinon.stub().resolves(),
-        '../../../utils/serverless-utils/log': {
-          log: { info: logInfo },
-          style: { aside: (msg) => msg, link: (msg) => msg },
-          progress: { get: () => ({ notice: () => {} }) },
-        },
-      });
+      const pagedMonitorStack = (
+        await esmock('../../../../../../lib/plugins/aws/lib/monitor-stack.ts', {
+          '../../../../../../lib/utils/sleep.ts': sinon.stub().resolves(),
+          '../../../../../../lib/utils/serverless-utils/log.ts': {
+            log: { info: logInfo },
+            style: { aside: (msg) => msg, link: (msg) => msg },
+            progress: { get: () => ({ notice: () => {} }) },
+          },
+        })
+      ).default;
       const plugin = { provider: awsPlugin.provider, options: {}, ...pagedMonitorStack };
       const describeStackEventsStub = stubDescribeStackEvents();
       const cfDataMock = {

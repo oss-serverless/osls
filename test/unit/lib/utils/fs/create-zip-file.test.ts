@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import EventEmitter from 'node:events';
 import path from 'node:path';
-import proxyquire from 'proxyquire';
 import createZipFile from '../../../../../lib/utils/fs/create-zip-file.ts';
 import { createTmpDir, createTmpFile, ensureDir, listZipFiles } from '../../../../utils/fs.ts';
-
 // Configure chai
 import { expect } from 'chai';
+
+import esmock from 'esmock';
 
 describe('#createZipFile()', () => {
   it('should create a zip file with the source directory content', async () => {
@@ -48,16 +48,16 @@ describe('#createZipFile()', () => {
       }
     }
 
-    const createZipFileProxy = proxyquire
-      .noCallThru()
-      .load('../../../../../lib/utils/fs/create-zip-file', {
+    const createZipFileProxy = (
+      await esmock('../../../../../lib/utils/fs/create-zip-file.ts', {
         'fs': {
           createWriteStream: () => output,
           lstatSync: () => ({ isFile: () => true }),
         },
         'yazl': { ZipFile: FakeZipFile },
-        './walk-dir-sync': () => ['/tmp/source/foo.json'],
-      });
+        '../../../../../lib/utils/fs/walk-dir-sync.ts': () => ['/tmp/source/foo.json'],
+      })
+    ).default;
 
     const promise = createZipFileProxy('/tmp/source', '/tmp/out.zip');
     output.emit('open');
@@ -78,16 +78,16 @@ describe('#createZipFile()', () => {
       }
     }
 
-    const createZipFileProxy = proxyquire
-      .noCallThru()
-      .load('../../../../../lib/utils/fs/create-zip-file', {
+    const createZipFileProxy = (
+      await esmock('../../../../../lib/utils/fs/create-zip-file.ts', {
         'fs': {
           createWriteStream: () => output,
           lstatSync: () => ({ isFile: () => true }),
         },
         'yazl': { ZipFile: FakeZipFile },
-        './walk-dir-sync': () => ['/tmp/source/foo.json'],
-      });
+        '../../../../../lib/utils/fs/walk-dir-sync.ts': () => ['/tmp/source/foo.json'],
+      })
+    ).default;
 
     const promise = createZipFileProxy('/tmp/source', '/tmp/out.zip');
     output.emit('error', new Error('write failed'));

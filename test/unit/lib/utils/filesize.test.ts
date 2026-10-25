@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import filesize from '../../../../lib/utils/filesize.ts';
 
-describe('test/unit/lib/utils/filesize.test.js', () => {
+describe('test/unit/lib/utils/filesize.test.ts', () => {
   it('should display zero bytes', () => {
     expect(filesize(0)).to.equal('0 B');
   });

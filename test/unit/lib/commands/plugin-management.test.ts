@@ -3,7 +3,7 @@ import pluginManagement from '../../../../lib/commands/plugin-management.ts';
 
 const { parsePluginInstallSpec, parsePluginUninstallSpec } = pluginManagement;
 
-describe('test/unit/lib/commands/plugin-management.test.js', () => {
+describe('test/unit/lib/commands/plugin-management.test.ts', () => {
   const maxLengthName = 'a'.repeat(214);
   const overLengthName = 'a'.repeat(215);
   const scopedMaxLengthName = `@${'a'.repeat(100)}/${'b'.repeat(112)}`;

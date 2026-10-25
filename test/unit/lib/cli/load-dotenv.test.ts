@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import ServerlessError from '../../../../lib/serverless-error.ts';
 import { expect } from 'chai';
 
-describe('test/unit/lib/cli/load-dotenv.test.js', () => {
+describe('test/unit/lib/cli/load-dotenv.test.ts', () => {
   let restoreEnv;
 
   before(async () => {

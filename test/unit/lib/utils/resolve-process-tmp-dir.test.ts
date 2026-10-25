@@ -4,11 +4,10 @@ import path from 'node:path';
 import requireUncached from '../../../utils/require-uncached.ts';
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import proxyquire2 from 'proxyquire';
 import resolveProcessTmpDir2 from '../../../../lib/utils/resolve-process-tmp-dir.ts';
-const proxyquire = proxyquire2.noCallThru().noPreserveCache();
+import esmock from 'esmock';
 
-describe('test/unit/lib/utils/resolve-process-tmp-dir.test.js', () => {
+describe('test/unit/lib/utils/resolve-process-tmp-dir.test.ts', () => {
   const randomHex = 'abcd'.repeat(6);
 
   afterEach(() => {
@@ -42,12 +41,14 @@ describe('test/unit/lib/utils/resolve-process-tmp-dir.test.js', () => {
     fsStub.promises.mkdtemp.onSecondCall().resolves(tmpDir);
     sinon.stub(process, 'once').returns(process);
 
-    const resolveProcessTmpDir = proxyquire('../../../../lib/utils/resolve-process-tmp-dir', {
-      fs: fsStub,
-      crypto: {
-        randomBytes: () => Buffer.from(randomHex, 'hex'),
-      },
-    });
+    const resolveProcessTmpDir = (
+      await esmock('../../../../lib/utils/resolve-process-tmp-dir.ts', {
+        fs: fsStub,
+        crypto: {
+          randomBytes: () => Buffer.from(randomHex, 'hex'),
+        },
+      })
+    ).default;
 
     await expect(resolveProcessTmpDir()).to.be.rejectedWith(error);
     expect(await resolveProcessTmpDir()).to.equal(tmpDir);
@@ -62,10 +63,12 @@ describe('test/unit/lib/utils/resolve-process-tmp-dir.test.js', () => {
     };
     sinon.stub(process, 'once').returns(process);
 
-    const resolveProcessTmpDir = proxyquire('../../../../lib/utils/resolve-process-tmp-dir', {
-      fs: fsStub,
-      crypto: { randomBytes: () => Buffer.from(randomHex, 'hex') },
-    });
+    const resolveProcessTmpDir = (
+      await esmock('../../../../lib/utils/resolve-process-tmp-dir.ts', {
+        fs: fsStub,
+        crypto: { randomBytes: () => Buffer.from(randomHex, 'hex') },
+      })
+    ).default;
 
     expect(await resolveProcessTmpDir()).to.equal(tmpDir);
     expect(await resolveProcessTmpDir()).to.equal(tmpDir);
@@ -80,10 +83,12 @@ describe('test/unit/lib/utils/resolve-process-tmp-dir.test.js', () => {
     };
     const onceStub = sinon.stub(process, 'once').returns(process);
 
-    const resolveProcessTmpDir = proxyquire('../../../../lib/utils/resolve-process-tmp-dir', {
-      fs: fsStub,
-      crypto: { randomBytes: () => Buffer.from(randomHex, 'hex') },
-    });
+    const resolveProcessTmpDir = (
+      await esmock('../../../../lib/utils/resolve-process-tmp-dir.ts', {
+        fs: fsStub,
+        crypto: { randomBytes: () => Buffer.from(randomHex, 'hex') },
+      })
+    ).default;
 
     await resolveProcessTmpDir();
 
@@ -103,10 +108,12 @@ describe('test/unit/lib/utils/resolve-process-tmp-dir.test.js', () => {
     };
     const onceStub = sinon.stub(process, 'once').returns(process);
 
-    const resolveProcessTmpDir = proxyquire('../../../../lib/utils/resolve-process-tmp-dir', {
-      fs: fsStub,
-      crypto: { randomBytes: () => Buffer.from(randomHex, 'hex') },
-    });
+    const resolveProcessTmpDir = (
+      await esmock('../../../../lib/utils/resolve-process-tmp-dir.ts', {
+        fs: fsStub,
+        crypto: { randomBytes: () => Buffer.from(randomHex, 'hex') },
+      })
+    ).default;
 
     await resolveProcessTmpDir();
 

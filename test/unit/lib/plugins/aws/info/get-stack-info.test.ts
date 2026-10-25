@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import AwsInfo from '../../../../../../lib/plugins/aws/info/index.ts';
 import retry from '../../../../../../lib/aws/retry.ts';
 import {
@@ -9,6 +8,7 @@ import {
   ListExportsCommand,
 } from '@aws-sdk/client-cloudformation';
 import { ApiGatewayV2Client, GetApiCommand } from '@aws-sdk/client-apigatewayv2';
+import esmock from 'esmock';
 const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
@@ -274,10 +274,11 @@ describe('#getStackInfo()', () => {
       .rejects(createThrottlingError())
       .onSecondCall()
       .resolves({ Stacks: [{ Outputs: [] }] });
-    const getStackInfoWithFastRetry = proxyquire(
-      '../../../../../../lib/plugins/aws/info/get-stack-info',
-      { '../../../aws/retry': fastRetry }
-    );
+    const getStackInfoWithFastRetry = (
+      await esmock('../../../../../../lib/plugins/aws/info/get-stack-info.ts', {
+        '../../../../../../lib/aws/retry.ts': fastRetry,
+      })
+    ).default;
 
     await getStackInfoWithFastRetry.getStackInfo.call(awsInfo);
 

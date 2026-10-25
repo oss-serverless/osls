@@ -1,23 +1,22 @@
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import { CloudFormationClient, DescribeChangeSetCommand } from '@aws-sdk/client-cloudformation';
+import esmock from 'esmock';
 
 describe('waitForChangeSetCreation', () => {
   let awsPlugin;
   let sendStub;
   let sleepStub;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sleepStub = sinon.stub().resolves();
     sendStub = sinon.stub(CloudFormationClient.prototype, 'send');
 
-    const waitForChangeSetCreation = proxyquire(
-      '../../../../../../lib/plugins/aws/lib/wait-for-change-set-creation',
-      {
-        '../../../utils/sleep': sleepStub,
-      }
-    );
+    const waitForChangeSetCreation = (
+      await esmock('../../../../../../lib/plugins/aws/lib/wait-for-change-set-creation.ts', {
+        '../../../../../../lib/utils/sleep.ts': sleepStub,
+      })
+    ).default;
 
     awsPlugin = {
       provider: {
@@ -56,16 +55,15 @@ describe('waitForChangeSetCreation', () => {
         return { ChangeSetName: 'change-set', Status: 'CREATE_COMPLETE', Changes: [] };
       }
     }
-    const waitForChangeSetCreation = proxyquire(
-      '../../../../../../lib/plugins/aws/lib/wait-for-change-set-creation',
-      {
-        '../../../utils/sleep': sleepStub,
+    const waitForChangeSetCreation = (
+      await esmock('../../../../../../lib/plugins/aws/lib/wait-for-change-set-creation.ts', {
+        '../../../../../../lib/utils/sleep.ts': sleepStub,
         '@aws-sdk/client-cloudformation': {
           CloudFormationClient: StubCloudFormationClient,
           DescribeChangeSetCommand,
         },
-      }
-    );
+      })
+    ).default;
     const plugin = {
       provider: {
         getAwsSdkV3Config: sinon.stub().resolves({ region: 'us-west-2', credentials }),

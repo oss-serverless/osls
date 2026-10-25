@@ -1,10 +1,8 @@
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import proxyquire2 from 'proxyquire';
+import esmock from 'esmock';
 
-const proxyquire = proxyquire2.noCallThru().noPreserveCache();
-
-const loadUntildify = ({
+const loadUntildify = async ({
   homeDirectory = '/home/test-user',
   username = 'test-user',
   homedirError,
@@ -19,9 +17,11 @@ const loadUntildify = ({
   if (userInfoError) osStub.userInfo.throws(userInfoError);
   else osStub.userInfo.returns({ username });
 
-  const untildify = proxyquire('../../../../lib/utils/untildify', {
-    os: osStub,
-  });
+  const untildify = (
+    await esmock('../../../../lib/utils/untildify.ts', {
+      os: osStub,
+    })
+  ).default;
 
   return { untildify, osStub };
 };
@@ -37,7 +37,7 @@ const expectErrorCode = (fn, code) => {
   throw new Error(`Expected ${code} error`);
 };
 
-describe('test/unit/lib/utils/untildify.test.js', () => {
+describe('test/unit/lib/utils/untildify.test.ts', () => {
   it('throws on non-string input', () => {
     const { untildify, osStub } = loadUntildify();
 
@@ -94,7 +94,7 @@ describe('test/unit/lib/utils/untildify.test.js', () => {
     expect(osStub.userInfo).to.have.been.calledOnce;
   });
 
-  it('caches the home directory after the first call', () => {
+  it('caches the home directory after the first call', async () => {
     const osStub = {
       homedir: sinon.stub(),
       userInfo: sinon.stub().returns({ username: 'test-user' }),
@@ -102,9 +102,11 @@ describe('test/unit/lib/utils/untildify.test.js', () => {
     osStub.homedir.onFirstCall().returns('/home/first');
     osStub.homedir.onSecondCall().returns('/home/second');
 
-    const untildify = proxyquire('../../../../lib/utils/untildify', {
-      os: osStub,
-    });
+    const untildify = (
+      await esmock('../../../../lib/utils/untildify.ts', {
+        os: osStub,
+      })
+    ).default;
 
     expect(untildify('~/one')).to.equal('/home/first/one');
     expect(untildify('~/two')).to.equal('/home/first/two');
@@ -112,7 +114,7 @@ describe('test/unit/lib/utils/untildify.test.js', () => {
     expect(osStub.homedir).to.have.been.calledOnce;
   });
 
-  it('caches the current username after the first user-home lookup', () => {
+  it('caches the current username after the first user-home lookup', async () => {
     const osStub = {
       homedir: sinon.stub().returns('/home/first-user'),
       userInfo: sinon.stub(),
@@ -120,9 +122,11 @@ describe('test/unit/lib/utils/untildify.test.js', () => {
     osStub.userInfo.onFirstCall().returns({ username: 'first-user' });
     osStub.userInfo.onSecondCall().returns({ username: 'second-user' });
 
-    const untildify = proxyquire('../../../../lib/utils/untildify', {
-      os: osStub,
-    });
+    const untildify = (
+      await esmock('../../../../lib/utils/untildify.ts', {
+        os: osStub,
+      })
+    ).default;
 
     expect(untildify('~first-user/project')).to.equal('/home/first-user/project');
     expectErrorCode(

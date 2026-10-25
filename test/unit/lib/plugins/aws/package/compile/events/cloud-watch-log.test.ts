@@ -449,7 +449,7 @@ describe('AwsCompileCloudWatchLogEvents', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/package/compile/events/cloud-watch-log.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/cloud-watch-log.test.ts', () => {
   describe('when there are cloud watch log events defined', () => {
     let cfResources;
 

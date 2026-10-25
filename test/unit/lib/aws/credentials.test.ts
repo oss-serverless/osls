@@ -1,12 +1,12 @@
 import * as chai from 'chai';
 import path from 'node:path';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import { overrideEnv } from '../../../utils/process.ts';
+import esmock from 'esmock';
 
 const { expect } = chai;
 
-describe('test/unit/lib/aws/credentials.test.js', () => {
+describe('test/unit/lib/aws/credentials.test.ts', () => {
   const homeDir = path.resolve('/home/test');
   const credentialsFilePath = path.join(homeDir, '.aws', 'credentials');
   const configFilePath = path.join(homeDir, '.aws', 'config');
@@ -50,7 +50,7 @@ describe('test/unit/lib/aws/credentials.test.js', () => {
   }
   FakeNodeHttpHandler.instances = [];
 
-  function loadCredentials({
+  async function loadCredentials({
     files = {},
     fromIni,
     fromNodeProviderChain,
@@ -86,7 +86,7 @@ describe('test/unit/lib/aws/credentials.test.js', () => {
     };
     if (readline) stubs.readline = readline;
 
-    return proxyquire('../../../../lib/aws/credentials', stubs);
+    return (await esmock('../../../../lib/aws/credentials.ts', stubs)).default;
   }
 
   function createFakeReadline({ answer } = {}) {

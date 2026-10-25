@@ -5,7 +5,6 @@ import { Readable, Writable } from 'node:stream';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import * as chai from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import AwsProvider from '../../../../../../../lib/plugins/aws/provider.ts';
 import AwsCompileFunctions from '../../../../../../../lib/plugins/aws/package/compile/functions.ts';
 import Serverless from '../../../../../../../lib/serverless.ts';
@@ -13,6 +12,7 @@ import runServerless from '../../../../../../utils/run-serverless.ts';
 import setupProgrammaticFixture from '../../../../../../utils/setup-programmatic-fixture.ts';
 import { createDeployAwsStubMap } from '../../../../../../utils/aws-stub-maps.ts';
 import { getTmpDirPath, createTmpFile } from '../../../../../../utils/fs.ts';
+import esmock from 'esmock';
 
 const expect = chai.expect;
 
@@ -92,7 +92,7 @@ describe('AwsCompileFunctions', () => {
       if (fsp.unlink.restore) fsp.unlink.restore();
     });
 
-    function createAwsCompileFunctionsWithS3ClientStub({ onSend } = {}) {
+    async function createAwsCompileFunctionsWithS3ClientStub({ onSend } = {}) {
       const s3Clients = [];
       class FakeGetObjectCommand {
         constructor(input) {
@@ -110,15 +110,14 @@ describe('AwsCompileFunctions', () => {
           return undefined;
         }
       }
-      const AwsCompileFunctionsWithClientStub = proxyquire(
-        '../../../../../../../lib/plugins/aws/package/compile/functions',
-        {
+      const AwsCompileFunctionsWithClientStub = (
+        await esmock('../../../../../../../lib/plugins/aws/package/compile/functions.ts', {
           '@aws-sdk/client-s3': {
             S3Client: FakeS3Client,
             GetObjectCommand: FakeGetObjectCommand,
           },
-        }
-      );
+        })
+      ).default;
 
       return { AwsCompileFunctionsWithClientStub, FakeGetObjectCommand, s3Clients };
     }
@@ -2510,7 +2509,7 @@ describe('AwsCompileFunctions', () => {
   });
 });
 
-describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
+describe('lib/plugins/aws/package/compile/functions/index.test.ts', () => {
   describe('Provider properties', () => {
     let cfResources;
     let cfOutputs;

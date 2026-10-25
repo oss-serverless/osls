@@ -3,7 +3,7 @@ import zlib from 'node:zlib';
 import { expect } from 'chai';
 import s3BodyToString from '../../../../lib/aws/s3-body-to-string.ts';
 
-describe('test/unit/lib/aws/s3-body-to-string.test.js', () => {
+describe('test/unit/lib/aws/s3-body-to-string.test.ts', () => {
   it('returns string bodies unchanged', async () => {
     await expect(s3BodyToString('value')).to.eventually.equal('value');
   });

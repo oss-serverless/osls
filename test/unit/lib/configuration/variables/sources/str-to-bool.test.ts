@@ -3,7 +3,7 @@ import resolveMeta from '../../../../../../lib/configuration/variables/resolve-m
 import resolve from '../../../../../../lib/configuration/variables/resolve.ts';
 import strToBoolSource from '../../../../../../lib/configuration/variables/sources/str-to-bool.ts';
 
-describe('test/unit/lib/configuration/variables/sources/str-to-bool.test.js', () => {
+describe('test/unit/lib/configuration/variables/sources/str-to-bool.test.ts', () => {
   let configuration;
   let variablesMeta;
   before(async () => {

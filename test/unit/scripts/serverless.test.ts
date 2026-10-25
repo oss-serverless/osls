@@ -10,7 +10,7 @@ const serverlessPath = path.resolve(import.meta.dirname, '../../../scripts/serve
 const programmaticFixturesPath = path.resolve(import.meta.dirname, '../../fixtures/programmatic');
 const cliFixturesPath = path.resolve(import.meta.dirname, '../../fixtures/cli');
 
-describe('test/unit/scripts/serverless.test.js', () => {
+describe('test/unit/scripts/serverless.test.ts', () => {
   it('should display version when "--version" option', async () => {
     const output = String((await spawn('node', [serverlessPath, '-v'])).stdoutBuffer);
     expect(output).to.include(`osls version: ${version}`);

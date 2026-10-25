@@ -5,7 +5,7 @@ import requireWithImportFallback from '../../../../lib/utils/require-with-import
 
 const { expect } = chai;
 
-describe('test/unit/lib/utils/require-with-import-fallback.test.js', () => {
+describe('test/unit/lib/utils/require-with-import-fallback.test.ts', () => {
   let modulePath;
 
   afterEach(async () => {

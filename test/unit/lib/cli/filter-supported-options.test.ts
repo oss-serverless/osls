@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import filterSupportedOptions from '../../../../lib/cli/filter-supported-options.ts';
 
-describe('test/unit/lib/cli/filter-supported-options.test.js', () => {
+describe('test/unit/lib/cli/filter-supported-options.test.ts', () => {
   it('should recognize just command schema options if passsed', () => {
     expect(
       filterSupportedOptions(

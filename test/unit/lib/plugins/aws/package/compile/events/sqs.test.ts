@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import runServerless from '../../../../../../../utils/run-serverless.ts';
 
-describe('test/unit/lib/plugins/aws/package/compile/events/sqs.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/sqs.test.ts', () => {
   describe('regular configuration', () => {
     let directArnEventSourceMappingResource;
     let basicEventSourceMappingResource;

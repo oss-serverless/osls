@@ -154,7 +154,7 @@ describe('#compileStage()', () => {
   });
 });
 
-describe('test/unit/lib/plugins/aws/package/compile/events/apiGateway/lib/stage/index.test.js', () => {
+describe('test/unit/lib/plugins/aws/package/compile/events/apiGateway/lib/stage/index.test.ts', () => {
   const getApiGatewayDeploymentResource = (cfTemplate) => {
     const deploymentLogicalId = Object.keys(cfTemplate.Resources).find((key) =>
       key.startsWith('ApiGatewayDeployment')

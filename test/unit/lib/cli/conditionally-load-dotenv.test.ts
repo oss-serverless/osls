@@ -4,7 +4,7 @@ import { promises as fsp } from 'node:fs';
 import conditionallyLoadDotenv from '../../../../lib/cli/conditionally-load-dotenv.ts';
 import { expect } from 'chai';
 
-describe('test/unit/lib/cli/conditionally-load-dotenv.test.js', () => {
+describe('test/unit/lib/cli/conditionally-load-dotenv.test.ts', () => {
   let restoreEnv;
 
   before(async () => {

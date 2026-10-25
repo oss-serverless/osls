@@ -5,14 +5,14 @@ import path from 'node:path';
 import { EventEmitter } from 'node:events';
 import nodeStream from 'node:stream';
 import { expect } from 'chai';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 import spawn from '../../../../lib/utils/spawn.ts';
+import esmock from 'esmock';
 
-const loadSpawnWithStubs = (stubs) =>
-  proxyquire.noCallThru().load('../../../../lib/utils/spawn', stubs);
-const loadSpawnSyncWithStubs = (stubs) =>
-  proxyquire.noCallThru().load('../../../../lib/utils/spawn-sync', stubs);
+const loadSpawnWithStubs = async (stubs) =>
+  (await esmock('../../../../lib/utils/spawn.ts', stubs)).default;
+const loadSpawnSyncWithStubs = async (stubs) =>
+  (await esmock('../../../../lib/utils/spawn-sync.ts', stubs)).default;
 
 const repoRoot = path.resolve(import.meta.dirname, '../../../../');
 

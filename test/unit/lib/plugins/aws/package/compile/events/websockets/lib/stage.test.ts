@@ -170,7 +170,7 @@ describe('#compileStage()', () => {
   });
 });
 
-describe('lib/plugins/aws/package/compile/events/websockets/lib/stage.test.js', () => {
+describe('lib/plugins/aws/package/compile/events/websockets/lib/stage.test.ts', () => {
   describe('logs with several custom options', () => {
     let resource;
     const customLogFormat = ['$context.identity.sourceIp', '$context.requestId'].join(' ');

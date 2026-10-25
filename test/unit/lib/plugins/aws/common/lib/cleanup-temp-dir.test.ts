@@ -1,7 +1,7 @@
 import * as chai from 'chai';
 import path from 'node:path';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
+import esmock from 'esmock';
 
 const expect = chai.expect;
 
@@ -10,14 +10,14 @@ describe('#cleanupTempDir()', () => {
   let dirExistsSync;
   let removeSync;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     dirExistsSync = sinon.stub();
     removeSync = sinon.stub();
-    const cleanupTempDir = proxyquire
-      .noCallThru()
-      .load('../../../../../../../lib/plugins/aws/common/lib/cleanup-temp-dir', {
-        '../../../../utils/fs/remove': { removeSync },
-      });
+    const cleanupTempDir = (
+      await esmock('../../../../../../../lib/plugins/aws/common/lib/cleanup-temp-dir.ts', {
+        '../../../../../../../lib/utils/fs/remove.ts': { removeSync },
+      })
+    ).default;
     context = {
       serverless: {
         serviceDir: '/service',

@@ -3,7 +3,7 @@ import resolveMeta from '../../../../../lib/configuration/variables/resolve-meta
 import resolve from '../../../../../lib/configuration/variables/resolve.ts';
 import resolveUnresolvedSourceTypes from '../../../../../lib/configuration/variables/resolve-unresolved-source-types.ts';
 
-describe('test/unit/lib/configuration/variables/resolve-unresolved-source-types.test.js', () => {
+describe('test/unit/lib/configuration/variables/resolve-unresolved-source-types.test.ts', () => {
   const configuration = {
     resolved: 'foo${recognized:}',
     unrecognized: 'foo${unrecognized:}',

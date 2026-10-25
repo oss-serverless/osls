@@ -1,14 +1,14 @@
 import * as chai from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import ServerlessError from '../../../../lib/serverless-error.ts';
 import retry from '../../../../lib/aws/retry.ts';
+import esmock from 'esmock';
 
 const { retryOnThrottlingError, retryOnTransientNetworkError } = retry;
 
 const { expect } = chai;
 
-describe('test/unit/lib/aws/retry.test.js', () => {
+describe('test/unit/lib/aws/retry.test.ts', () => {
   const createThrottlingError = () =>
     Object.assign(new Error('Rate exceeded'), { name: 'ThrottlingException' });
 
@@ -79,9 +79,11 @@ describe('test/unit/lib/aws/retry.test.js', () => {
 
   it('jitters the retry delay between 0.8 and 1.4 times the base delay', async () => {
     const sleepStub = sinon.stub().resolves();
-    const { retryOnThrottlingError: retryWithSleepStub } = proxyquire('../../../../lib/aws/retry', {
-      '../utils/sleep': sleepStub,
-    });
+    const { retryOnThrottlingError: retryWithSleepStub } = (
+      await esmock('../../../../lib/aws/retry.ts', {
+        '../../../../lib/utils/sleep.ts': sleepStub,
+      })
+    ).default;
     const randomStub = sinon.stub(Math, 'random');
     randomStub.onFirstCall().returns(0);
     randomStub.onSecondCall().returns(0.999999);

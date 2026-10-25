@@ -5,7 +5,7 @@ import { ensureDir, ensureFile, outputFile, remove } from '../../../utils/fs.ts'
 
 const { expect } = chai;
 
-describe('test/unit/lib/configuration/read.test.js', () => {
+describe('test/unit/lib/configuration/read.test.ts', () => {
   let configurationPath;
 
   afterEach(async () => {

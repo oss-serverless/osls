@@ -14,7 +14,7 @@ const createConfigSchemaHandler = (configurationInput) =>
     service: { configValidationMode: 'error' },
   });
 
-describe('test/unit/lib/classes/ConfigSchemaHandler/index.test.js', () => {
+describe('test/unit/lib/classes/ConfigSchemaHandler/index.test.ts', () => {
   describe('#constructor', () => {
     it('should freeze parts of schema for service', async () => {
       return runServerless({

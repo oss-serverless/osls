@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import AwsInfo from '../../../../../../lib/plugins/aws/info/index.ts';
 import retry from '../../../../../../lib/aws/retry.ts';
 import { CloudFormationClient, ListStackResourcesCommand } from '@aws-sdk/client-cloudformation';
+import esmock from 'esmock';
 const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
@@ -200,10 +200,11 @@ describe('#getResourceCount()', () => {
       .onSecondCall()
       .resolves({ StackResourceSummaries: [{}, {}] });
     awsInfo.gatheredData = { info: {}, outputs: [] };
-    const getResourceCountWithFastRetry = proxyquire(
-      '../../../../../../lib/plugins/aws/info/get-resource-count',
-      { '../../../aws/retry': fastRetry }
-    );
+    const getResourceCountWithFastRetry = (
+      await esmock('../../../../../../lib/plugins/aws/info/get-resource-count.ts', {
+        '../../../../../../lib/aws/retry.ts': fastRetry,
+      })
+    ).default;
 
     await getResourceCountWithFastRetry.getResourceCount.call(awsInfo);
 

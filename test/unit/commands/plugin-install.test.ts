@@ -2,11 +2,11 @@ import path from 'node:path';
 import { promises as fsp } from 'node:fs';
 import * as sinon from 'sinon';
 import * as yaml from 'js-yaml';
-import proxyquire from 'proxyquire';
 import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
 import resolveConfigurationPath from '../../../lib/cli/resolve-configuration-path.ts';
 import cloudformationSchema from '../../../lib/utils/serverless-utils/cloudformation-schema.ts';
 import { expect } from 'chai';
+import esmock from 'esmock';
 
 const writeRawConfiguration = async (serviceDir, rawYaml) => {
   const configurationFilePath = await resolveConfigurationPath({
@@ -38,11 +38,13 @@ const writeJsonConfiguration = async (serviceDir, configuration, rawJson) => {
   };
 };
 
-describe('test/unit/commands/plugin-install.test.js', async () => {
+describe('test/unit/commands/plugin-install.test.ts', async () => {
   const spawnFake = sinon.fake();
-  const installPlugin = proxyquire('../../../commands/plugin-install', {
-    '../lib/utils/spawn': spawnFake,
-  });
+  const installPlugin = (
+    await esmock('../../../commands/plugin-install.ts', {
+      '../../../lib/utils/spawn.ts': spawnFake,
+    })
+  ).default;
   const pluginName = 'serverless-plugin-1';
 
   const expectInstallSpawn = (serviceDir, packageSpec, { allowInstallScripts = false } = {}) => {

@@ -2,17 +2,19 @@ import path from 'node:path';
 import { promises as fsp } from 'node:fs';
 import * as sinon from 'sinon';
 import * as yaml from 'js-yaml';
-import proxyquire from 'proxyquire';
 import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
 import resolveConfigurationPath from '../../../lib/cli/resolve-configuration-path.ts';
 import cloudformationSchema from '../../../lib/utils/serverless-utils/cloudformation-schema.ts';
 import { expect } from 'chai';
+import esmock from 'esmock';
 
 const pluginName = 'serverless-plugin-1';
 const spawnFake = sinon.fake();
-const uninstallPlugin = proxyquire('../../../commands/plugin-uninstall', {
-  '../lib/utils/spawn': spawnFake,
-});
+const uninstallPlugin = (
+  await esmock('../../../commands/plugin-uninstall.ts', {
+    '../../../lib/utils/spawn.ts': spawnFake,
+  })
+).default;
 
 const writeRawConfiguration = async (serviceDir, rawYaml) => {
   const configurationFilePath = await resolveConfigurationPath({
@@ -78,7 +80,7 @@ const uninstallFromPluginFixture = async () => {
   return fixture;
 };
 
-describe('test/unit/commands/plugin-uninstall.test.js', async () => {
+describe('test/unit/commands/plugin-uninstall.test.ts', async () => {
   afterEach(() => {
     spawnFake.resetHistory();
   });
