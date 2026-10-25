@@ -4,9 +4,8 @@
  * For more info search for the "utils/ensure-artifact.js" file in the codebase.
  */
 
-import { wait, MAX_AWS_REQUEST_TRY } from '../utils.ts';
+import { wait, MAX_AWS_REQUEST_TRY, getEnvironment, handlerWrapper } from '../utils.ts';
 
-import { getEnvironment, handlerWrapper } from '../utils.ts';
 import {
   APIGatewayClient,
   GetAccountCommand,

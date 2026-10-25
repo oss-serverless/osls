@@ -1,7 +1,6 @@
-import { packageJson as packageModule } from '../utils/package-root.ts';
+import { packageJson as packageModule, packageRoot } from '../utils/package-root.ts';
 import resolveLocalServerlessPath from './local-serverless-path.ts';
 import log from '../utils/serverless-utils/log.ts';
-import { packageRoot } from '../utils/package-root.ts';
 const { version } = packageModule;
 const { writeText } = log;
 

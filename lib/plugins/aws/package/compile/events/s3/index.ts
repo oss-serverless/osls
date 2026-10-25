@@ -286,7 +286,6 @@ class AwsCompileS3Events {
         functionObj.events.forEach((event) => {
           if (event.s3 && isObject(event.s3) && event.s3.existing) {
             numEventsForFunc++;
-            let rules;
             const { forceDeploy } = event.s3;
             const bucket = event.s3.bucket;
             // In order to property use it as key and during comparisons below,
@@ -305,7 +304,7 @@ class AwsCompileS3Events {
               throw new ServerlessError(errorMessage, 'S3_MULTIPLE_BUCKETS_PER_FUNCTION');
             }
 
-            rules = (event.s3.rules || []).map((rule) => {
+            const rules = (event.s3.rules || []).map((rule) => {
               const key = Object.keys(rule)[0];
               const value = rule[key];
               return {

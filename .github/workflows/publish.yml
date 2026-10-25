@@ -17,23 +17,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Restore npm cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.npm
-          key: npm-no-lock-v1-${{ runner.os }}-node24-${{ hashFiles('package.json') }}
-          restore-keys: |
-            npm-no-lock-v1-${{ runner.os }}-node24-
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install Node.js and npm
         uses: actions/setup-node@v6
         with:
           node-version: 24.x
-          package-manager-cache: false
+          cache: pnpm
           registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
-        run: npm install --package-lock=false
+        run: pnpm install --frozen-lockfile
 
       # Store the name of the release
       # See https://stackoverflow.com/questions/58177786/get-the-current-pushed-tag-in-github-actions
@@ -41,22 +36,33 @@ jobs:
 
       - run: npm version $RELEASE_VERSION --no-git-tag-version
 
+      - name: Type check
+        run: pnpm run typecheck
+
+      - name: Unit tests
+        # Some tests depend on TTY support, which is missing in GA runner
+        run: script -e -c "pnpm run test --bail"
+
+      # dist/ is the published package root, with a package.json generated from the root one
+      - name: Build
+        run: pnpm run build
+
       - name: Verify package contents
-        run: npm pack --dry-run
+        run: npm pack ./dist --dry-run
 
       - name: Build publish tarball
-        run: echo "PACKAGE_TGZ=$(npm pack --silent)" >> $GITHUB_ENV
+        run: echo "PACKAGE_TGZ=$(npm pack ./dist --silent)" >> $GITHUB_ENV
 
-      - name: Run tests against version packaged with npm pack
+      - name: Smoke test the packed package
         run: |
-          PACKAGE_VERSION=${PACKAGE_TGZ#osls-}
-          PACKAGE_VERSION=${PACKAGE_VERSION%.tgz}
-          mkdir "serverless-${PACKAGE_VERSION}"
-          tar zxf "$PACKAGE_TGZ" -C "serverless-${PACKAGE_VERSION}"
-          cp -R test "serverless-${PACKAGE_VERSION}/package"
-          ln -s "$(pwd)"/node_modules "serverless-${PACKAGE_VERSION}/package/node_modules"
-          cd "serverless-${PACKAGE_VERSION}/package"
-          script -e -c "npm test -- -b"
+          mkdir "$RUNNER_TEMP/consumer"
+          cp -R test/fixtures/programmatic/function/. "$RUNNER_TEMP/consumer"
+          PACKAGE_PATH="$(pwd)/$PACKAGE_TGZ"
+          cd "$RUNNER_TEMP/consumer"
+          npm init -y > /dev/null
+          npm install "$PACKAGE_PATH"
+          npx osls --version
+          npx osls print
 
       - name: Upload tested tarball
         uses: actions/upload-artifact@v7

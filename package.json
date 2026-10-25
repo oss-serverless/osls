@@ -1,6 +1,7 @@
 {
   "name": "osls",
   "version": "4.0.0-dev",
+  "private": true,
   "description": "osls CLI for deploying serverless applications",
   "type": "module",
   "preferGlobal": true,
@@ -19,12 +20,12 @@
     "apache-open-whisk",
     "iot"
   ],
-  "main": "lib/serverless.js",
+  "main": "lib/serverless.ts",
   "types": "types/index.d.ts",
   "bin": {
-    "serverless": "bin/serverless.js",
-    "sls": "bin/serverless.js",
-    "osls": "bin/serverless.js"
+    "serverless": "bin/serverless.ts",
+    "sls": "bin/serverless.ts",
+    "osls": "bin/serverless.ts"
   },
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
@@ -76,7 +77,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/chai": "^5.2.3",
+    "@types/chai-as-promised": "^8.0.2",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.20.5",
+    "@types/sinon": "^22.0.2",
+    "@types/sinon-chai": "^4.0.1",
     "@typescript/native": "npm:typescript@^7.0.2",
     "adm-zip": "^0.5.10",
     "chai": "^6.2.2",
@@ -88,6 +94,7 @@
     "esmock": "^2.8.0",
     "git-list-updated": "^1.2.1",
     "globals": "^17.5.0",
+    "jiti": "^2.7.0",
     "jszip": "^3.10.1",
     "mocha": "12.0.0-rc.1",
     "prettier": "^3.8.3",
@@ -98,17 +105,19 @@
     "typescript-eslint": "^8.72.0"
   },
   "scripts": {
-    "docs-check": "node scripts/check-docs-coverage.js",
-    "integration-test-run-package": "mocha --config test/mocha/package.cjs \"test/integration-package/**/*.tests.js\"",
+    "build": "node scripts/build.ts",
+    "docs-check": "node scripts/check-docs-coverage.ts",
+    "integration-test-run-package": "mocha --config test/mocha/config.json \"test/integration-package/**/*.tests.ts\"",
     "lint": "eslint .",
-    "lint:updated": "pipe-git-updated --ext=cjs --ext=js --ext=mjs --base=4.x -- eslint",
-    "prettier-check": "prettier -c \"**/*.{cjs,css,html,js,json,md,mjs,yaml,yml}\"",
-    "prettier-check:updated": "pipe-git-updated --ext=cjs --ext=css --ext=html --ext=js --ext=json --ext=md --ext=mjs --ext=yaml --ext=yml --base=4.x -- prettier -c",
-    "prettify": "prettier --write \"**/*.{cjs,css,html,js,json,md,mjs,yaml,yml}\"",
-    "prettify:updated": "pipe-git-updated --ext=cjs --ext=css --ext=html --ext=js --ext=json --ext=md --ext=mjs --ext=yaml --ext=yml --base=4.x -- prettier --write",
-    "test": "mocha --config test/mocha/unit.cjs --parallel \"test/unit/**/*.test.js\"",
+    "lint:updated": "pipe-git-updated --ext=cjs --ext=js --ext=mjs --ext=ts --base=4.x -- eslint",
+    "prettier-check": "prettier -c \"**/*.{cjs,css,html,js,json,md,mjs,ts,yaml,yml}\"",
+    "prettier-check:updated": "pipe-git-updated --ext=cjs --ext=css --ext=html --ext=js --ext=json --ext=md --ext=mjs --ext=ts --ext=yaml --ext=yml --base=4.x -- prettier -c",
+    "prettify": "prettier --write \"**/*.{cjs,css,html,js,json,md,mjs,ts,yaml,yml}\"",
+    "prettify:updated": "pipe-git-updated --ext=cjs --ext=css --ext=html --ext=js --ext=json --ext=md --ext=mjs --ext=ts --ext=yaml --ext=yml --base=4.x -- prettier --write",
+    "test": "mocha --config test/mocha/config.json --parallel \"test/unit/**/*.test.ts\"",
     "test:ci": "npm run prettier-check:updated && npm run lint:updated && npm run test:isolated",
-    "test:isolated": "mocha --config test/mocha/unit.cjs --parallel \"test/unit/**/*.test.js\""
+    "test:isolated": "mocha --config test/mocha/config.json --parallel \"test/unit/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.json"
   },
   "engines": {
     "node": "^22.18.0 || ^24.0.0"

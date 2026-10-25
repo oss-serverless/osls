@@ -1,17 +1,18 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 import { flatConfigs as importXFlatConfigs } from 'eslint-plugin-import-x';
 import n from 'eslint-plugin-n';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 const devDependencyFiles = [
-  '**/*.test.js',
+  '**/*.test.ts',
   '**/scripts/**',
   '**/test/**',
   '**/tests/**',
-  'eslint.config.mjs',
-  'prettier.config.js',
+  'eslint.config.ts',
+  'prettier.config.ts',
 ];
 
 export default defineConfig([
@@ -21,17 +22,16 @@ export default defineConfig([
       reportUnusedDisableDirectives: 'warn',
     },
   },
-  globalIgnores(['**/.*', '!.github/', '!.github/**']),
+  globalIgnores(['**/.*', '!.github/', '!.github/**', 'dist/']),
   js.configs.recommended,
-  n.configs['flat/recommended-script'],
+  n.configs['flat/recommended-module'],
   importXFlatConfigs.recommended,
-  eslintConfigPrettier,
   {
-    name: 'osls/javascript',
-    files: ['**/*.{cjs,js,mjs}'],
+    name: 'osls/sources',
+    files: ['**/*.{cjs,js,mjs,ts}'],
     languageOptions: {
       ecmaVersion: 2025,
-      sourceType: 'commonjs',
+      sourceType: 'module',
       globals: {
         ...globals.node,
         fetch: 'readonly',
@@ -61,32 +61,52 @@ export default defineConfig([
       'n/no-process-exit': 'off',
       'n/no-deprecated-api': 'off',
       'n/hashbang': 'off',
-      'n/no-unpublished-bin': 'error',
+      'n/no-unpublished-bin': 'off',
     },
   },
   {
-    name: 'osls/published-files',
-    files: ['bin/serverless.js', 'commands/**/*.js', 'lib/**/*.js', 'scripts/serverless.js'],
+    name: 'osls/typescript',
+    files: ['**/*.ts'],
+    extends: [tseslint.configs.recommended],
     rules: {
-      'n/no-unpublished-import': 'error',
-      'n/no-unpublished-require': 'error',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          caughtErrors: 'all',
+          // Leading underscore marks deliberately unused bindings (eg. rest destructuring)
+          varsIgnorePattern: '^_',
+        },
+      ],
+      // Destructuring keeps `let` when some of its bindings are reassigned
+      'prefer-const': ['error', { destructuring: 'all' }],
+      // The code base was converted from JavaScript; types are tightened module by module
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      '@typescript-eslint/no-this-alias': 'off',
     },
   },
   {
-    name: 'osls/modules',
-    files: ['**/*.mjs'],
+    name: 'osls/commonjs-fixtures',
+    files: [
+      '**/*.cjs',
+      'test/fixtures/**/*.js',
+      'test/**/fixture/**/*.js',
+      'test/**/fixtures/**/*.js',
+    ],
     languageOptions: {
-      sourceType: 'module',
+      sourceType: 'commonjs',
     },
   },
   {
     name: 'osls/tests',
-    files: ['**/*.test.js', '**/test/**'],
+    files: ['**/*.test.ts', '**/test/**'],
     languageOptions: {
       globals: globals.mocha,
     },
     rules: {
       'no-unused-expressions': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
   {
@@ -109,4 +129,5 @@ export default defineConfig([
       sourceType: 'module',
     },
   },
+  eslintConfigPrettier,
 ]);

@@ -1,0 +1,34 @@
+{
+  // Type checks the whole repository with TypeScript 7 (`tsc` from @typescript/native)
+  // The sources run directly on Node.js (type stripping), so they use erasable syntax only and
+  // import each other with `.ts` extensions, rewritten to `.js` when building `dist/`
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["es2023"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node", "mocha"],
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    // The code base was converted from JavaScript; strictness is raised module by module
+    "strict": false,
+    "noImplicitAny": false
+  },
+  "include": [
+    "bin/**/*.ts",
+    "commands/**/*.ts",
+    "lib/**/*.ts",
+    "scripts/**/*.ts",
+    "test/**/*.ts",
+    "types/**/*.d.ts",
+    "prettier.config.ts",
+    "eslint.config.ts"
+  ],
+  "exclude": ["dist", "node_modules", "test/fixtures", "**/fixtures/**", "**/fixture/**"]
+}

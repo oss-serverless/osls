@@ -3,13 +3,7 @@
 export type AwsArnString = string;
 export type ErrorCode = string;
 export type AwsCfFunction =
-  | AwsCfImport
-  | AwsCfJoin
-  | AwsCfGetAtt
-  | AwsCfRef
-  | AwsCfSub
-  | AwsCfBase64
-  | AwsCfToJsonString;
+  AwsCfImport | AwsCfJoin | AwsCfGetAtt | AwsCfRef | AwsCfSub | AwsCfBase64 | AwsCfToJsonString;
 export type AwsCfInstruction = string | AwsCfFunction;
 export type AwsArn = AwsArnString | AwsCfFunction;
 export type FunctionName = string;
@@ -250,14 +244,7 @@ export interface AWS {
                         headers?: string[];
                         maxAge?: number;
                         methods?: (
-                          | 'GET'
-                          | 'POST'
-                          | 'PUT'
-                          | 'PATCH'
-                          | 'OPTIONS'
-                          | 'HEAD'
-                          | 'DELETE'
-                          | 'ANY'
+                          'GET' | 'POST' | 'PUT' | 'PATCH' | 'OPTIONS' | 'HEAD' | 'DELETE' | 'ANY'
                         )[];
                         origin?: string;
                         origins?: string[];
@@ -638,10 +625,7 @@ export interface AWS {
                     [k: string]: unknown;
                   };
               eventType?:
-                | 'viewer-request'
-                | 'origin-request'
-                | 'origin-response'
-                | 'viewer-response';
+                'viewer-request' | 'origin-request' | 'origin-response' | 'viewer-response';
               isDefaultOrigin?: boolean;
               includeBody?: boolean;
               origin?:
@@ -1578,3 +1562,6 @@ export interface AwsApiGatewayApiKeysProperties {
 export interface AwsCfImportLocallyResolvable {
   'Fn::ImportValue': string;
 }
+
+// The package main export: the Serverless class
+export { default } from '../lib/serverless.js';

@@ -254,7 +254,14 @@ function getAwsSdkV3CredentialsProviderCacheKey({ provider, profile } = {}) {
   });
 }
 
-function getAwsSdkV3CredentialsProvider({ provider, profile } = {}) {
+// Named through the providers it returns, so declarations stay portable
+type AwsSdkV3CredentialsProvider =
+  ReturnType<typeof fromIni> | ReturnType<typeof fromNodeProviderChain>;
+
+function getAwsSdkV3CredentialsProvider({
+  provider,
+  profile,
+}: { provider?: any; profile?: string } = {}): AwsSdkV3CredentialsProvider {
   const stage = provider && provider.getStage ? provider.getStage() : null;
   const stageUpper = stage ? stage.toUpperCase() : null;
   const providerProfile =

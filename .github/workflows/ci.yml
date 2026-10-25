@@ -2,39 +2,108 @@ name: CI
 
 on:
   push:
-    branches: [4.x, pnpm, typescript7-native, ci-checks]
-  pull_request:
     branches: [4.x]
+  pull_request:
+
+env:
+  SLS_IGNORE_WARNING: '*'
+  FORCE_COLOR: 1
 
 jobs:
-  ci:
+  checks:
+    name: '[Linux] Node 24: Formatting, lint, types, build & packaging tests'
     runs-on: ubuntu-latest
+    env:
+      SLS_SCHEMA_CACHE_BASE_DIR: /home/runner
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 30
+
+      - name: Retrieve last 4.x commit (for `git diff` purposes)
+        run: |
+          git checkout -b pr
+          git fetch --prune --depth=30 origin +refs/heads/4.x:refs/remotes/origin/4.x
+          git checkout 4.x
+          git checkout pr
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: '22'
-          cache: 'pnpm'
+          node-version: 24.x
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm run lint || true
+      - name: Validate formatting
+        run: pnpm run prettier-check:updated
+
+      - name: Validate lint rules
+        run: pnpm run lint:updated
 
       - name: Type check
-        run: pnpm exec tsc --noEmit || true
+        run: pnpm run typecheck
 
       - name: Build
-        run: pnpm run build 2>&1 | tail -5 || echo "no build script"
+        run: pnpm run build
 
-      - name: Tests
-        run: pnpm run test:isolated 2>&1 | tail -30 || true
+      - name: Validate docs coverage
+        run: pnpm run docs-check
+
+      - name: Packaging tests
+        run: pnpm run integration-test-run-package
+
+      - name: Large zip memory smoke test
+        run: NODE_OPTIONS="--max-old-space-size=256 --expose-gc" SERVERLESS_LARGE_ZIP_SMOKE=1 pnpm exec mocha --config test/mocha/config.json test/unit/lib/plugins/package/lib/zip-service.test.ts --grep "large zip memory smoke"
+
+      - name: Smoke test the packed package
+        run: |
+          npm pack ./dist --pack-destination "$RUNNER_TEMP"
+          mkdir "$RUNNER_TEMP/consumer"
+          cp -R test/fixtures/programmatic/function/. "$RUNNER_TEMP/consumer"
+          cd "$RUNNER_TEMP/consumer"
+          npm init -y > /dev/null
+          npm install "$RUNNER_TEMP"/osls-*.tgz
+          npx osls --version
+          npx osls print
+
+  unit:
+    name: '[${{ matrix.os }}] Node ${{ matrix.node }}: Unit tests'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, node: 22.x }
+          - { os: ubuntu-latest, node: 24.x }
+          - { os: windows-latest, node: 22.x }
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit tests
+        if: runner.os == 'Linux'
+        # Some tests depend on TTY support, which is missing in GA runner
+        # Workaround taken from https://github.com/actions/runner/issues/241#issuecomment-577360161
+        run: script -e -c "pnpm run test --bail"
+
+      - name: Unit tests
+        if: runner.os != 'Linux'
+        run: pnpm run test --bail
