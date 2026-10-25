@@ -1,8 +1,6 @@
 import * as chai from 'chai';
 import * as sandbox from 'sinon';
-import { constants } from 'node:fs';
-import fs from 'node:fs';
-import { promises as fsp } from 'node:fs';
+import fs, { constants, promises as fsp } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import AwsConfigCredentials from '../../../../../lib/plugins/aws/config-credentials.ts';

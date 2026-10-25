@@ -1,5 +1,4 @@
-import fs from 'node:fs';
-import { promises as fsp } from 'node:fs';
+import fs, { promises as fsp } from 'node:fs';
 import path from 'node:path';
 import { Readable, Writable } from 'node:stream';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';

@@ -87,6 +87,14 @@ export default defineConfig([
     },
   },
   {
+    // Declarations reference the compiled layout of the published package (`lib/*.js`)
+    name: 'osls/declarations',
+    files: ['types/**/*.d.ts'],
+    rules: {
+      'import-x/no-unresolved': 'off',
+    },
+  },
+  {
     name: 'osls/commonjs-fixtures',
     files: [
       '**/*.cjs',
