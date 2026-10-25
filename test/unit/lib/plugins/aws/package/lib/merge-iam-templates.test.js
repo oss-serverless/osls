@@ -459,6 +459,44 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
         expect(iamResource.Properties.DataProtectionPolicy.Name).to.equal('data-protection-policy');
       });
 
+      it('should support `provider.logs.lambda.logGroupClass`', async () => {
+        const { cfTemplate, awsNaming } = await runServerless({
+          fixture: 'function',
+          command: 'package',
+          configExt: {
+            provider: {
+              logs: {
+                lambda: {
+                  logGroupClass: 'infrequent_access',
+                },
+              },
+            },
+            functions: {
+              fnStandardLogs: {
+                handler: 'index.handler',
+                logs: {
+                  logGroupClass: 'standard',
+                },
+              },
+              fnDisableLogs: {
+                handler: 'index.handler',
+                disableLogs: true,
+              },
+            },
+          },
+        });
+
+        expect(cfTemplate.Resources).to.have.property(
+          awsNaming.getInfrequentAccessLogGroupLogicalId('basic')
+        );
+        expect(cfTemplate.Resources).to.not.have.property(
+          awsNaming.getInfrequentAccessLogGroupLogicalId('fnStandardLogs')
+        );
+        expect(cfTemplate.Resources).to.not.have.property(
+          awsNaming.getInfrequentAccessLogGroupLogicalId('fnDisableLogs')
+        );
+      });
+
       it('should support `provider.iam.role.tags`', () => {
         const IamRoleLambdaExecution = naming.getRoleLogicalId();
         const iamResource = cfResources[IamRoleLambdaExecution];
@@ -515,6 +553,21 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
                   Statement: [],
                 },
               },
+              fnInfrequentAccessLogs: {
+                handler: 'index.handler',
+                condition: 'CreateFunctionCondition',
+                logRetentionInDays: 5,
+                logs: {
+                  logGroupClass: 'infrequent_access',
+                },
+              },
+              fnInfrequentAccessLogsCustomName: {
+                name: 'infrequent-access-logs',
+                handler: 'index.handler',
+                logs: {
+                  logGroupClass: 'infrequent_access',
+                },
+              },
               fnWithVpc: {
                 handler: 'index.handler',
                 vpc: {
@@ -526,6 +579,13 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
                 name: customFunctionName,
                 handler: 'index.handler',
                 disableLogs: true,
+              },
+            },
+            resources: {
+              Conditions: {
+                CreateFunctionCondition: {
+                  'Fn::Equals': ['true', 'true'],
+                },
               },
             },
           },
@@ -579,6 +639,50 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
         expect(logResource.Properties.LogGroupName).to.be.equal(
           naming.getLogGroupName(functionName)
         );
+      });
+
+      it('should support `functions[].logs.logGroupClass`', () => {
+        const functionName = serverless.service.getFunction('fnInfrequentAccessLogs').name;
+
+        expect(
+          cfResources[naming.getInfrequentAccessLogGroupLogicalId('fnInfrequentAccessLogs')]
+        ).to.deep.equal({
+          Type: 'AWS::Logs::LogGroup',
+          Condition: 'CreateFunctionCondition',
+          Properties: {
+            LogGroupName: naming.getInfrequentAccessLogGroupName(functionName),
+            RetentionInDays: 5,
+            LogGroupClass: 'INFREQUENT_ACCESS',
+          },
+        });
+        expect(cfResources[naming.getLogGroupLogicalId('fnInfrequentAccessLogs')]).to.deep.equal({
+          Type: 'AWS::Logs::LogGroup',
+          Condition: 'CreateFunctionCondition',
+          Properties: {
+            LogGroupName: naming.getLogGroupName(functionName),
+            RetentionInDays: 5,
+          },
+        });
+      });
+
+      it('should grant access to both log groups of custom named functions with Infrequent Access logs', () => {
+        const [createLogStatement, putLogStatement] =
+          cfResources[naming.getRoleLogicalId()].Properties.Policies[0].PolicyDocument.Statement;
+        const logGroupArnPrefix =
+          'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/';
+
+        expect(createLogStatement.Resource).to.deep.include({
+          'Fn::Sub': `${logGroupArnPrefix}infrequent-access-logs-ia:*`,
+        });
+        expect(createLogStatement.Resource).to.deep.include({
+          'Fn::Sub': `${logGroupArnPrefix}infrequent-access-logs:*`,
+        });
+        expect(putLogStatement.Resource).to.deep.include({
+          'Fn::Sub': `${logGroupArnPrefix}infrequent-access-logs-ia:*:*`,
+        });
+        expect(putLogStatement.Resource).to.deep.include({
+          'Fn::Sub': `${logGroupArnPrefix}infrequent-access-logs:*:*`,
+        });
       });
 
       it('should not have allow rights to put logs for custom named function when disableLogs option is enabled', async () => {

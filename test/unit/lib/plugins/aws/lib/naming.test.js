@@ -236,6 +236,22 @@ describe('#naming()', () => {
     });
   });
 
+  describe('#getInfrequentAccessLogGroupLogicalId()', () => {
+    it('should suffix the log group logical id with "IA"', () => {
+      expect(sdk.naming.getInfrequentAccessLogGroupLogicalId('functionName')).to.equal(
+        'FunctionNameLogGroupIA'
+      );
+    });
+  });
+
+  describe('#getInfrequentAccessLogGroupName()', () => {
+    it('should suffix the log group name with "-ia"', () => {
+      expect(sdk.naming.getInfrequentAccessLogGroupName('functionName')).to.equal(
+        '/aws/lambda/functionName-ia'
+      );
+    });
+  });
+
   describe('#getNormalizedFunctionName()', () => {
     it('should normalize the given functionName', () => {
       expect(sdk.naming.getNormalizedFunctionName('functionName')).to.equal('FunctionName');

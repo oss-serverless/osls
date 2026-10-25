@@ -3,6 +3,7 @@
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 const AwsLogs = require('../../../../../lib/plugins/aws/logs');
+const AwsProvider = require('../../../../../lib/plugins/aws/provider');
 const ServerlessError = require('../../../../../lib/serverless-error');
 const {
   CloudWatchLogsClient,
@@ -18,12 +19,14 @@ function createServerlessContext(options) {
     getStage: () => options.stage,
     getRegion: () => options.region,
     getAwsSdkV3Config: async () => ({ region: options.region }),
+    isFunctionLogGroupInfrequentAccess: AwsProvider.prototype.isFunctionLogGroupInfrequentAccess,
     naming: {
       getLogGroupName: (lambdaName) => `/aws/lambda/${lambdaName}`,
     },
   };
   const service = {
     service: 'new-service',
+    provider: {},
     functions: {},
     getFunction(functionName) {
       if (!this.functions || !Object.hasOwn(this.functions, functionName)) {
@@ -36,15 +39,15 @@ function createServerlessContext(options) {
     },
   };
 
-  return {
-    provider,
-    serverless: {
-      service,
-      serviceDir: false,
-      processedInput: { commands: ['logs'] },
-      getProvider: sinon.stub().withArgs('aws').returns(provider),
-    },
+  const serverless = {
+    service,
+    serviceDir: false,
+    processedInput: { commands: ['logs'] },
+    getProvider: sinon.stub().withArgs('aws').returns(provider),
   };
+  provider.serverless = serverless;
+
+  return { provider, serverless };
 }
 
 describe('AwsLogs', () => {
@@ -134,6 +137,14 @@ describe('AwsLogs', () => {
       expect(awsLogs.options.logGroupName).to.deep.equal(
         awsLogs.provider.naming.getLogGroupName('customName')
       );
+    });
+
+    it('it should throw error if the function logs to an Infrequent Access log group', () => {
+      serverless.service.functions.first.logs = { logGroupClass: 'infrequent_access' };
+
+      expect(() => awsLogs.extendedValidate())
+        .to.throw(ServerlessError)
+        .with.property('code', 'LOGS_INFREQUENT_ACCESS_UNSUPPORTED');
     });
   });
 

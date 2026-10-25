@@ -4897,6 +4897,81 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
       });
     });
 
+    it('should support `functions[].logs.logGroupClass`', async () => {
+      const { cfTemplate, awsNaming, serverless } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          functions: {
+            basic: {
+              logs: {
+                logGroupClass: 'infrequent_access',
+              },
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      const { Properties, DependsOn } = cfTemplate.Resources[awsNaming.getLambdaLogicalId('basic')];
+
+      expect(Properties.LoggingConfig).to.deep.equal({
+        LogGroup: awsNaming.getInfrequentAccessLogGroupName(
+          serverless.service.getFunction('basic').name
+        ),
+      });
+      expect(DependsOn).to.deep.equal([
+        awsNaming.getLogGroupLogicalId('basic'),
+        awsNaming.getInfrequentAccessLogGroupLogicalId('basic'),
+      ]);
+    });
+
+    it('should not route logs to an Infrequent Access log group when `functions[].disableLogs` is set', async () => {
+      const { cfTemplate, awsNaming } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          provider: {
+            logs: {
+              lambda: {
+                logGroupClass: 'infrequent_access',
+              },
+            },
+          },
+          functions: {
+            basic: {
+              disableLogs: true,
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      expect(
+        cfTemplate.Resources[awsNaming.getLambdaLogicalId('basic')].Properties
+      ).to.not.have.property('LoggingConfig');
+    });
+
+    it('should reject `logs.logGroupClass` combined with `logs.logGroup`', async () => {
+      await expect(
+        runServerless({
+          fixture: 'function',
+          configExt: {
+            functions: {
+              basic: {
+                logs: {
+                  logGroup: 'valid',
+                  logGroupClass: 'infrequent_access',
+                },
+              },
+            },
+          },
+          command: 'package',
+        })
+      ).to.be.eventually.rejected.and.have.property(
+        'code',
+        'FUNCTION_LOG_GROUP_CLASS_CUSTOM_LOG_GROUP_CONFLICT'
+      );
+    });
+
     it('should support `functions[].fileSystemConfig` (with vpc configured on function)', () => {
       const functionServiceConfig = serviceConfig.functions.fnFileSystemConfig;
       const fileSystemCfConfig =
@@ -5030,6 +5105,46 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         expect(
           updatedTemplate.Resources.BasicLambdaFunction.Properties.Environment.Variables.MY_ENV_VAR
         ).to.equal('myvalue');
+
+        expect(originalVersionArn).to.not.equal(updatedVersionArn);
+      });
+
+      it('should create a different version if logging configuration changed', async () => {
+        const { servicePath: serviceDir, updateConfig } = await setupProgrammaticFixture(
+          'function',
+          {
+            configExt: {},
+          }
+        );
+
+        const { cfTemplate: originalTemplate } = await runServerless({
+          cwd: serviceDir,
+          command: 'package',
+        });
+
+        const originalVersionArn =
+          originalTemplate.Outputs.BasicLambdaFunctionQualifiedArn.Value.Ref;
+
+        await updateConfig({
+          functions: {
+            basic: {
+              logs: {
+                logGroupClass: 'infrequent_access',
+              },
+            },
+          },
+        });
+
+        const { cfTemplate: updatedTemplate } = await runServerless({
+          cwd: serviceDir,
+          command: 'package',
+        });
+
+        const updatedVersionArn = updatedTemplate.Outputs.BasicLambdaFunctionQualifiedArn.Value.Ref;
+
+        expect(updatedTemplate.Resources.BasicLambdaFunction.Properties).to.have.property(
+          'LoggingConfig'
+        );
 
         expect(originalVersionArn).to.not.equal(updatedVersionArn);
       });

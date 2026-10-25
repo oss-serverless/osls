@@ -806,6 +806,25 @@ functions:
       Name: data-protection-policy
 ```
 
+You can store a function's logs in the CloudWatch Logs [Infrequent Access log class](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch_Logs_Log_Classes.html), which costs less to ingest but supports fewer features, by setting `logs.logGroupClass` to `infrequent_access`. Setting `logs.lambda.logGroupClass` on the provider applies it to every function, and a function can opt back out with `standard`. As with the other `logs` settings, a function that sets its own `logs` doesn't inherit `logGroupClass` from the provider.
+
+```yaml
+provider:
+  logs:
+    lambda:
+      logGroupClass: infrequent_access
+
+functions:
+  hello:
+    handler: handler.hello
+  realTimeReports:
+    handler: handler.reports
+    logs:
+      logGroupClass: standard
+```
+
+AWS can't change the class of an existing log group, so osls creates an additional `/aws/lambda/<function name>-ia` log group, with the same retention and data protection policy, and points the function's logging configuration at it. The standard log group and the logs already in it are kept. Functions that use a custom IAM role need permission to write to the new log group. Switching a function back to `standard` deletes its Infrequent Access log group along with its logs. `osls logs` can't read Infrequent Access log groups, so use CloudWatch Logs Insights instead, and `logGroupClass` can't be combined with `logs.logGroup`.
+
 ## Versioning Deployed Functions
 
 By default, osls creates function versions for every deploy. This behavior is optional, and can be turned off in cases where you don't invoke past versions by their qualifier. If you would like to do this, you can invoke your functions as `arn:aws:lambda:....:function/myFunc:3` to invoke version 3 for example.
