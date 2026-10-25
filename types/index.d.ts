@@ -561,6 +561,7 @@ export interface AWS {
                 | 'CreateAuthChallenge'
                 | 'VerifyAuthChallengeResponse'
                 | 'UserMigration'
+                | 'InboundFederation'
                 | 'CustomSMSSender'
                 | 'CustomEmailSender';
               existing?: boolean;

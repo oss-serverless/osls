@@ -181,6 +181,20 @@ functions:
 
 **NOTE:** V2_0 and V3_0 require your user pool to be on the Essentials or Plus feature plan, as documented [by AWS](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-token-generation.html).
 
+### InboundFederation Trigger
+
+The [InboundFederation trigger](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-inbound-federation.html) lets a function add, override or suppress the attributes Cognito receives from an external SAML, OIDC or social identity provider before they are stored on the user profile. Cognito requires a `lambdaVersion` for this trigger and `V1_0` is the only supported value, so it is set automatically:
+
+```yml
+functions:
+  inboundFederation:
+    handler: inboundFederation.handler
+    events:
+      - cognitoUserPool:
+          pool: MyUserPool
+          trigger: InboundFederation
+```
+
 ### Custom Message Trigger Handlers
 
 For custom messages, you will need to check `event.triggerSource` type inside your handler function:
