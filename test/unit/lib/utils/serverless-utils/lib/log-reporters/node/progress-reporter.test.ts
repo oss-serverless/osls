@@ -50,9 +50,9 @@ describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/progress-r
     return { load, handlers, cliProgressFooter, progress, log, joinTextTokens, style };
   };
 
-  it('logs main events once and clears the progress footer', () => {
+  it('logs main events once and clears the progress footer', async () => {
     const { load, handlers, cliProgressFooter, progress, log, joinTextTokens, style } =
-      loadProgressReporter();
+      await loadProgressReporter();
     const setIntervalStub = sinon.stub(global, 'setInterval').returns(123);
     const clearIntervalStub = sinon.stub(global, 'clearInterval');
     sinon.stub(Date, 'now').returns(1000);
@@ -86,8 +86,8 @@ describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/progress-r
     expect(cliProgressFooter.updateProgress.lastCall).to.have.been.calledWithExactly();
   });
 
-  it('tracks and removes sub-progress items', () => {
-    const { load, handlers, cliProgressFooter, joinTextTokens } = loadProgressReporter();
+  it('tracks and removes sub-progress items', async () => {
+    const { load, handlers, cliProgressFooter, joinTextTokens } = await loadProgressReporter();
 
     load({ logLevelIndex: 2 });
     handlers.get('update')({

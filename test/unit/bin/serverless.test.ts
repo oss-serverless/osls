@@ -5,16 +5,21 @@ import esmock from 'esmock';
 const expect = chai.expect;
 
 describe('test/unit/bin/serverless.test.ts', () => {
+  let binModule;
+
+  // triage and run-compose are imported lazily (`await import()`), so the mocks must persist
   const loadBin = async (stubs) => {
-    delete require.cache[require.resolve('../../../bin/serverless.js')];
-    (await esmock('../../../bin/serverless.ts', stubs)).default;
+    binModule = await esmock.p('../../../bin/serverless.ts', stubs);
+    return binModule;
   };
 
   afterEach(() => {
     sinon.restore();
+    if (binModule) esmock.purge(binModule);
+    binModule = null;
   });
 
-  it('exits before CLI triage on unsupported Node versions', () => {
+  it('exits before CLI triage on unsupported Node versions', async () => {
     const isSupportedNodeVersion = sinon.stub().returns(false);
     isSupportedNodeVersion.supportedRange = '^20.19.0 || ^22.13.0 || >=24';
     const triage = sinon.stub();
@@ -24,13 +29,18 @@ describe('test/unit/bin/serverless.test.ts', () => {
       throw processExitError;
     });
 
-    expect(() => {
-      loadBin({
-        '../lib/cli/is-supported-node-version': isSupportedNodeVersion,
-        '../package.json': { version: '3.40.1' },
-        '../lib/cli/triage': triage,
+    let error;
+    try {
+      await loadBin({
+        '../../../lib/cli/is-supported-node-version.ts': isSupportedNodeVersion,
+        '../../../lib/utils/package-root.ts': { packageJson: { version: '3.40.1' } },
+        '../../../lib/cli/triage.ts': triage,
       });
-    }).to.throw(processExitError);
+    } catch (loadError) {
+      error = loadError;
+    }
+    stderrWrite.restore();
+    expect(error).to.equal(processExitError);
 
     expect(isSupportedNodeVersion).to.have.been.calledOnceWithExactly(process.version);
     expect(stderrWrite).to.have.been.calledOnceWithExactly(
@@ -44,18 +54,21 @@ describe('test/unit/bin/serverless.test.ts', () => {
 
   it('dispatches compose requests through run-compose on supported Node versions', async () => {
     const triage = sinon.stub().returns(Promise.resolve('@osls/compose'));
-    const runCompose = sinon.stub().resolves();
+    let resolveRunCompose;
+    const runComposeCalled = new Promise((resolve) => {
+      resolveRunCompose = resolve;
+    });
+    const runCompose = sinon.stub().callsFake(async () => resolveRunCompose());
     const isSupportedNodeVersion = sinon.stub().returns(true);
     isSupportedNodeVersion.supportedRange = '^20.19.0 || ^22.13.0 || >=24';
 
-    loadBin({
-      '../lib/cli/is-supported-node-version': isSupportedNodeVersion,
-      '../lib/utils/is-standalone-executable': false,
-      '../lib/cli/triage': triage,
-      '../lib/cli/run-compose': runCompose,
+    await loadBin({
+      '../../../lib/cli/is-supported-node-version.ts': isSupportedNodeVersion,
+      '../../../lib/cli/triage.ts': triage,
+      '../../../lib/cli/run-compose.ts': runCompose,
     });
 
-    await Promise.resolve();
+    await runComposeCalled;
 
     expect(triage).to.have.been.calledOnceWithExactly();
     expect(runCompose).to.have.been.calledOnceWithExactly();

@@ -19,7 +19,7 @@ const loadUntildify = async ({
 
   const untildify = (
     await esmock('../../../../lib/utils/untildify.ts', {
-      os: osStub,
+      'node:os': osStub,
     })
   ).default;
 
@@ -38,8 +38,8 @@ const expectErrorCode = (fn, code) => {
 };
 
 describe('test/unit/lib/utils/untildify.test.ts', () => {
-  it('throws on non-string input', () => {
-    const { untildify, osStub } = loadUntildify();
+  it('throws on non-string input', async () => {
+    const { untildify, osStub } = await loadUntildify();
 
     expect(() => untildify()).to.throw(TypeError, 'Expected a string, got undefined');
     expect(() => untildify(null)).to.throw(TypeError, 'Expected a string, got object');
@@ -49,8 +49,8 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
     expect(osStub.userInfo).to.not.have.been.called;
   });
 
-  it('expands regular home-relative paths', () => {
-    const { untildify, osStub } = loadUntildify();
+  it('expands regular home-relative paths', async () => {
+    const { untildify, osStub } = await loadUntildify();
 
     expect(untildify('~')).to.equal('/home/test-user');
     expect(untildify('~/service')).to.equal('/home/test-user/service');
@@ -60,8 +60,8 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
     expect(osStub.userInfo).to.not.have.been.called;
   });
 
-  it('returns paths unchanged when they do not start with an expandable tilde', () => {
-    const { untildify, osStub } = loadUntildify();
+  it('returns paths unchanged when they do not start with an expandable tilde', async () => {
+    const { untildify, osStub } = await loadUntildify();
 
     expect(untildify('service')).to.equal('service');
     expect(untildify('/tmp/~service')).to.equal('/tmp/~service');
@@ -71,8 +71,8 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
     expect(osStub.userInfo).to.not.have.been.called;
   });
 
-  it('rejects another user home path', () => {
-    const { untildify, osStub } = loadUntildify({ username: 'current-user' });
+  it('rejects another user home path', async () => {
+    const { untildify, osStub } = await loadUntildify({ username: 'current-user' });
 
     expectErrorCode(() => untildify('~other-user/service'), 'UNSUPPORTED_HOME_DIRECTORY_EXPANSION');
 
@@ -80,8 +80,8 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
     expect(osStub.userInfo).to.have.been.calledOnce;
   });
 
-  it('expands current user home paths', () => {
-    const { untildify, osStub } = loadUntildify({
+  it('expands current user home paths', async () => {
+    const { untildify, osStub } = await loadUntildify({
       homeDirectory: '/Users/current-user',
       username: 'current-user',
     });
@@ -104,7 +104,7 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
 
     const untildify = (
       await esmock('../../../../lib/utils/untildify.ts', {
-        os: osStub,
+        'node:os': osStub,
       })
     ).default;
 
@@ -124,7 +124,7 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
 
     const untildify = (
       await esmock('../../../../lib/utils/untildify.ts', {
-        os: osStub,
+        'node:os': osStub,
       })
     ).default;
 
@@ -137,8 +137,8 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
     expect(osStub.userInfo).to.have.been.calledOnce;
   });
 
-  it('throws for regular tilde paths when no home directory is available', () => {
-    const { untildify, osStub } = loadUntildify({ homeDirectory: '' });
+  it('throws for regular tilde paths when no home directory is available', async () => {
+    const { untildify, osStub } = await loadUntildify({ homeDirectory: '' });
 
     expectErrorCode(() => untildify('~/service'), 'HOME_DIRECTORY_UNAVAILABLE');
 
@@ -146,8 +146,8 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
     expect(osStub.userInfo).to.not.have.been.called;
   });
 
-  it('throws for current user home paths when no home directory is available', () => {
-    const { untildify, osStub } = loadUntildify({ homeDirectory: '', username: 'test-user' });
+  it('throws for current user home paths when no home directory is available', async () => {
+    const { untildify, osStub } = await loadUntildify({ homeDirectory: '', username: 'test-user' });
 
     expectErrorCode(() => untildify('~test-user/service'), 'HOME_DIRECTORY_UNAVAILABLE');
 
@@ -155,16 +155,16 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
     expect(osStub.userInfo).to.have.been.calledOnce;
   });
 
-  it('throws a controlled error when home directory lookup fails', () => {
-    const { untildify } = loadUntildify({ homedirError: new Error('home lookup failed') });
+  it('throws a controlled error when home directory lookup fails', async () => {
+    const { untildify } = await loadUntildify({ homedirError: new Error('home lookup failed') });
 
     const error = expectErrorCode(() => untildify('~/service'), 'HOME_DIRECTORY_UNAVAILABLE');
 
     expect(error.message).to.include('home lookup failed');
   });
 
-  it('throws a controlled error when current user lookup fails', () => {
-    const { untildify, osStub } = loadUntildify({
+  it('throws a controlled error when current user lookup fails', async () => {
+    const { untildify, osStub } = await loadUntildify({
       userInfoError: new Error('user lookup failed'),
     });
 
@@ -177,8 +177,8 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
     expect(osStub.homedir).to.not.have.been.called;
   });
 
-  it('throws a controlled error when current username is unavailable', () => {
-    const { untildify, osStub } = loadUntildify({ username: '' });
+  it('throws a controlled error when current username is unavailable', async () => {
+    const { untildify, osStub } = await loadUntildify({ username: '' });
 
     expectErrorCode(() => untildify('~test-user/service'), 'CURRENT_USER_UNAVAILABLE');
 
@@ -186,8 +186,8 @@ describe('test/unit/lib/utils/untildify.test.ts', () => {
     expect(osStub.userInfo).to.have.been.calledOnce;
   });
 
-  it('expands home paths without interpreting replacement tokens in the home directory', () => {
-    const { untildify } = loadUntildify({ homeDirectory: '/home/$&user' });
+  it('expands home paths without interpreting replacement tokens in the home directory', async () => {
+    const { untildify } = await loadUntildify({ homeDirectory: '/home/$&user' });
 
     expect(untildify('~/service')).to.equal('/home/$&user/service');
   });

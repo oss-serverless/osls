@@ -103,9 +103,9 @@ const assertRedaction = async ({ args, redacted, visible = [] }) => {
 };
 
 describe('spawn', () => {
-  it('rejects shell-enabled spawns synchronously before spawning', () => {
+  it('rejects shell-enabled spawns synchronously before spawning', async () => {
     const crossSpawnStub = sinon.stub();
-    const spawnWithStubs = loadSpawnWithStubs({
+    const spawnWithStubs = await loadSpawnWithStubs({
       'cross-spawn': crossSpawnStub,
     });
 
@@ -130,9 +130,9 @@ describe('spawn', () => {
     expect(error.message).to.equal('Refusing to spawn command with null bytes.');
   });
 
-  it('enforces spawn policy for sync spawns', () => {
+  it('enforces spawn policy for sync spawns', async () => {
     const crossSpawnStub = { sync: sinon.stub() };
-    const spawnSyncWithStubs = loadSpawnSyncWithStubs({
+    const spawnSyncWithStubs = await loadSpawnSyncWithStubs({
       'cross-spawn': crossSpawnStub,
     });
 
@@ -226,7 +226,7 @@ describe('spawn', () => {
 
   it('buffers output without concatenating on each chunk or retaining unread std', async () => {
     const child = createFakeChild();
-    const spawnWithStubs = loadSpawnWithStubs({
+    const spawnWithStubs = await loadSpawnWithStubs({
       'cross-spawn': () => child,
     });
     const concatSpy = sinon.spy(Buffer, 'concat');
@@ -288,9 +288,9 @@ describe('spawn', () => {
       }
     }
 
-    const spawnWithStubs = loadSpawnWithStubs({
+    const spawnWithStubs = await loadSpawnWithStubs({
       'cross-spawn': () => child,
-      'stream': { PassThrough: BackpressurePassThrough },
+      'node:stream': { PassThrough: BackpressurePassThrough },
     });
     const execution = spawnWithStubs('fake-command');
     const stdChunks = [];

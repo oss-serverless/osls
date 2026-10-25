@@ -79,7 +79,7 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-c
     };
     variablesMeta = resolveMeta(configuration);
 
-    const source = loadSource(({ StackName }, { region }) => {
+    const source = await loadSource(({ StackName }, { region }) => {
       if (StackName === 'existing') {
         return {
           Stacks: [

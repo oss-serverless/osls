@@ -2,8 +2,7 @@ import * as sinon from 'sinon';
 import provisionTempDir from '../../../../lib/provision-tmp-dir.ts';
 import { join } from 'node:path';
 import { expect } from 'chai';
-import { promises as fsp } from 'node:fs';
-import fs from 'node:fs';
+import fs, { promises as fsp } from 'node:fs';
 import safeMoveFile from '../../../../../lib/utils/fs/safe-move-file.ts';
 import { ensureFileSync, remove } from '../../../../utils/fs.ts';
 import esmock from 'esmock';
@@ -177,7 +176,7 @@ describe('test/unit/lib/utils/fs/safeMoveFile.test.ts', () => {
 
     it('retries on Windows and succeeds once the lock clears', async () => {
       setPlatform('win32');
-      loadSafeMoveFileWithStubbedSleep();
+      await loadSafeMoveFileWithStubbedSleep();
       renameStub.onFirstCall().rejects(createFakeEpermError());
 
       await safeMoveFileWithStubbedSleep(sourceFile, destinationFile);
@@ -190,7 +189,7 @@ describe('test/unit/lib/utils/fs/safeMoveFile.test.ts', () => {
 
     it('rethrows the EPERM once the retries are exhausted', async () => {
       setPlatform('win32');
-      loadSafeMoveFileWithStubbedSleep();
+      await loadSafeMoveFileWithStubbedSleep();
       renameStub.rejects(createFakeEpermError());
 
       await expect(safeMoveFileWithStubbedSleep(sourceFile, destinationFile)).to.be.rejectedWith(
@@ -203,7 +202,7 @@ describe('test/unit/lib/utils/fs/safeMoveFile.test.ts', () => {
 
     it('does not retry EPERM on non-Windows platforms', async () => {
       setPlatform('linux');
-      loadSafeMoveFileWithStubbedSleep();
+      await loadSafeMoveFileWithStubbedSleep();
       renameStub.rejects(createFakeEpermError());
 
       await expect(safeMoveFileWithStubbedSleep(sourceFile, destinationFile)).to.be.rejectedWith(

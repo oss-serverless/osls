@@ -77,7 +77,7 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-a
     if (configExt) configuration = mergePlainObjects(configuration, configExt);
     variablesMeta = resolveMeta(configuration);
     const serverlessInstance = createServerlessInstance();
-    const getAwsSource = loadSource(handler || (() => ({ Account: '1234567890' })));
+    const getAwsSource = await loadSource(handler || (() => ({ Account: '1234567890' })));
 
     await resolve({
       serviceDir: process.cwd(),
@@ -170,7 +170,7 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-a
   });
 
   it('should ignore inherited region from options', async () => {
-    const getAwsSource = loadSource(() => ({ Account: '1234567890' }));
+    const getAwsSource = await loadSource(() => ({ Account: '1234567890' }));
     const source = getAwsSource(createServerlessInstance());
     const result = await source.resolve({
       address: 'region',

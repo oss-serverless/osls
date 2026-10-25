@@ -38,13 +38,14 @@ const writeJsonConfiguration = async (serviceDir, configuration, rawJson) => {
   };
 };
 
-describe('test/unit/commands/plugin-install.test.ts', async () => {
-  const spawnFake = sinon.fake();
-  const installPlugin = (
-    await esmock('../../../commands/plugin-install.ts', {
-      '../../../lib/utils/spawn.ts': spawnFake,
-    })
-  ).default;
+const spawnFake = sinon.fake();
+const installPlugin = (
+  await esmock('../../../commands/plugin-install.ts', {
+    '../../../lib/utils/spawn.ts': spawnFake,
+  })
+).default;
+
+describe('test/unit/commands/plugin-install.test.ts', () => {
   const pluginName = 'serverless-plugin-1';
 
   const expectInstallSpawn = (serviceDir, packageSpec, { allowInstallScripts = false } = {}) => {

@@ -22,23 +22,23 @@ const writeFakeComposeBin = async (rootDir) => {
   return composeBinPath;
 };
 
+const loadedModules = [];
+
+// progress-footer is imported lazily (`await import()`), so the mocks must persist
 const loadRunCompose = async ({
   spawnStub,
   inquirerStub,
   progressFooterFactoryStub,
   fsStub,
 } = {}) => {
-  const modulePath = '../../../../lib/cli/run-compose';
-  delete require.cache[require.resolve(modulePath)];
-
-  return (
-    await esmock(modulePath, {
-      '../utils/spawn': spawnStub,
-      '../utils/serverless-utils/inquirer': inquirerStub,
-      '../utils/progress-footer': progressFooterFactoryStub,
-      ...(fsStub ? { fs: fsStub } : {}),
-    })
-  ).default;
+  const runComposeModule = await esmock.p('../../../../lib/cli/run-compose.ts', {
+    '../../../../lib/utils/spawn.ts': spawnStub,
+    '../../../../lib/utils/serverless-utils/inquirer/index.ts': inquirerStub,
+    '../../../../lib/utils/progress-footer.ts': progressFooterFactoryStub,
+    ...(fsStub ? { 'node:fs': fsStub } : {}),
+  });
+  loadedModules.push(runComposeModule);
+  return runComposeModule.default;
 };
 
 describe('test/unit/lib/cli/run-compose.test.ts', () => {
@@ -84,6 +84,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
     process.exitCode = originalExitCode;
     delete global.__runComposeCalls;
     sinon.restore();
+    for (const loadedModule of loadedModules.splice(0)) esmock.purge(loadedModule);
     await remove(serviceDir);
   });
 
@@ -95,7 +96,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
 
     const spawnStub = sinon.stub();
     const inquirerStub = { prompt: sinon.stub() };
-    const runCompose = loadRunCompose({
+    const runCompose = await loadRunCompose({
       spawnStub,
       inquirerStub,
       progressFooterFactoryStub: sinon.stub(),
@@ -123,7 +124,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
     });
 
     const inquirerStub = { prompt: sinon.stub() };
-    const runCompose = loadRunCompose({
+    const runCompose = await loadRunCompose({
       spawnStub,
       inquirerStub,
       progressFooterFactoryStub: sinon.stub(),
@@ -151,7 +152,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
     const inquirerStub = {
       prompt: sinon.stub().resolves({ shouldInstallCompose: false }),
     };
-    const runCompose = loadRunCompose({
+    const runCompose = await loadRunCompose({
       spawnStub,
       inquirerStub,
       progressFooterFactoryStub: sinon.stub(),
@@ -187,7 +188,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
       prompt: sinon.stub().resolves({ shouldInstallCompose: true }),
     };
     const progressFooter = createProgressFooter();
-    const runCompose = loadRunCompose({
+    const runCompose = await loadRunCompose({
       spawnStub,
       inquirerStub,
       progressFooterFactoryStub: sinon.stub().returns(progressFooter),
@@ -219,7 +220,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
       prompt: sinon.stub().resolves({ shouldInstallCompose: true }),
     };
     const progressFooter = createProgressFooter();
-    const runCompose = loadRunCompose({
+    const runCompose = await loadRunCompose({
       spawnStub,
       inquirerStub,
       progressFooterFactoryStub: sinon.stub().returns(progressFooter),
@@ -255,7 +256,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
       prompt: sinon.stub().resolves({ shouldInstallCompose: true }),
     };
     const progressFooter = createProgressFooter();
-    const runCompose = loadRunCompose({
+    const runCompose = await loadRunCompose({
       spawnStub,
       inquirerStub,
       progressFooterFactoryStub: sinon.stub().returns(progressFooter),
@@ -293,7 +294,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
       throw new Error(`Unexpected spawn: ${command} ${args.join(' ')}`);
     });
 
-    const runCompose = loadRunCompose({
+    const runCompose = await loadRunCompose({
       spawnStub,
       inquirerStub: { prompt: sinon.stub() },
       progressFooterFactoryStub: sinon.stub(),
@@ -319,7 +320,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
       throw new Error(`Unexpected spawn: ${command} ${args.join(' ')}`);
     });
 
-    const runCompose = loadRunCompose({
+    const runCompose = await loadRunCompose({
       spawnStub,
       inquirerStub: { prompt: sinon.stub() },
       progressFooterFactoryStub: sinon.stub(),
@@ -358,7 +359,7 @@ describe('test/unit/lib/cli/run-compose.test.ts', () => {
       throw new Error(`Unexpected spawn: ${command} ${args.join(' ')}`);
     });
 
-    const runCompose = loadRunCompose({
+    const runCompose = await loadRunCompose({
       spawnStub,
       inquirerStub: { prompt: sinon.stub() },
       progressFooterFactoryStub: sinon.stub(),

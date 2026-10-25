@@ -1,4 +1,5 @@
-#!/usr/bin/env node// Setup log writing
+#!/usr/bin/env node
+// Setup log writing
 import '../lib/utils/serverless-utils/log-reporters/node.ts';
 
 import { log, progress } from '../lib/utils/serverless-utils/log.ts';

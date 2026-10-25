@@ -1,8 +1,14 @@
 import * as chai from 'chai';
 import * as sinon from 'sinon';
+import { fileURLToPath } from 'node:url';
 import esmock from 'esmock';
 
 const { expect } = chai;
+
+// esmock resolves package names with the "module"/"import" export conditions, which point
+// @smithy/core/config at a bundler-only ES build. Node.js loads the "node" (CommonJS) build, so
+// the mock is keyed by the path Node.js resolves
+const smithyCoreConfigPath = fileURLToPath(import.meta.resolve('@smithy/core/config'));
 
 describe('test/unit/lib/aws/sso-login.test.ts', () => {
   let originalEnv;
@@ -89,8 +95,8 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
     });
   }
 
-  function loadWrappedSsoProvider(provider, { requestHandler = {}, ...loadOptions } = {}) {
-    const loaded = loadSsoLogin({
+  async function loadWrappedSsoProvider(provider, { requestHandler = {}, ...loadOptions } = {}) {
+    const loaded = await loadSsoLogin({
       profiles: {
         dev: {
           sso_start_url: 'https://example.awsapps.com/start',
@@ -138,13 +144,13 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
           SSOOIDCClient: FakeSSOOIDCClient,
           StartDeviceAuthorizationCommand,
         },
-        '@smithy/core/config': {
+        [smithyCoreConfigPath]: {
           getSSOTokenFilepath: getTokenPath,
           loadSsoSessionData: loadSsoSessionData || sinon.stub().resolves(sessions),
           parseKnownFiles: parseKnownFiles || sinon.stub().resolves(profiles),
         },
         '../../../../lib/utils/serverless-utils/log.ts': { writeText: writeTextStub },
-        'fs': {
+        'node:fs': {
           promises: {
             mkdir: mkdirStub,
           },
@@ -183,7 +189,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
   });
 
   it('resolves modern SSO profile config with SDK-compatible session parsing', async () => {
-    const { ssoLogin } = loadSsoLogin({
+    const { ssoLogin } = await loadSsoLogin({
       profiles: {
         dev: {
           sso_session: 'my-sso',
@@ -219,7 +225,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
   });
 
   it('uses the legacy start URL as the cache key and default scopes', async () => {
-    const { ssoLogin } = loadSsoLogin({
+    const { ssoLogin } = await loadSsoLogin({
       profiles: {
         legacy: {
           sso_start_url: 'https://legacy.awsapps.com/start',
@@ -243,7 +249,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
   });
 
   it('follows role-chaining source profiles to the SSO configuration', async () => {
-    const { ssoLogin } = loadSsoLogin({
+    const { ssoLogin } = await loadSsoLogin({
       profiles: {
         'dev': {
           role_arn: 'arn:aws:iam::123456789012:role/Deploy',
@@ -276,7 +282,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
     // During role chaining, fromIni routes a source profile carrying
     // credential_source (without role_arn) to IMDS/ECS/environment credentials,
     // ignoring its sso_* keys
-    const { ssoLogin } = loadSsoLogin({
+    const { ssoLogin } = await loadSsoLogin({
       profiles: {
         dev: {
           role_arn: 'arn:aws:iam::123456789012:role/Deploy',
@@ -304,7 +310,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
   it('resolves no SSO config when the profile resolves through a non-SSO source', async () => {
     // fromIni prioritizes credential_process over the sso_* keys, so a login
     // could not fix the failure
-    const { ssoLogin } = loadSsoLogin({
+    const { ssoLogin } = await loadSsoLogin({
       profiles: {
         dev: {
           credential_process: '/usr/local/bin/aws-creds',
@@ -326,7 +332,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
   });
 
   it('resolves no SSO config when the profile is a web identity profile', async () => {
-    const { ssoLogin } = loadSsoLogin({
+    const { ssoLogin } = await loadSsoLogin({
       profiles: {
         dev: {
           web_identity_token_file: '/var/run/token',
@@ -351,7 +357,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
   it('resolves SSO config when a web identity token file lacks role_arn', async () => {
     // fromIni only routes to web identity when role_arn is present; a stale
     // web_identity_token_file alone must not suppress SSO recovery
-    const { ssoLogin } = loadSsoLogin({
+    const { ssoLogin } = await loadSsoLogin({
       profiles: {
         dev: {
           web_identity_token_file: '/var/run/token',
@@ -374,7 +380,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
 
   it('rethrows non-credential errors without attempting login', async () => {
     const originalError = new Error('unrelated failure');
-    const { wrappedProvider } = loadWrappedSsoProvider(sinon.stub().rejects(originalError));
+    const { wrappedProvider } = await loadWrappedSsoProvider(sinon.stub().rejects(originalError));
 
     const error = await captureRejection(wrappedProvider());
 
@@ -384,7 +390,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
 
   it('preserves non-SSO credential errors', async () => {
     const originalError = createCredentialsProviderError('static credential failure');
-    const { wrappedProvider } = loadWrappedSsoProvider(sinon.stub().rejects(originalError), {
+    const { wrappedProvider } = await loadWrappedSsoProvider(sinon.stub().rejects(originalError), {
       profiles: {
         dev: {
           aws_access_key_id: 'key',
@@ -412,7 +418,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
         clientSecretExpiresAt: 1783276800,
       }),
     });
-    const { wrappedProvider, writeFileAtomic, writeText } = loadWrappedSsoProvider(provider, {
+    const { wrappedProvider, writeFileAtomic, writeText } = await loadWrappedSsoProvider(provider, {
       requestHandler: { handler: true },
       profiles: {
         dev: {
@@ -480,7 +486,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
         verificationUri: 'https://device.sso.aws/verify',
       },
     });
-    const { wrappedProvider, writeText } = loadWrappedSsoProvider(provider);
+    const { wrappedProvider, writeText } = await loadWrappedSsoProvider(provider);
 
     const resultPromise = wrappedProvider();
     await clock.tickAsync(1000);
@@ -513,7 +519,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
         };
       },
     });
-    const { wrappedProvider } = loadWrappedSsoProvider(provider);
+    const { wrappedProvider } = await loadWrappedSsoProvider(provider);
 
     const resultPromise = wrappedProvider();
     await clock.tickAsync(1000);
@@ -538,7 +544,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
       resolveRegistration = resolve;
     });
     stubOidcFlow({ register: () => registrationPromise });
-    const { wrappedProvider } = loadWrappedSsoProvider(provider);
+    const { wrappedProvider } = await loadWrappedSsoProvider(provider);
 
     const firstResult = wrappedProvider();
     const secondResult = wrappedProvider();
@@ -579,7 +585,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
         };
       },
     });
-    const { wrappedProvider } = loadWrappedSsoProvider(provider);
+    const { wrappedProvider } = await loadWrappedSsoProvider(provider);
 
     const firstError = captureRejection(wrappedProvider());
     await clock.tickAsync(1000);
@@ -603,7 +609,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
     provider.onCall(2).rejects(createCredentialsProviderError());
     provider.onCall(3).resolves({ accessKeyId: 'second', secretAccessKey: 'secret' });
     stubOidcFlow();
-    const { wrappedProvider } = loadWrappedSsoProvider(provider);
+    const { wrappedProvider } = await loadWrappedSsoProvider(provider);
 
     const firstResult = wrappedProvider();
     await clock.tickAsync(1000);
@@ -623,7 +629,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
 
   it('rethrows the original provider error when SSO detection itself fails', async () => {
     const originalError = createCredentialsProviderError('original provider failure');
-    const { wrappedProvider } = loadWrappedSsoProvider(sinon.stub().rejects(originalError), {
+    const { wrappedProvider } = await loadWrappedSsoProvider(sinon.stub().rejects(originalError), {
       parseKnownFiles: sinon.stub().rejects(new Error('config file unreadable')),
     });
 
@@ -643,7 +649,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
         throw deniedError;
       },
     });
-    const { wrappedProvider } = loadWrappedSsoProvider(
+    const { wrappedProvider } = await loadWrappedSsoProvider(
       sinon.stub().rejects(createCredentialsProviderError())
     );
 
@@ -662,7 +668,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
         throw Object.assign(new Error('device code expired'), { name: 'ExpiredTokenException' });
       },
     });
-    const { wrappedProvider } = loadWrappedSsoProvider(
+    const { wrappedProvider } = await loadWrappedSsoProvider(
       sinon.stub().rejects(createCredentialsProviderError())
     );
 
@@ -675,7 +681,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
   it('maps an authorization wall-clock timeout to AWS_SSO_LOGIN_EXPIRED', async () => {
     const clock = sinon.useFakeTimers(new Date('2026-07-05T12:00:00.000Z'));
     stubOidcFlow({ authorization: { expiresIn: 0 } });
-    const { wrappedProvider } = loadWrappedSsoProvider(
+    const { wrappedProvider } = await loadWrappedSsoProvider(
       sinon.stub().rejects(createCredentialsProviderError())
     );
 
@@ -691,7 +697,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
   it('maps an incomplete OIDC response to AWS_SSO_LOGIN_INVALID_RESPONSE', async () => {
     const clock = sinon.useFakeTimers(new Date('2026-07-05T12:00:00.000Z'));
     stubOidcFlow({ createToken: () => ({ expiresIn: 3600 }) });
-    const { wrappedProvider } = loadWrappedSsoProvider(
+    const { wrappedProvider } = await loadWrappedSsoProvider(
       sinon.stub().rejects(createCredentialsProviderError())
     );
 
@@ -711,7 +717,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
         throw unknownError;
       },
     });
-    const { wrappedProvider } = loadWrappedSsoProvider(
+    const { wrappedProvider } = await loadWrappedSsoProvider(
       sinon.stub().rejects(createCredentialsProviderError())
     );
 
@@ -727,7 +733,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
     const clock = sinon.useFakeTimers(new Date('2026-07-05T12:00:00.000Z'));
     const providerError = createCredentialsProviderError('user is not assigned to the role');
     stubOidcFlow();
-    const { wrappedProvider } = loadWrappedSsoProvider(sinon.stub().rejects(providerError));
+    const { wrappedProvider } = await loadWrappedSsoProvider(sinon.stub().rejects(providerError));
 
     const firstError = captureRejection(wrappedProvider());
     await clock.tickAsync(1000);
@@ -746,7 +752,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
   it('fails before OIDC calls in CI, preserving the original error details', async () => {
     process.env.CI = '1';
     const originalError = createCredentialsProviderError('the SSO session has expired');
-    const { wrappedProvider } = loadWrappedSsoProvider(sinon.stub().rejects(originalError));
+    const { wrappedProvider } = await loadWrappedSsoProvider(sinon.stub().rejects(originalError));
 
     const error = await captureRejection(wrappedProvider());
 
@@ -762,7 +768,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
     FakeSSOOIDCClient.send.rejects(
       Object.assign(new Error('registration failed'), { name: 'InternalServerException' })
     );
-    const { wrappedProvider } = loadWrappedSsoProvider(
+    const { wrappedProvider } = await loadWrappedSsoProvider(
       sinon.stub().rejects(createCredentialsProviderError())
     );
 
@@ -779,7 +785,7 @@ describe('test/unit/lib/aws/sso-login.test.ts', () => {
     FakeSSOOIDCClient.send.rejects(
       Object.assign(new Error('registration failed'), { name: 'InternalServerException' })
     );
-    const { wrappedProvider } = loadWrappedSsoProvider(
+    const { wrappedProvider } = await loadWrappedSsoProvider(
       sinon.stub().rejects(createCredentialsProviderError())
     );
 

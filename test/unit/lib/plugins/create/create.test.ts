@@ -23,15 +23,16 @@ const loadCreate = async ({
   const renameServiceStub = sinon.stub();
 
   const stubs = {
-    '../../utils/download-template-from-repo': {
+    '../../../../../lib/utils/download-template-from-repo.ts': {
       downloadTemplateFromRepo: downloadTemplateFromRepoStub || sinon.stub(),
     },
-    '../../utils/fs/dir-exists-sync': dirExistsSyncStub || sinon.stub().returns(false),
-    '../../utils/fs/copy-dir-contents-sync': copyDirContentsSyncStub,
-    '../../utils/rename-service': {
+    '../../../../../lib/utils/fs/dir-exists-sync.ts':
+      dirExistsSyncStub || sinon.stub().returns(false),
+    '../../../../../lib/utils/fs/copy-dir-contents-sync.ts': copyDirContentsSyncStub,
+    '../../../../../lib/utils/rename-service.ts': {
       renameService: renameServiceStub,
     },
-    '../../utils/serverless-utils/log': {
+    '../../../../../lib/utils/serverless-utils/log.ts': {
       progress: {
         get: () => ({ notice: sinon.stub() }),
       },
@@ -43,7 +44,7 @@ const loadCreate = async ({
       },
     },
   };
-  if (untildifyStub) stubs['../../utils/untildify'] = untildifyStub;
+  if (untildifyStub) stubs['../../../../../lib/utils/untildify.ts'] = untildifyStub;
 
   const Create = (await esmock('../../../../../lib/plugins/create/create.ts', stubs)).default;
 
@@ -116,9 +117,9 @@ describe('test/unit/lib/plugins/create/create.test.ts', () => {
         options
       );
 
-    beforeEach(() => {
+    beforeEach(async () => {
       downloadTemplateFromRepoStub = sinon.stub();
-      ({ Create, noticeSuccessStub } = loadCreate({ downloadTemplateFromRepoStub }));
+      ({ Create, noticeSuccessStub } = await loadCreate({ downloadTemplateFromRepoStub }));
     });
 
     it('should report the name-based target directory when --name is provided without --path', async () => {
@@ -276,7 +277,7 @@ describe('test/unit/lib/plugins/create/create.test.ts', () => {
   describe('local template path flow', () => {
     it('should default the target directory to the template folder name', async () => {
       const { Create, copyDirContentsSyncStub, noticeSuccessStub, renameServiceStub } =
-        loadCreate();
+        await loadCreate();
 
       await new Create(
         {
@@ -301,7 +302,7 @@ describe('test/unit/lib/plugins/create/create.test.ts', () => {
 
     it('should expand a home-relative local template path before copying', async () => {
       const { Create, copyDirContentsSyncStub, noticeSuccessStub, renameServiceStub } =
-        loadCreate();
+        await loadCreate();
 
       await new Create(
         {
@@ -330,7 +331,7 @@ describe('test/unit/lib/plugins/create/create.test.ts', () => {
         'Cannot expand path "~/aws": home directory could not be resolved.',
         'HOME_DIRECTORY_UNAVAILABLE'
       );
-      const { Create, copyDirContentsSyncStub, renameServiceStub } = loadCreate({
+      const { Create, copyDirContentsSyncStub, renameServiceStub } = await loadCreate({
         untildifyStub: sinon.stub().throws(expansionError),
       });
 
@@ -357,7 +358,7 @@ describe('test/unit/lib/plugins/create/create.test.ts', () => {
 
     it('should default the service name to the target directory basename when only --path is provided', async () => {
       const { Create, copyDirContentsSyncStub, noticeSuccessStub, renameServiceStub } =
-        loadCreate();
+        await loadCreate();
       const targetPath = 'nested/service-directory';
       const expectedServiceDir = path.resolve(process.cwd(), targetPath);
 
@@ -387,7 +388,7 @@ describe('test/unit/lib/plugins/create/create.test.ts', () => {
 
     it('should expand a home-relative local target path while reporting the original path', async () => {
       const { Create, copyDirContentsSyncStub, noticeSuccessStub, renameServiceStub } =
-        loadCreate();
+        await loadCreate();
       const targetPath = '~/nested/service-directory';
       const expectedServiceDir = path.join(os.homedir(), 'nested', 'service-directory');
 
@@ -414,7 +415,7 @@ describe('test/unit/lib/plugins/create/create.test.ts', () => {
     });
 
     it('should report the provided local target path when the directory already exists', async () => {
-      const { Create } = loadCreate({
+      const { Create } = await loadCreate({
         dirExistsSyncStub: sinon.stub().returns(true),
       });
 

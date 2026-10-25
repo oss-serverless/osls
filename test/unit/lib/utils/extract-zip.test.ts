@@ -10,7 +10,7 @@ import esmock from 'esmock';
 const fsp = fs.promises;
 
 const loadExtractZipWithFs = async (fsStub) =>
-  (await esmock('../../../../lib/utils/extract-zip.ts', { fs: fsStub })).default;
+  (await esmock('../../../../lib/utils/extract-zip.ts', { 'node:fs': fsStub })).default;
 
 const createZipBuffer = (entries) =>
   new Promise((resolve, reject) => {
@@ -291,7 +291,7 @@ describe('extractZip', () => {
         },
       },
     };
-    const { extractZip: extractZipWithFsStub } = loadExtractZipWithFs(fsStub);
+    const { extractZip: extractZipWithFsStub } = await loadExtractZipWithFs(fsStub);
     const zipBuffer = await createZipBuffer([{ path: 'file.txt', data: 'fixture' }]);
 
     await extractZipWithFsStub(zipBuffer, tmpDir);
@@ -318,7 +318,7 @@ describe('extractZip', () => {
         },
       },
     };
-    const { extractZip: extractZipWithFsStub } = loadExtractZipWithFs(fsStub);
+    const { extractZip: extractZipWithFsStub } = await loadExtractZipWithFs(fsStub);
     const targetPath = path.join(tmpDir, 'file.txt');
     const zipBuffer = await createZipBuffer([{ path: 'file.txt', data: 'changed' }]);
 

@@ -14,7 +14,7 @@ const { expect } = chai;
 const loadUntildifyWithHome = async (homeDirectory) =>
   (
     await esmock('../../../../lib/utils/untildify.ts', {
-      os: {
+      'node:os': {
         homedir: () => homeDirectory,
         userInfo: () => ({ username: 'test-user' }),
       },
@@ -308,7 +308,7 @@ describe('downloadTemplateFromRepo', () => {
           '../../../../lib/utils/serverless-utils/download.ts': downloadStub,
           '../../../../lib/utils/spawn.ts': spawnStub,
           '../../../../lib/utils/fs/remove.ts': { removeSync: removeSyncStub },
-          '../../../../lib/utils/untildify.ts': loadUntildifyWithHome(fakeHome),
+          '../../../../lib/utils/untildify.ts': await loadUntildifyWithHome(fakeHome),
         })
       ).default.downloadTemplateFromRepo;
 
@@ -368,7 +368,7 @@ describe('downloadTemplateFromRepo', () => {
           '../../../../lib/utils/serverless-utils/download.ts': downloadStub,
           '../../../../lib/utils/spawn.ts': spawnStub,
           '../../../../lib/utils/fs/remove.ts': { removeSync: removeSyncStub },
-          '../../../../lib/utils/untildify.ts': loadUntildifyWithHome(fakeHome),
+          '../../../../lib/utils/untildify.ts': await loadUntildifyWithHome(fakeHome),
         })
       ).default.downloadTemplateFromRepo;
       fs.mkdirSync(expandedPath, { recursive: true });

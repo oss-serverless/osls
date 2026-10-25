@@ -85,7 +85,7 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-s
     };
     variablesMeta = resolveMeta(configuration);
 
-    const source = loadSource(({ Name, WithDecryption }, { region }) => {
+    const source = await loadSource(({ Name, WithDecryption }, { region }) => {
       if (Name === 'existing') {
         return { Parameter: { Type: 'String', Value: region === 'eu-west-1' ? region : 'value' } };
       }

@@ -21,7 +21,7 @@ describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/style.test
       await esmock(
         '../../../../../../../../lib/utils/serverless-utils/lib/log-reporters/node/style.ts',
         {
-          'ext/function/identity': (value) => value,
+          'ext/function/identity.js': (value) => value,
           '../../../../../../../../lib/utils/colors.ts': {
             stderrColors: {
               gray: (value) => `stderr-gray(${value})`,

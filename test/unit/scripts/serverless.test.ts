@@ -6,7 +6,7 @@ import packageModule from '../../../package.json' with { type: 'json' };
 import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
 const { version } = packageModule;
 
-const serverlessPath = path.resolve(import.meta.dirname, '../../../scripts/serverless.js');
+const serverlessPath = path.resolve(import.meta.dirname, '../../../scripts/serverless.ts');
 const programmaticFixturesPath = path.resolve(import.meta.dirname, '../../fixtures/programmatic');
 const cliFixturesPath = path.resolve(import.meta.dirname, '../../fixtures/cli');
 

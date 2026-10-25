@@ -1,7 +1,6 @@
 import path from 'node:path';
 import * as chai from 'chai';
-import fs from 'node:fs';
-import { promises as fsp } from 'node:fs';
+import fs, { promises as fsp } from 'node:fs';
 import * as sinon from 'sinon';
 import { load as yamlParse } from 'js-yaml';
 import createFromLocalTemplate from '../../../../lib/utils/create-from-local-template.ts';
@@ -17,7 +16,7 @@ const expect = chai.expect;
 const loadUntildifyWithHome = async (homeDirectory) =>
   (
     await esmock('../../../../lib/utils/untildify.ts', {
-      os: {
+      'node:os': {
         homedir: () => homeDirectory,
         userInfo: () => ({ username: 'test-user' }),
       },
@@ -43,7 +42,7 @@ describe('test/unit/lib/utils/create-from-local-template.test.ts', () => {
       const projectDir = path.join(getTmpDirPath(), 'some-service');
       const createFromLocalTemplateWithFakeHome = (
         await esmock('../../../../lib/utils/create-from-local-template.ts', {
-          '../../../../lib/utils/untildify.ts': loadUntildifyWithHome(fakeHome),
+          '../../../../lib/utils/untildify.ts': await loadUntildifyWithHome(fakeHome),
         })
       ).default;
 

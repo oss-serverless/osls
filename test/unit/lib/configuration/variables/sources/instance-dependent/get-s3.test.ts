@@ -79,7 +79,7 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-s
     };
     variablesMeta = resolveMeta(configuration);
 
-    const source = loadSource(({ Bucket, Key }) => {
+    const source = await loadSource(({ Bucket, Key }) => {
       if (Bucket === 'existing') {
         if (Key === 'someKey') return { Body: 'foo' };
         if (Key === 'emptyKey') return { Body: '' };

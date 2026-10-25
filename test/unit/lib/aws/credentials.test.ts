@@ -73,18 +73,20 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
         fromNodeProviderChain,
       },
       '@smithy/node-http-handler': { NodeHttpHandler: FakeNodeHttpHandler },
-      './sso-login': {
+      '../../../../lib/aws/sso-login.ts': {
         withInteractiveSsoLogin:
           withInteractiveSsoLogin ||
           (({ provider: wrappedProvider }) => {
             return wrappedProvider;
           }),
       },
-      '../utils/serverless-utils/log': { log: { warning: logWarning || sinon.stub() } },
-      'fs': { readFileSync },
-      'os': { homedir: () => homeDir },
+      '../../../../lib/utils/serverless-utils/log.ts': {
+        log: { warning: logWarning || sinon.stub() },
+      },
+      'node:fs': { readFileSync },
+      'node:os': { homedir: () => homeDir },
     };
-    if (readline) stubs.readline = readline;
+    if (readline) stubs['node:readline'] = readline;
 
     return (await esmock('../../../../lib/aws/credentials.ts', stubs)).default;
   }
@@ -141,7 +143,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       .stub()
       .returns(sinon.stub().rejects(createUnresolvedProfileError('default')));
     const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-    const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+    const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
       fromIni,
       fromNodeProviderChain,
     });
@@ -161,7 +163,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
     const fallbackProvider = sinon.stub().resolves(fallbackCredentials);
     const fromIni = sinon.stub().returns(profileProvider);
     const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-    const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+    const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
       fromIni,
       fromNodeProviderChain,
     });
@@ -182,7 +184,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       .stub()
       .returns(sinon.stub().rejects(createUnresolvedProfileError('default')));
     const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-    const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+    const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
       files: {
         [credentialsFilePath]: ['[default]', 'aws_access_key_id = accessKeyId'].join('\n'),
       },
@@ -208,7 +210,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
         .stub()
         .returns(sinon.stub().rejects(createUnresolvedProfileError('default')));
       const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-      const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+      const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
         files: {
           [credentialsFilePath]: ['[default]', 'aws_access_key_id = accessKeyId'].join('\n'),
         },
@@ -239,7 +241,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
         .stub()
         .returns(sinon.stub().rejects(createUnresolvedProfileError('default')));
       const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-      const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+      const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
         files: {
           [configFilePath]: ['[profile default]', 'custom_field = value'].join('\n'),
         },
@@ -268,7 +270,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       .stub()
       .returns(sinon.stub().rejects(createUnresolvedProfileError('default')));
     const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-    const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+    const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
       files: {
         [credentialsFilePath]: ['[default]', 'custom_field = value'].join('\n'),
       },
@@ -293,7 +295,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
     });
     const fromIni = sinon.stub().returns(sinon.stub().rejects(originalError));
     const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-    const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+    const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
       files: {
         [configFilePath]: [
           '[default]',
@@ -323,7 +325,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
         .stub()
         .returns(sinon.stub().rejects(createUnresolvedProfileError('custom-default')));
       const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-      const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+      const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
         files: {
           [credentialsFilePath]: ['[custom-default]', 'aws_access_key_id = accessKeyId'].join('\n'),
         },
@@ -350,7 +352,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
         .stub()
         .returns(sinon.stub().rejects(createUnresolvedProfileError('custom-default')));
       const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-      const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+      const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
         files: {
           [configFilePath]: ['[profile "custom-default"]', 'custom_field = value'].join('\n'),
         },
@@ -378,7 +380,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       });
       const fromIni = sinon.stub().returns(sinon.stub().rejects(originalError));
       const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-      const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+      const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
         files: {
           [configFilePath]: [
             '[profile custom-default]',
@@ -416,7 +418,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
         .returns(sinon.stub().rejects(createUnresolvedProfileError('missing-default')));
       const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
       const logWarning = sinon.spy();
-      const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+      const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
         fromIni,
         fromNodeProviderChain,
         logWarning,
@@ -441,7 +443,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       .stub()
       .returns(sinon.stub().rejects(createUnresolvedProfileError('custom')));
     const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-    const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+    const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
       fromIni,
       fromNodeProviderChain,
     });
@@ -453,7 +455,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
     expect(fallbackProvider).to.not.have.been.called;
   });
 
-  it('detects implicit default profiles from credentials and config files', () => {
+  it('detects implicit default profiles from credentials and config files', async () => {
     const fromIni = sinon.stub();
     const fromNodeProviderChain = sinon.stub();
     for (const [description, files] of [
@@ -477,7 +479,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
         { [configFilePath]: ["[profile 'default']", 'region = us-east-1'].join('\n') },
       ],
     ]) {
-      const { doesImplicitDefaultProfileExist } = loadCredentials({
+      const { doesImplicitDefaultProfileExist } = await loadCredentials({
         files,
         fromIni,
         fromNodeProviderChain,
@@ -487,10 +489,10 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
     }
   });
 
-  it('does not detect non-default profiles as implicit default profiles', () => {
+  it('does not detect non-default profiles as implicit default profiles', async () => {
     const fromIni = sinon.stub();
     const fromNodeProviderChain = sinon.stub();
-    const { doesImplicitDefaultProfileExist } = loadCredentials({
+    const { doesImplicitDefaultProfileExist } = await loadCredentials({
       files: {
         [credentialsFilePath]: ['[credentials-profile]', 'aws_access_key_id = accessKeyId'].join(
           '\n'
@@ -521,7 +523,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       .stub()
       .returns(sinon.stub().rejects(createUnresolvedProfileError('default')));
     const fromNodeProviderChain = sinon.stub().returns(fallbackProvider);
-    const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+    const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
       files: { [credentialsFilePath]: readError },
       fromIni,
       fromNodeProviderChain,
@@ -537,7 +539,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       process.env.AWS_PROFILE = 'dev';
       const fromIni = sinon.stub().returns(sinon.stub().resolves({}));
       const fromNodeProviderChain = sinon.stub();
-      loadCredentials({ fromIni, fromNodeProviderChain }).getAwsSdkV3CredentialsProvider();
+      (await loadCredentials({ fromIni, fromNodeProviderChain })).getAwsSdkV3CredentialsProvider();
 
       expect(fromIni).to.have.been.calledOnce;
       const initOptions = fromIni.firstCall.args[0];
@@ -559,7 +561,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       const fromNodeProviderChain = sinon.stub();
       const wrappedProvider = sinon.stub().resolves(profileCredentials);
       const withInteractiveSsoLogin = sinon.stub().returns(wrappedProvider);
-      const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+      const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
         fromIni,
         fromNodeProviderChain,
         withInteractiveSsoLogin,
@@ -593,7 +595,10 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       .stub()
       .returns(sinon.stub().rejects(createUnresolvedProfileError('default')));
     const fromNodeProviderChain = sinon.stub().returns(sinon.stub().resolves(fallbackCredentials));
-    const { getAwsSdkV3CredentialsProvider } = loadCredentials({ fromIni, fromNodeProviderChain });
+    const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
+      fromIni,
+      fromNodeProviderChain,
+    });
 
     await expect(getAwsSdkV3CredentialsProvider()()).to.eventually.deep.equal(fallbackCredentials);
     expect(fromNodeProviderChain).to.have.been.calledOnce;
@@ -606,7 +611,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
     await overrideEnv(async () => {
       const fromIni = sinon.stub().returns(sinon.stub().resolves({}));
       const fromNodeProviderChain = sinon.stub();
-      const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+      const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
         fromIni,
         fromNodeProviderChain,
       });
@@ -627,11 +632,13 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       process.env.AWS_PROFILE = 'mfa-profile';
       const fromIni = sinon.stub().returns(sinon.stub().resolves({}));
       const fromNodeProviderChain = sinon.stub();
-      loadCredentials({
-        fromIni,
-        fromNodeProviderChain,
-        readline: createFakeReadline(),
-      }).getAwsSdkV3CredentialsProvider();
+      (
+        await loadCredentials({
+          fromIni,
+          fromNodeProviderChain,
+          readline: createFakeReadline(),
+        })
+      ).getAwsSdkV3CredentialsProvider();
 
       const { mfaCodeProvider } = fromIni.firstCall.args[0];
       const error = await mfaCodeProvider('arn:aws:iam::123456789012:mfa/user').then(
@@ -650,11 +657,13 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       process.env.AWS_PROFILE = 'mfa-profile';
       const fromIni = sinon.stub().returns(sinon.stub().resolves({}));
       const fromNodeProviderChain = sinon.stub();
-      loadCredentials({
-        fromIni,
-        fromNodeProviderChain,
-        readline: createFakeReadline({ answer: '123456' }),
-      }).getAwsSdkV3CredentialsProvider();
+      (
+        await loadCredentials({
+          fromIni,
+          fromNodeProviderChain,
+          readline: createFakeReadline({ answer: '123456' }),
+        })
+      ).getAwsSdkV3CredentialsProvider();
 
       const { mfaCodeProvider } = fromIni.firstCall.args[0];
 
@@ -670,7 +679,7 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       const fromIni = sinon.stub().returns(sinon.stub().resolves({}));
       const fromNodeProviderChain = sinon.stub();
       const logWarning = sinon.spy();
-      const { getAwsSdkV3CredentialsProvider } = loadCredentials({
+      const { getAwsSdkV3CredentialsProvider } = await loadCredentials({
         files: {
           [credentialsFilePath]: [
             '[divergent]',
@@ -703,19 +712,21 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       const fromIni = sinon.stub().returns(sinon.stub().resolves({}));
       const fromNodeProviderChain = sinon.stub();
       const logWarning = sinon.spy();
-      loadCredentials({
-        files: {
-          [credentialsFilePath]: [
-            '[plain]',
-            'aws_access_key_id = accessKeyId',
-            'aws_secret_access_key = secretAccessKey',
-          ].join('\n'),
-          [configFilePath]: ['[profile plain]', 'region = us-east-1'].join('\n'),
-        },
-        fromIni,
-        fromNodeProviderChain,
-        logWarning,
-      }).getAwsSdkV3CredentialsProvider();
+      (
+        await loadCredentials({
+          files: {
+            [credentialsFilePath]: [
+              '[plain]',
+              'aws_access_key_id = accessKeyId',
+              'aws_secret_access_key = secretAccessKey',
+            ].join('\n'),
+            [configFilePath]: ['[profile plain]', 'region = us-east-1'].join('\n'),
+          },
+          fromIni,
+          fromNodeProviderChain,
+          logWarning,
+        })
+      ).getAwsSdkV3CredentialsProvider();
 
       expect(logWarning).to.not.have.been.called;
     });
@@ -727,18 +738,20 @@ describe('test/unit/lib/aws/credentials.test.ts', () => {
       const fromIni = sinon.stub().returns(sinon.stub().resolves({}));
       const fromNodeProviderChain = sinon.stub();
       const logWarning = sinon.spy();
-      loadCredentials({
-        files: {
-          [configFilePath]: [
-            '[profile role-only]',
-            'role_arn = arn:aws:iam::123456789012:role/deploy',
-            'credential_source = Environment',
-          ].join('\n'),
-        },
-        fromIni,
-        fromNodeProviderChain,
-        logWarning,
-      }).getAwsSdkV3CredentialsProvider();
+      (
+        await loadCredentials({
+          files: {
+            [configFilePath]: [
+              '[profile role-only]',
+              'role_arn = arn:aws:iam::123456789012:role/deploy',
+              'credential_source = Environment',
+            ].join('\n'),
+          },
+          fromIni,
+          fromNodeProviderChain,
+          logWarning,
+        })
+      ).getAwsSdkV3CredentialsProvider();
 
       expect(logWarning).to.not.have.been.called;
     });

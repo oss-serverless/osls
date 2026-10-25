@@ -28,14 +28,14 @@ describe('test/unit/lib/aws/config.test.ts', () => {
       await esmock('../../../../lib/aws/config.ts', {
         '@smithy/node-http-handler': { NodeHttpHandler: FakeNodeHttpHandler },
         'https-proxy-agent': { HttpsProxyAgent: FakeHttpsProxyAgent },
-        'https': { Agent: FakeHttpsAgent },
+        'node:https': { Agent: FakeHttpsAgent },
       })
     ).default;
   }
 
   it('preserves explicit maxAttempts values including zero', async () => {
     await overrideEnv(async () => {
-      const { buildClientConfig } = loadConfig();
+      const { buildClientConfig } = await loadConfig();
 
       expect(buildClientConfig({ maxAttempts: 0 }).maxAttempts).to.equal(0);
       expect(buildClientConfig({ maxAttempts: 1 }).maxAttempts).to.equal(1);
@@ -44,7 +44,7 @@ describe('test/unit/lib/aws/config.test.ts', () => {
 
   it('maps Serverless retry count to SDK v3 maxAttempts', async () => {
     await overrideEnv(async () => {
-      const { buildClientConfig } = loadConfig();
+      const { buildClientConfig } = await loadConfig();
 
       expect(buildClientConfig().maxAttempts).to.equal(5);
 
@@ -59,7 +59,7 @@ describe('test/unit/lib/aws/config.test.ts', () => {
   it('falls back to environment region only when region is undefined', async () => {
     await overrideEnv(async () => {
       process.env.AWS_REGION = 'eu-west-1';
-      const { buildClientConfig } = loadConfig();
+      const { buildClientConfig } = await loadConfig();
 
       expect(buildClientConfig().region).to.equal('eu-west-1');
       expect(buildClientConfig({ region: undefined }).region).to.equal('eu-west-1');
@@ -71,7 +71,7 @@ describe('test/unit/lib/aws/config.test.ts', () => {
   it('uses NodeHttpHandler for timeout config', async () => {
     await overrideEnv(async () => {
       process.env.AWS_CLIENT_TIMEOUT = '1234';
-      const { buildClientConfig } = loadConfig();
+      const { buildClientConfig } = await loadConfig();
 
       const config = buildClientConfig();
 
@@ -82,7 +82,7 @@ describe('test/unit/lib/aws/config.test.ts', () => {
   it('preserves explicit zero timeout config', async () => {
     await overrideEnv(async () => {
       process.env.AWS_CLIENT_TIMEOUT = '0';
-      const { buildClientConfig } = loadConfig();
+      const { buildClientConfig } = await loadConfig();
 
       const config = buildClientConfig();
 
@@ -92,7 +92,7 @@ describe('test/unit/lib/aws/config.test.ts', () => {
 
   it('defaults to a 120 second socket timeout and always constructs a request handler', async () => {
     await overrideEnv(async () => {
-      const { buildClientConfig } = loadConfig();
+      const { buildClientConfig } = await loadConfig();
 
       const config = buildClientConfig();
 
@@ -103,7 +103,7 @@ describe('test/unit/lib/aws/config.test.ts', () => {
   it('assigns the proxy agent for both http and https requests', async () => {
     await overrideEnv(async () => {
       process.env.HTTPS_PROXY = 'https://proxy.example.com:1234';
-      const { buildClientConfig } = loadConfig();
+      const { buildClientConfig } = await loadConfig();
 
       const config = buildClientConfig();
 
@@ -156,7 +156,7 @@ describe('test/unit/lib/aws/config.test.ts', () => {
     await overrideEnv(async () => {
       process.env.HTTPS_PROXY = 'https://proxy.example.com:1234';
       process.env.HTTPS_CA = 'certificate';
-      const { buildClientConfig } = loadConfig();
+      const { buildClientConfig } = await loadConfig();
 
       const config = buildClientConfig();
 
@@ -174,7 +174,7 @@ describe('test/unit/lib/aws/config.test.ts', () => {
   it('passes CA options when constructing the native HTTPS agent', async () => {
     await overrideEnv(async () => {
       process.env.HTTPS_CA = 'certificate';
-      const { buildClientConfig } = loadConfig();
+      const { buildClientConfig } = await loadConfig();
 
       const config = buildClientConfig();
 
@@ -186,16 +186,16 @@ describe('test/unit/lib/aws/config.test.ts', () => {
     });
   });
 
-  it('passes custom user agent config through', () => {
-    const { buildClientConfig } = loadConfig();
+  it('passes custom user agent config through', async () => {
+    const { buildClientConfig } = await loadConfig();
 
     expect(buildClientConfig({ customUserAgent: 'custom-agent' }).customUserAgent).to.equal(
       'custom-agent'
     );
   });
 
-  it('passes SDK v3 client options through', () => {
-    const { buildClientConfig } = loadConfig();
+  it('passes SDK v3 client options through', async () => {
+    const { buildClientConfig } = await loadConfig();
     const requestHandler = {};
 
     expect(

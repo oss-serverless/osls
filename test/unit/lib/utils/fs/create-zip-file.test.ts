@@ -50,7 +50,7 @@ describe('#createZipFile()', () => {
 
     const createZipFileProxy = (
       await esmock('../../../../../lib/utils/fs/create-zip-file.ts', {
-        'fs': {
+        'node:fs': {
           createWriteStream: () => output,
           lstatSync: () => ({ isFile: () => true }),
         },
@@ -80,7 +80,7 @@ describe('#createZipFile()', () => {
 
     const createZipFileProxy = (
       await esmock('../../../../../lib/utils/fs/create-zip-file.ts', {
-        'fs': {
+        'node:fs': {
           createWriteStream: () => output,
           lstatSync: () => ({ isFile: () => true }),
         },

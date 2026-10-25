@@ -80,7 +80,7 @@ const uninstallFromPluginFixture = async () => {
   return fixture;
 };
 
-describe('test/unit/commands/plugin-uninstall.test.ts', async () => {
+describe('test/unit/commands/plugin-uninstall.test.ts', () => {
   afterEach(() => {
     spawnFake.resetHistory();
   });

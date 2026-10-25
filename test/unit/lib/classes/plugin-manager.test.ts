@@ -7,14 +7,13 @@ import CLI from '../../../../lib/classes/cli.ts';
 import resolveInput from '../../../../lib/cli/resolve-input.ts';
 import Create from '../../../../lib/plugins/create/create.ts';
 import ServerlessError from '../../../../lib/serverless-error.ts';
-import getRequire from '../../../../lib/utils/get-require.ts';
-import importModule from '../../../../lib/utils/require-with-import-fallback.ts';
+import resolveFrom from '../../../../lib/utils/resolve-from.ts';
+import importModule from '../../../../lib/utils/import-module.ts';
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
 import * as sinon from 'sinon';
 import { installPlugin } from '../../../utils/plugins.ts';
 import { ensureDirSync, getTmpDirPath, removeSync } from '../../../utils/fs.ts';
-import module from 'node:module';
 import esmock from 'esmock';
 
 const expect = chai.expect;
@@ -395,26 +394,27 @@ describe('PluginManager', () => {
       case './RelativePath/ServicePluginMock2':
         return `${serviceDir}/RelativePath/ServicePluginMock2`;
       default:
-        return getRequire(directory).resolve(pluginPath);
+        return resolveFrom(directory, pluginPath);
     }
   };
 
   let restoreEnv;
   let serviceDir;
   const servicePluginMocks = new Map();
-  const PluginManager = (
-    await esmock('../../../../lib/classes/plugin-manager.ts', {
-      '../utils/get-require': (directory) => {
-        const resultRequire = module.createRequire(path.resolve(directory, 'req'));
-        resultRequire.resolve = (pluginPath) => resolveStub(directory, pluginPath);
-        return resultRequire;
-      },
-      '../utils/require-with-import-fallback': async (pluginPath) => {
-        if (servicePluginMocks.has(pluginPath)) return servicePluginMocks.get(pluginPath);
-        return importModule(pluginPath);
-      },
-    })
-  ).default;
+  let PluginManager;
+
+  before(async () => {
+    PluginManager = (
+      await esmock('../../../../lib/classes/plugin-manager.ts', {
+        '../../../../lib/utils/resolve-from.ts': (directory, pluginPath) =>
+          resolveStub(directory, pluginPath),
+        '../../../../lib/utils/import-module.ts': async (pluginPath) => {
+          if (servicePluginMocks.has(pluginPath)) return servicePluginMocks.get(pluginPath);
+          return importModule(pluginPath);
+        },
+      })
+    ).default;
+  });
 
   beforeEach(() => {
     ({ restoreEnv } = overrideEnv({ whitelist: ['APPDATA', 'PATH'] }));
