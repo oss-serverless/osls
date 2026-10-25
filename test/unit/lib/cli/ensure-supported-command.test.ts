@@ -1,11 +1,10 @@
-'use strict';
-
-const { expect } = require('chai');
-const { overrideArgv } = require('../../../utils/process');
-const ServerlessError = require('../../../../lib/serverless-error');
-const { triggeredDeprecations } = require('../../../../lib/utils/log-deprecation');
-const ensureSupportedCommand = require('../../../../lib/cli/ensure-supported-command');
-const resolveInput = require('../../../../lib/cli/resolve-input');
+import { expect } from 'chai';
+import { overrideArgv } from '../../../utils/process.ts';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import logDeprecation from '../../../../lib/utils/log-deprecation.ts';
+import ensureSupportedCommand from '../../../../lib/cli/ensure-supported-command.ts';
+import resolveInput from '../../../../lib/cli/resolve-input.ts';
+const { triggeredDeprecations } = logDeprecation;
 
 describe('test/unit/lib/cli/ensure-supported-command.test.js', () => {
   beforeEach(() => {

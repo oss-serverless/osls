@@ -1,11 +1,10 @@
-'use strict';
-
-const { log } = require('../../../utils/serverless-utils/log');
-const { ECRClient, DescribeRepositoriesCommand } = require('@aws-sdk/client-ecr');
-const {
+import log2 from '../../../utils/serverless-utils/log.ts';
+import { ECRClient, DescribeRepositoriesCommand } from '@aws-sdk/client-ecr';
+import {
   isEcrRepositoryNotFoundError,
   isEcrAccessDeniedError,
-} = require('../../../aws/aws-sdk-v3-error');
+} from '../../../aws/aws-sdk-v3-error.ts';
+const { log } = log2;
 
 function getEcrClient(context) {
   context.ecrClientPromise ||= context.provider
@@ -14,7 +13,7 @@ function getEcrClient(context) {
   return context.ecrClientPromise;
 }
 
-module.exports = {
+export default {
   async checkIfEcrRepositoryExists() {
     const registryId = await this.provider.getAccountId();
     const repositoryName = this.provider.naming.getEcrRepositoryName();

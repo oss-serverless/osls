@@ -1,10 +1,8 @@
-'use strict';
-
-const chai = require('chai');
-const crypto = require('crypto');
-const getHashForFilePath = require('../../../../../../../lib/plugins/aws/package/lib/get-hash-for-file-path');
-const fsp = require('fs').promises;
-const path = require('path');
+import * as chai from 'chai';
+import crypto from 'node:crypto';
+import getHashForFilePath from '../../../../../../../lib/plugins/aws/package/lib/get-hash-for-file-path.ts';
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
 
 const expect = chai.expect;
 

@@ -1,6 +1,14 @@
-'use strict';
+import globalState from '../lib/global-state.ts';
+import logReporter from '../lib/log-reporters/node/log-reporter.ts';
+import getOutputReporter from '../lib/log/get-output-reporter.ts';
+import joinTextTokens from '../lib/log/join-text-tokens.ts';
+import logLevels from 'log/levels.json' with { type: 'json' };
 
-const globalState = require('../lib/global-state');
+// Apply style decorators
+import '../lib/log-reporters/node/style.ts';
+
+import isInteractive2 from '../../is-interactive.ts';
+import progressReporter from '../lib/log-reporters/node/progress-reporter.ts';
 
 if (globalState.logLevelIndex != null) {
   // An edge case, of log reporter being setup second time for Node.js process
@@ -29,19 +37,13 @@ process.argv.some((flag, index) => {
   return true;
 });
 
-const logReporter = require('../lib/log-reporters/node/log-reporter');
-const { emitter: outputEmitter } = require('../lib/log/get-output-reporter');
-const joinTextTokens = require('../lib/log/join-text-tokens');
-const logLevels = require('log/levels');
+const { emitter: outputEmitter } = getOutputReporter;
 
 const logLevelIndex = logLevels.includes(process.env.SLS_LOG_LEVEL)
   ? logLevels.indexOf(process.env.SLS_LOG_LEVEL)
   : logLevels.indexOf('notice');
 
-const isInteractive = require('../../is-interactive')() || process.env.SLS_INTERACTIVE_SETUP_ENABLE;
-
-// Apply style decorators
-require('../lib/log-reporters/node/style');
+const isInteractive = isInteractive2() || process.env.SLS_INTERACTIVE_SETUP_ENABLE;
 
 // Event logs
 logReporter({ logLevelIndex, debugNamespaces: process.env.SLS_LOG_DEBUG });
@@ -54,5 +56,5 @@ outputEmitter.on('write', ({ mode, textTokens }) => {
 
 globalState.logIsInteractive = isInteractive;
 if (isInteractive) {
-  require('../lib/log-reporters/node/progress-reporter')({ logLevelIndex });
+  progressReporter({ logLevelIndex });
 }

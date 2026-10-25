@@ -1,8 +1,6 @@
-'use strict';
-
-const runServerless = require('../../../../../../../utils/run-serverless');
-const { expect } = require('chai');
-const naming = require('../../../../../../../../lib/plugins/aws/lib/naming');
+import runServerless from '../../../../../../../utils/run-serverless.ts';
+import { expect } from 'chai';
+import naming from '../../../../../../../../lib/plugins/aws/lib/naming.ts';
 
 describe('test/unit/lib/plugins/aws/package/compile/events/alias.test.js', () => {
   let lambdaResourceCount = 0;

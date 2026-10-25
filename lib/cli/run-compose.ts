@@ -1,14 +1,13 @@
-'use strict';
-
-const { createRequire } = require('module');
-const path = require('path');
-const fsp = require('fs').promises;
-const spawn = require('../utils/spawn');
-const inquirer = require('../utils/serverless-utils/inquirer');
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import spawn from '../utils/spawn.ts';
+import inquirer from '../utils/serverless-utils/inquirer/index.ts';
+import isInteractive2 from '../utils/is-interactive.ts';
 
 const relativeBinPath = '@osls/compose/bin/serverless-compose';
 
-const isInteractive = require('../utils/is-interactive')();
+const isInteractive = isInteractive2();
 
 const ensureMinimalPackageJson = async () => {
   return fsp.writeFile(path.join(process.cwd(), 'package.json'), '{}');
@@ -39,7 +38,7 @@ const resolveGlobalNpmPath = async () => {
   }
 };
 
-module.exports = async () => {
+export default async () => {
   // 1. If installed locally in service node_modules, run it
   const localNpmPath = resolveAbsoluteModulePath(process.cwd(), relativeBinPath);
   if (localNpmPath) {
@@ -88,7 +87,7 @@ module.exports = async () => {
 
     // Add progress bar
     if (shouldInstallCompose) {
-      const createProgressFooter = require('../utils/progress-footer');
+      const createProgressFooter = (await import('../utils/progress-footer.ts')).default;
       const cliProgressFooter = createProgressFooter();
       cliProgressFooter.shouldAddProgressAnimationPrefix = true;
       cliProgressFooter.progressAnimationPrefixFrames =

@@ -1,11 +1,8 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const resolveMeta = require('../../../../../../lib/configuration/variables/resolve-meta');
-const resolve = require('../../../../../../lib/configuration/variables/resolve');
-const selfSource = require('../../../../../../lib/configuration/variables/sources/self');
-const optSource = require('../../../../../../lib/configuration/variables/sources/opt');
+import { expect } from 'chai';
+import resolveMeta from '../../../../../../lib/configuration/variables/resolve-meta.ts';
+import resolve from '../../../../../../lib/configuration/variables/resolve.ts';
+import selfSource from '../../../../../../lib/configuration/variables/sources/self.ts';
+import optSource from '../../../../../../lib/configuration/variables/sources/opt.ts';
 
 describe('test/unit/lib/configuration/variables/sources/opt.test.js', () => {
   let configuration;

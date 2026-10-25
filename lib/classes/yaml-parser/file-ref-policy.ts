@@ -1,10 +1,8 @@
-'use strict';
-
-const fsp = require('fs').promises;
-const path = require('path');
-const { fileURLToPath } = require('url');
-const { denyExternalRef, throwOptionsError } = require('./external-ref-errors');
-const { assertKnownOptions, assertOptionsObject } = require('./option-validation');
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { denyExternalRef, throwOptionsError } from './external-ref-errors.ts';
+import { assertKnownOptions, assertOptionsObject } from './option-validation.ts';
 
 const DEFAULT_ALLOWED_ROOTS = ['.'];
 const FILE_REF_POLICY_HINT =
@@ -116,7 +114,9 @@ const assertFileRefAllowed = async (documentUrl, options) => {
   }
 };
 
-module.exports = {
+export { assertFileRefAllowed, normalizeFileRefOptions };
+
+export default {
   assertFileRefAllowed,
   normalizeFileRefOptions,
 };

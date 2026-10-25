@@ -1,8 +1,4 @@
-// Improve error reporting for osls-specific functionality
-
-'use strict';
-
-module.exports = {
+export default {
   validateTemplate() {
     // No-op at this point
   },

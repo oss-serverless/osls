@@ -1,8 +1,6 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const AwsInfo = require('../../../../../../lib/plugins/aws/info/index');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import AwsInfo from '../../../../../../lib/plugins/aws/info/index.ts';
 
 function createServerlessContext(options, getAwsInfo) {
   const provider = {

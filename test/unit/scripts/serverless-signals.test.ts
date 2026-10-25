@@ -1,8 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
+import { expect } from 'chai';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
 
 const modulePath = '../../../scripts/serverless.js';
 

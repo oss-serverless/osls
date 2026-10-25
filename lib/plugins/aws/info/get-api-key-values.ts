@@ -1,13 +1,14 @@
-'use strict';
-
-const promiseLimit = require('ext/promise/limit').bind(Promise);
-const isObject = require('type/object/is');
-const {
+import isObject from 'type/object/is.js';
+import {
   CloudFormationClient,
   DescribeStackResourcesCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { APIGatewayClient, GetApiKeyCommand } = require('@aws-sdk/client-api-gateway');
-const { retryOnThrottlingError } = require('../../../aws/retry');
+} from '@aws-sdk/client-cloudformation';
+import { APIGatewayClient, GetApiKeyCommand } from '@aws-sdk/client-api-gateway';
+import retry from '../../../aws/retry.ts';
+import promiseLimit2 from 'ext/promise/limit.js';
+
+const promiseLimit = promiseLimit2.bind(Promise);
+const { retryOnThrottlingError } = retry;
 
 function getCloudFormationClient(context) {
   context.cloudFormationClientPromise ||= context.provider
@@ -23,7 +24,7 @@ function getApiGatewayClient(context) {
   return context.apiGatewayClientPromise;
 }
 
-module.exports = {
+export default {
   async getApiKeyValues() {
     const info = this.gatheredData.info;
     info.apiKeys = [];

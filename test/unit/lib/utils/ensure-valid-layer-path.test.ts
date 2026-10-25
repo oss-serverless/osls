@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const ensureValidLayerPath = require('../../../../lib/utils/ensure-valid-layer-path');
+import { expect } from 'chai';
+import ensureValidLayerPath from '../../../../lib/utils/ensure-valid-layer-path.ts';
 
 describe('test/unit/lib/utils/ensure-valid-layer-path.test.js', () => {
   for (const layerPath of ['layer', '/tmp/layer', undefined]) {

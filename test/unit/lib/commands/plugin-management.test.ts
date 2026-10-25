@@ -1,10 +1,7 @@
-'use strict';
+import { expect } from 'chai';
+import pluginManagement from '../../../../lib/commands/plugin-management.ts';
 
-const { expect } = require('chai');
-const {
-  parsePluginInstallSpec,
-  parsePluginUninstallSpec,
-} = require('../../../../lib/commands/plugin-management');
+const { parsePluginInstallSpec, parsePluginUninstallSpec } = pluginManagement;
 
 describe('test/unit/lib/commands/plugin-management.test.js', () => {
   const maxLengthName = 'a'.repeat(214);

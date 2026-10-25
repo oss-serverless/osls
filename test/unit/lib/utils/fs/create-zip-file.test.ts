@@ -1,14 +1,12 @@
-'use strict';
-
-const fs = require('fs');
-const EventEmitter = require('events');
-const path = require('path');
-const proxyquire = require('proxyquire');
-const createZipFile = require('../../../../../lib/utils/fs/create-zip-file');
-const { createTmpDir, createTmpFile, ensureDir, listZipFiles } = require('../../../../utils/fs');
+import fs from 'node:fs';
+import EventEmitter from 'node:events';
+import path from 'node:path';
+import proxyquire from 'proxyquire';
+import createZipFile from '../../../../../lib/utils/fs/create-zip-file.ts';
+import { createTmpDir, createTmpFile, ensureDir, listZipFiles } from '../../../../utils/fs.ts';
 
 // Configure chai
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 describe('#createZipFile()', () => {
   it('should create a zip file with the source directory content', async () => {

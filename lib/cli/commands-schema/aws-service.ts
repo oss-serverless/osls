@@ -1,7 +1,5 @@
-'use strict';
-
-const awsServiceOptions = require('./common-options/aws-service');
-const serviceCommands = require('./service');
+import awsServiceOptions from './common-options/aws-service.ts';
+import serviceCommands from './service.ts';
 
 const commands = (module.exports = new Map());
 

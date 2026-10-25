@@ -1,6 +1,4 @@
-'use strict';
-
-const resolveLambdaTarget = require('../../../../../utils/resolve-lambda-target');
+import resolveLambdaTarget from '../../../../../utils/resolve-lambda-target.ts';
 
 const healthCheckDefaults = {
   HealthCheckEnabled: false,
@@ -12,7 +10,7 @@ const healthCheckDefaults = {
   Matcher: { HttpCode: '200' },
 };
 
-module.exports = {
+export default {
   compileTargetGroups() {
     this.validated.events.forEach((event) => {
       const {

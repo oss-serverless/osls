@@ -1,14 +1,14 @@
-'use strict';
+import path from 'node:path';
+import packageModule from '../../package.json' with { type: 'json' };
+import isStandaloneExecutable from '../utils/is-standalone-executable.ts';
+import resolveLocalServerlessPath from './local-serverless-path.ts';
+import log from '../utils/serverless-utils/log.ts';
+const { version } = packageModule;
+const { writeText } = log;
 
-const path = require('path');
-const { version } = require('../../package');
-const isStandaloneExecutable = require('../utils/is-standalone-executable');
-const resolveLocalServerlessPath = require('./local-serverless-path');
-const { writeText } = require('../utils/serverless-utils/log');
+const serverlessPath = path.resolve(import.meta.dirname, '../..');
 
-const serverlessPath = path.resolve(__dirname, '../..');
-
-module.exports = async () => {
+export default async () => {
   const localServerlessPath = resolveLocalServerlessPath();
   const installationModePostfix = (() => {
     if (isStandaloneExecutable) return ' (standalone)';

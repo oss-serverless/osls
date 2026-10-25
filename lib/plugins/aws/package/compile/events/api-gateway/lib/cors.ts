@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = {
+export default {
   compileCors() {
     if (this.validated.corsPreflight) {
       Object.entries(this.validated.corsPreflight).forEach(([path, config]) => {

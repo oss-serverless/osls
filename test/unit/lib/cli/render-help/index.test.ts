@@ -1,11 +1,9 @@
-'use strict';
-
-const { expect } = require('chai');
-const { overrideArgv } = require('../../../../utils/process');
-const resolveInput = require('../../../../../lib/cli/resolve-input');
-const resolveFinalCommandsSchema = require('../../../../../lib/cli/commands-schema/resolve-final');
-const renderHelp = require('../../../../../lib/cli/render-help');
-const observeOutput = require('../../../../lib/observe-output');
+import { expect } from 'chai';
+import { overrideArgv } from '../../../../utils/process.ts';
+import resolveInput from '../../../../../lib/cli/resolve-input.ts';
+import resolveFinalCommandsSchema from '../../../../../lib/cli/commands-schema/resolve-final.ts';
+import renderHelp from '../../../../../lib/cli/render-help/index.ts';
+import observeOutput from '../../../../lib/observe-output.ts';
 
 describe('test/unit/lib/cli/render-help/index.test.js', () => {
   class TestPlugin {

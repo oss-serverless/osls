@@ -1,7 +1,5 @@
-'use strict';
-
-const cliCommandsSchema = require('../../cli/commands-schema');
-const pluginUtils = require('./lib/utils');
+import cliCommandsSchema from '../../cli/commands-schema/index.ts';
+import pluginUtils from './lib/utils.ts';
 
 class PluginList {
   constructor(serverless, options) {
@@ -31,4 +29,4 @@ class PluginList {
   }
 }
 
-module.exports = PluginList;
+export default PluginList;

@@ -1,10 +1,7 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const resolveMeta = require('../../../../../lib/configuration/variables/resolve-meta');
-const resolve = require('../../../../../lib/configuration/variables/resolve');
-const resolveUnresolvedSourceTypes = require('../../../../../lib/configuration/variables/resolve-unresolved-source-types');
+import { expect } from 'chai';
+import resolveMeta from '../../../../../lib/configuration/variables/resolve-meta.ts';
+import resolve from '../../../../../lib/configuration/variables/resolve.ts';
+import resolveUnresolvedSourceTypes from '../../../../../lib/configuration/variables/resolve-unresolved-source-types.ts';
 
 describe('test/unit/lib/configuration/variables/resolve-unresolved-source-types.test.js', () => {
   const configuration = {

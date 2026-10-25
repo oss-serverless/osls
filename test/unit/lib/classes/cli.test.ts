@@ -1,11 +1,8 @@
-'use strict';
-
-const chai = require('chai');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-
-const CLI = require('../../../../lib/classes/cli');
-const Serverless = require('../../../../lib/serverless');
+import * as chai from 'chai';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import CLI from '../../../../lib/classes/cli.ts';
+import Serverless from '../../../../lib/serverless.ts';
 
 const { expect } = chai;
 

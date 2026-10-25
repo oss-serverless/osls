@@ -1,13 +1,11 @@
-'use strict';
+import untildify from './untildify.ts';
+import { promises as fsp } from 'node:fs';
+import copy from './fs/copy.ts';
+import renameService2 from './rename-service.ts';
+import ServerlessError from '../serverless-error.ts';
+const { renameService } = renameService2;
 
-const untildify = require('./untildify');
-const fsp = require('fs').promises;
-const copy = require('./fs/copy');
-const { renameService } = require('./rename-service');
-
-const ServerlessError = require('../serverless-error');
-
-module.exports = async ({ templatePath, projectDir, projectName }) => {
+export default async ({ templatePath, projectDir, projectName }) => {
   const sourcePath = untildify(templatePath);
 
   try {

@@ -1,18 +1,18 @@
-'use strict';
-
-const yazl = require('yazl');
-const os = require('os');
-const path = require('path');
-const crypto = require('crypto');
-const fs = require('fs');
-const { Readable } = require('stream');
+import yazl from 'yazl';
+import os from 'node:os';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import { Readable } from 'node:stream';
+import glob from '../../../utils/glob.ts';
+import memoizee from 'memoizee';
+import ServerlessError from '../../../serverless-error.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
+import spawnExt from '../../../utils/spawn.ts';
+import promiseLimit from 'ext/promise/limit.js';
 const fsp = fs.promises;
-const glob = require('../../../utils/glob');
-const memoizee = require('memoizee');
-const limit = require('ext/promise/limit').bind(Promise);
-const ServerlessError = require('../../../serverless-error');
-const { log } = require('../../../utils/serverless-utils/log');
-const spawnExt = require('../../../utils/spawn');
+const limit = promiseLimit.bind(Promise);
+const { log } = log2;
 
 const npmList = async (cwd, envName, outputFilePath) => {
   const outputFile = await fsp.open(outputFilePath, 'a');
@@ -368,7 +368,7 @@ const zipService = {
 const defaultGetFileContent = zipService.getFileContent;
 const defaultGetFileContentAndStat = zipService.getFileContentAndStat;
 
-module.exports = zipService;
+export default zipService;
 
 async function excludeNodeDevDependencies(serviceDir) {
   const exAndIn = {

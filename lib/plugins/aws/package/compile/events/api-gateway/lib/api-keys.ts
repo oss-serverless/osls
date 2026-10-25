@@ -1,6 +1,4 @@
-'use strict';
-
-const isObject = require('type/object/is');
+import isObject from 'type/object/is.js';
 
 function createApiKeyResource(that, apiKey) {
   const name = typeof apiKey === 'string' ? apiKey : apiKey.name;
@@ -28,7 +26,7 @@ function createApiKeyResource(that, apiKey) {
   };
 }
 
-module.exports = {
+export default {
   compileApiKeys() {
     const apiKeys =
       this.serverless.service.provider.apiGateway &&

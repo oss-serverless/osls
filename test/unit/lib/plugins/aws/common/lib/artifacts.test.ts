@@ -1,9 +1,7 @@
-'use strict';
-
-const expect = require('chai').expect;
-const path = require('path');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
+import { expect } from 'chai';
+import path from 'node:path';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
 
 describe('#moveArtifactsToPackage()', () => {
   let artifacts;

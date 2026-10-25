@@ -1,6 +1,5 @@
-'use strict';
-const expect = require('chai').expect;
-const getS3EndpointForRegion = require('../../../../../../lib/plugins/aws/utils/get-s3-endpoint-for-region');
+import { expect } from 'chai';
+import getS3EndpointForRegion from '../../../../../../lib/plugins/aws/utils/get-s3-endpoint-for-region.ts';
 
 describe('getS3EndpointForRegion', () => {
   it('should return standard endpoint for us-east-1', () => {

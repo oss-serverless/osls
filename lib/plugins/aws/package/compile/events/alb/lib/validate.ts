@@ -1,8 +1,6 @@
-'use strict';
-
-const ServerlessError = require('../../../../../../../serverless-error');
-const isObject = require('type/object/is');
-const { createRegistry, hasOwn } = require('../../../../../../../utils/safe-object');
+import ServerlessError from '../../../../../../../serverless-error.ts';
+import isObject from 'type/object/is.js';
+import { createRegistry, hasOwn } from '../../../../../../../utils/safe-object.ts';
 
 const collectDuplicates = (items, comparator) => {
   const uniqueItems = [];
@@ -20,7 +18,7 @@ const collectDuplicates = (items, comparator) => {
   return duplicates;
 };
 
-module.exports = {
+export default {
   // see https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-elb-application
   ALB_LISTENER_REGEXP: new RegExp(
     '^arn:aws[\\w-]*:elasticloadbalancing:.+:listener\\/app\\/[\\w-]+\\/([\\w-]+)\\/([\\w-]+)$'

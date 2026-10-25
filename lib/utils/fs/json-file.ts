@@ -1,6 +1,4 @@
-'use strict';
-
-const fsp = require('fs').promises;
+import { promises as fsp } from 'node:fs';
 
 const stripBom = (contents) => contents.replace(/^\uFEFF/u, '');
 
@@ -22,4 +20,5 @@ const writeJson = async (filePath, value) => {
   await fsp.writeFile(filePath, `${serialized}\n`);
 };
 
-module.exports = { readJson, writeJson };
+export { readJson, writeJson };
+export default { readJson, writeJson };

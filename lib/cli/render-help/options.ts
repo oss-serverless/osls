@@ -1,8 +1,7 @@
-'use strict';
+import log from '../../utils/serverless-utils/log.ts';
+const { writeText, style } = log;
 
-const { writeText, style } = require('../../utils/serverless-utils/log');
-
-module.exports = (commandOptions) => {
+export default (commandOptions) => {
   const indentFillLength = 40;
 
   for (const [option, optionsObject] of Object.entries(commandOptions)) {

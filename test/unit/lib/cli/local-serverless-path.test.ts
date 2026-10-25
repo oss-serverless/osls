@@ -1,13 +1,12 @@
-'use strict';
-
-const { expect } = require('chai');
-const path = require('path');
-const os = require('os');
-const fsp = require('fs').promises;
-const { ensureDir, ensureFile } = require('../../../utils/fs');
+import { expect } from 'chai';
+import path from 'node:path';
+import os from 'node:os';
+import { promises as fsp } from 'node:fs';
+import { ensureDir, ensureFile } from '../../../utils/fs.ts';
+import localServerlessPath from '../../../../lib/cli/local-serverless-path.ts';
 
 describe('test/unit/lib/cli/local-serverless-path.test.js', () => {
-  const resolveLocalServerlessPath = require('../../../../lib/cli/local-serverless-path');
+  const resolveLocalServerlessPath = localServerlessPath;
 
   it('should resolve with `null` when no local installation is found', () => {
     expect(resolveLocalServerlessPath()).to.equal(null);

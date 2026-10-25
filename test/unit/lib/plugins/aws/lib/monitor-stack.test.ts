@@ -1,13 +1,8 @@
-'use strict';
-
-const chai = require('chai');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const monitorStack = require('../../../../../../lib/plugins/aws/lib/monitor-stack');
-const {
-  CloudFormationClient,
-  DescribeStackEventsCommand,
-} = require('@aws-sdk/client-cloudformation');
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import monitorStack from '../../../../../../lib/plugins/aws/lib/monitor-stack.ts';
+import { CloudFormationClient, DescribeStackEventsCommand } from '@aws-sdk/client-cloudformation';
 
 const { expect } = chai;
 
@@ -140,7 +135,8 @@ describe('monitorStack', () => {
           return sendStub(command);
         }
       }
-      const { retryOnThrottlingError } = require('../../../../../../lib/aws/retry');
+      const { retryOnThrottlingError } = (await import('../../../../../../lib/aws/retry.ts'))
+        .default;
       const monitorStackWithStub = proxyquire(
         '../../../../../../lib/plugins/aws/lib/monitor-stack',
         {

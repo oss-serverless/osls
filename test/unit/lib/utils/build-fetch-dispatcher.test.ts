@@ -1,11 +1,9 @@
-'use strict';
-
-const chai = require('chai');
-const http = require('http');
-const net = require('net');
-const { EnvHttpProxyAgent, ProxyAgent } = require('undici');
-const { overrideEnv } = require('../../../utils/process');
-const buildFetchDispatcher = require('../../../../lib/utils/build-fetch-dispatcher');
+import * as chai from 'chai';
+import http from 'node:http';
+import net from 'node:net';
+import { EnvHttpProxyAgent, ProxyAgent } from 'undici';
+import { overrideEnv } from '../../../utils/process.ts';
+import buildFetchDispatcher from '../../../../lib/utils/build-fetch-dispatcher.ts';
 
 const { expect } = chai;
 

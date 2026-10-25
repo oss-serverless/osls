@@ -1,9 +1,6 @@
-'use strict';
-
-const expect = require('chai').expect;
-
-const awsNaming = require('../../../../../../lib/plugins/aws/lib/naming');
-const validateStage = require('../../../../../../lib/utils/validate-stage');
+import { expect } from 'chai';
+import awsNaming from '../../../../../../lib/plugins/aws/lib/naming.ts';
+import validateStage from '../../../../../../lib/utils/validate-stage.ts';
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 

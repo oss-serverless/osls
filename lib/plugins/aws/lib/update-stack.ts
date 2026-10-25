@@ -1,9 +1,8 @@
-'use strict';
+import getS3EndpointForRegion from '../utils/get-s3-endpoint-for-region.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
+import isChangeSetWithoutChanges from '../utils/is-change-set-without-changes.ts';
 
-const getS3EndpointForRegion = require('../utils/get-s3-endpoint-for-region');
-const { log, progress } = require('../../../utils/serverless-utils/log');
-const isChangeSetWithoutChanges = require('../utils/is-change-set-without-changes');
-const {
+import {
   CloudFormationClient,
   CreateStackCommand,
   CreateChangeSetCommand,
@@ -11,9 +10,12 @@ const {
   ExecuteChangeSetCommand,
   UpdateStackCommand,
   SetStackPolicyCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { isCloudFormationNoUpdateError } = require('../../../aws/aws-sdk-v3-error');
-const { retryOnThrottlingError } = require('../../../aws/retry');
+} from '@aws-sdk/client-cloudformation';
+
+import { isCloudFormationNoUpdateError } from '../../../aws/aws-sdk-v3-error.ts';
+import retry from '../../../aws/retry.ts';
+const { log, progress } = log2;
+const { retryOnThrottlingError } = retry;
 
 function getCloudFormationClient(context) {
   context.cloudFormationClientPromise ||= context.provider
@@ -22,7 +24,7 @@ function getCloudFormationClient(context) {
   return context.cloudFormationClientPromise;
 }
 
-module.exports = {
+export default {
   async createFallback() {
     this.createLater = false;
     progress.get('main').notice('Creating CloudFormation stack', { isMainEvent: true });

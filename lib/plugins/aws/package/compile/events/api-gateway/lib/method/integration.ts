@@ -1,6 +1,4 @@
-'use strict';
-
-const { safeSet, safeShallowAssign } = require('../../../../../../../../utils/safe-object');
+import { safeSet, safeShallowAssign } from '../../../../../../../../utils/safe-object.ts';
 
 const DEFAULT_COMMON_TEMPLATE = `
   #define( $loop )
@@ -48,7 +46,7 @@ const DEFAULT_COMMON_TEMPLATE = `
   }
 `;
 
-module.exports = {
+export default {
   getMethodIntegration(http, { lambdaLogicalId, lambdaAliasName }) {
     const type = http.integration || 'AWS_PROXY';
     const globalApiTimeout =

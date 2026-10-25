@@ -1,6 +1,4 @@
-'use strict';
-
-const runServerless = require('../../../utils/run-serverless');
+import runServerless from '../../../utils/run-serverless.ts';
 
 describe('Config', () => {
   it('should support "config credentials" command', () =>

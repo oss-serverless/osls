@@ -1,10 +1,8 @@
-'use strict';
+import ServerlessError from '../../../../../../../serverless-error.ts';
+import resolveLambdaTarget from '../../../../../utils/resolve-lambda-target.ts';
+import isObject from 'type/object/is.js';
 
-const ServerlessError = require('../../../../../../../serverless-error');
-const resolveLambdaTarget = require('../../../../../utils/resolve-lambda-target');
-const isObject = require('type/object/is');
-
-module.exports = {
+export default {
   validate() {
     const events = [];
 

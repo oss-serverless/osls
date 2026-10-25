@@ -1,7 +1,5 @@
-'use strict';
-
-const os = require('os');
-const ServerlessError = require('../serverless-error');
+import os from 'node:os';
+import ServerlessError from '../serverless-error.ts';
 
 let homeDirectory;
 let currentUser;
@@ -47,7 +45,7 @@ const getCurrentUser = (inputPath) => {
   );
 };
 
-module.exports = (pathWithTilde) => {
+export default (pathWithTilde) => {
   if (typeof pathWithTilde !== 'string') {
     throw new TypeError(`Expected a string, got ${typeof pathWithTilde}`);
   }

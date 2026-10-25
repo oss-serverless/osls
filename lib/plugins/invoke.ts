@@ -1,6 +1,4 @@
-'use strict';
-
-const cliCommandsSchema = require('../cli/commands-schema');
+import cliCommandsSchema from '../cli/commands-schema/index.ts';
 
 class Invoke {
   constructor(serverless, options) {
@@ -67,4 +65,4 @@ class Invoke {
   }
 }
 
-module.exports = Invoke;
+export default Invoke;

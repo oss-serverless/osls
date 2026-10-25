@@ -1,12 +1,11 @@
-'use strict';
+import { MAX_AWS_REQUEST_TRY } from '../../utils.ts';
 
-const { MAX_AWS_REQUEST_TRY } = require('../../utils');
-const {
+import {
   CognitoIdentityProviderClient,
   ListUserPoolsCommand,
   DescribeUserPoolCommand,
   UpdateUserPoolCommand,
-} = require('@aws-sdk/client-cognito-identity-provider');
+} from '@aws-sdk/client-cognito-identity-provider';
 
 const cognito = new CognitoIdentityProviderClient({ maxAttempts: MAX_AWS_REQUEST_TRY });
 
@@ -161,7 +160,9 @@ function removeExistingLambdas(lambdaConfig, lambdaArns) {
   return res;
 }
 
-module.exports = {
+export { findUserPoolByName, updateConfiguration, removeConfiguration };
+
+export default {
   findUserPoolByName,
   updateConfiguration,
   removeConfiguration,

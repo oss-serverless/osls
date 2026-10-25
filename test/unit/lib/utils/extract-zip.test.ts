@@ -1,15 +1,13 @@
-'use strict';
-
-const os = require('os');
-const path = require('path');
-const fs = require('fs');
+import os from 'node:os';
+import path from 'node:path';
+import fs from 'node:fs';
+import yazl from 'yazl';
+import { expect } from 'chai';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import { extractZip, isZipBuffer } from '../../../../lib/utils/extract-zip.ts';
+import { pathExists, remove } from '../../../utils/fs.ts';
 const fsp = fs.promises;
-const yazl = require('yazl');
-const { expect } = require('chai');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const { extractZip, isZipBuffer } = require('../../../../lib/utils/extract-zip');
-const { pathExists, remove } = require('../../../utils/fs');
 
 const loadExtractZipWithFs = (fsStub) =>
   proxyquire.noCallThru().load('../../../../lib/utils/extract-zip', { fs: fsStub });

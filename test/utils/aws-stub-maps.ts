@@ -1,7 +1,5 @@
-'use strict';
-
-const isPlainObject = require('type/plain-object/is');
-const { isUnsafePropertyKey } = require('../../lib/utils/object-path');
+import isPlainObject from 'type/plain-object/is.js';
+import { isUnsafePropertyKey } from '../../lib/utils/object-path.ts';
 
 function cloneValue(value) {
   if (Array.isArray(value)) return value.map(cloneValue);
@@ -54,4 +52,5 @@ const createDeployAwsStubMap = (overrides = {}) =>
     overrides
   );
 
-module.exports = { getCallerIdentity, createDeployAwsStubMap };
+export { getCallerIdentity, createDeployAwsStubMap };
+export default { getCallerIdentity, createDeployAwsStubMap };

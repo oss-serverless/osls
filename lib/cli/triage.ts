@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = async () => {
+export default async () => {
   const cliArgs = new Set(process.argv.slice(2));
 
   // Unconditionally favor "serverless" for version check
@@ -8,7 +6,7 @@ module.exports = async () => {
   if (cliArgs.has('-v')) return 'serverless';
 
   // Detect eventual component configuration
-  const fsp = require('fs').promises;
+  const fsp = (await import('node:fs')).default.promises;
 
   // Used only for osls compose, based on a simplified construction of command
   const command = (() => {

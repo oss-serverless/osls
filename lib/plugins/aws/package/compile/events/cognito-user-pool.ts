@@ -1,10 +1,9 @@
-'use strict';
-
-const { addCustomResourceToService } = require('../../../custom-resources');
-const ServerlessError = require('../../../../../serverless-error');
-const resolveLambdaTarget = require('../../../utils/resolve-lambda-target');
-const mergePlainObjects = require('../../../../../utils/merge-plain-objects');
-const { createRegistry, hasOwn } = require('../../../../../utils/safe-object');
+import customResources2 from '../../../custom-resources/index.ts';
+import ServerlessError from '../../../../../serverless-error.ts';
+import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
+import mergePlainObjects from '../../../../../utils/merge-plain-objects.ts';
+import { createRegistry, hasOwn } from '../../../../../utils/safe-object.ts';
+const { addCustomResourceToService } = customResources2;
 
 const customSenderSources = ['CustomSMSSender', 'CustomEmailSender'];
 const validTriggerSources = [
@@ -485,4 +484,4 @@ class AwsCompileCognitoUserPoolEvents {
   }
 }
 
-module.exports = AwsCompileCognitoUserPoolEvents;
+export default AwsCompileCognitoUserPoolEvents;

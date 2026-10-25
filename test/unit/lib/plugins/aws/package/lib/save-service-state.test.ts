@@ -1,9 +1,7 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const path = require('path');
-const saveServiceState = require('../../../../../../../lib/plugins/aws/package/lib/save-service-state');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import path from 'node:path';
+import saveServiceState from '../../../../../../../lib/plugins/aws/package/lib/save-service-state.ts';
 
 describe('#saveServiceState()', () => {
   let awsPackage;

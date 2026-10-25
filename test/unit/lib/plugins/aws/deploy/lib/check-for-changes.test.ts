@@ -1,34 +1,31 @@
-'use strict';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import glob from '../../../../../../../lib/utils/glob.ts';
+import * as sandbox from 'sinon';
+import proxyquire from 'proxyquire';
+import normalizeFiles from '../../../../../../../lib/plugins/aws/lib/normalize-files.ts';
+import AwsProvider from '../../../../../../../lib/plugins/aws/provider.ts';
+import AwsDeploy from '../../../../../../../lib/plugins/aws/deploy/index.ts';
+import Serverless from '../../../../../../../lib/serverless.ts';
+import ServerlessError from '../../../../../../../lib/serverless-error.ts';
+import runServerless from '../../../../../../utils/run-serverless.ts';
+import { S3Client, ListObjectsV2Command, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda';
 
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
-const glob = require('../../../../../../../lib/utils/glob');
-const sandbox = require('sinon');
-const proxyquire = require('proxyquire');
-const normalizeFiles = require('../../../../../../../lib/plugins/aws/lib/normalize-files');
-const AwsProvider = require('../../../../../../../lib/plugins/aws/provider');
-const AwsDeploy = require('../../../../../../../lib/plugins/aws/deploy/index');
-const Serverless = require('../../../../../../../lib/serverless');
-const ServerlessError = require('../../../../../../../lib/serverless-error');
-const runServerless = require('../../../../../../utils/run-serverless');
-const { S3Client, ListObjectsV2Command, HeadObjectCommand } = require('@aws-sdk/client-s3');
-const { LambdaClient, GetFunctionCommand } = require('@aws-sdk/client-lambda');
-const {
+import {
   CloudWatchLogsClient,
   DeleteSubscriptionFilterCommand,
   DescribeSubscriptionFiltersCommand,
-} = require('@aws-sdk/client-cloudwatch-logs');
-const {
-  CloudFormationClient,
-  DescribeStackResourceCommand,
-} = require('@aws-sdk/client-cloudformation');
-const releasePendingRequestsUntilSettled = require('../../../../../../utils/release-pending-requests-until-settled');
+} from '@aws-sdk/client-cloudwatch-logs';
 
-const fsp = fs.promises;
+import { CloudFormationClient, DescribeStackResourceCommand } from '@aws-sdk/client-cloudformation';
+import releasePendingRequestsUntilSettled from '../../../../../../utils/release-pending-requests-until-settled.ts';
 
 // Configure chai
-const expect = require('chai').expect;
+import { expect } from 'chai';
+
+const fsp = fs.promises;
 
 function createAwsDeployTestInstance() {
   const options = {

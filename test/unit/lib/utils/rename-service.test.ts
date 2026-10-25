@@ -1,13 +1,11 @@
-'use strict';
-
-const Utils = require('../../../../lib/classes/utils');
-const YamlParser = require('../../../../lib/classes/yaml-parser');
-const fs = require('fs');
-const path = require('path');
-const { expect } = require('chai');
-const { ensureDirSync, getTmpDirPath } = require('../../../utils/fs');
-
-const { renameService } = require('../../../../lib/utils/rename-service');
+import Utils from '../../../../lib/classes/utils.ts';
+import YamlParser from '../../../../lib/classes/yaml-parser.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect } from 'chai';
+import { ensureDirSync, getTmpDirPath } from '../../../utils/fs.ts';
+import renameService2 from '../../../../lib/utils/rename-service.ts';
+const { renameService } = renameService2;
 
 const createHarness = () => {
   const serverlessLike = {};

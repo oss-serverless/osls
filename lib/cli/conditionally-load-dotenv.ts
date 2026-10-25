@@ -1,9 +1,7 @@
-'use strict';
+import resolveStage from '../utils/resolve-stage.ts';
 
-const resolveStage = require('../utils/resolve-stage');
-
-module.exports = async (options, configuration) => {
+export default async (options, configuration) => {
   if (!configuration.useDotenv) return false;
-  require('./load-dotenv')(resolveStage({ configuration, options }));
+  (await import('./load-dotenv.ts')).default(resolveStage({ configuration, options }));
   return true;
 };

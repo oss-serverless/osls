@@ -1,8 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-const ServerlessError = require('../../../../lib/serverless-error');
-const awsSdkV3Error = require('../../../../lib/aws/aws-sdk-v3-error');
+import { expect } from 'chai';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import awsSdkV3Error from '../../../../lib/aws/aws-sdk-v3-error.ts';
 
 describe('test/unit/lib/aws/aws-sdk-v3-error.test.js', () => {
   it('extracts error codes from legacy and SDK v3 error shapes', () => {

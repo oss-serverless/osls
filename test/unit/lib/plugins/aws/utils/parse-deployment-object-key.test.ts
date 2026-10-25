@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const parseDeploymentObjectKey = require('../../../../../../lib/plugins/aws/utils/parse-deployment-object-key');
+import { expect } from 'chai';
+import parseDeploymentObjectKey from '../../../../../../lib/plugins/aws/utils/parse-deployment-object-key.ts';
 
 describe('test/unit/lib/plugins/aws/utils/parse-deployment-object-key.test.js', () => {
   it('parses a valid deployment object key', () => {

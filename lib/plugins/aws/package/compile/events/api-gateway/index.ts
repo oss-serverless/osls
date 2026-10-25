@@ -1,23 +1,20 @@
-'use strict';
-
-const memoize = require('memoizee');
-
-const validate = require('./lib/validate');
-const compileRestApi = require('./lib/rest-api');
-const compileRequestValidators = require('./lib/request-validator');
-const compileApiKeys = require('./lib/api-keys');
-const compileUsagePlan = require('./lib/usage-plan');
-const compileUsagePlanKeys = require('./lib/usage-plan-keys');
-const compileResources = require('./lib/resources');
-const compileCors = require('./lib/cors');
-const compileMethods = require('./lib/method/index');
-const compileAuthorizers = require('./lib/authorizers');
-const compileDeployment = require('./lib/deployment');
-const compilePermissions = require('./lib/permissions');
-const compileStage = require('./lib/stage');
-const getMethodAuthorization = require('./lib/method/authorization');
-const getMethodIntegration = require('./lib/method/integration');
-const getMethodResponses = require('./lib/method/responses');
+import memoize from 'memoizee';
+import validate from './lib/validate.ts';
+import compileRestApi from './lib/rest-api.ts';
+import compileRequestValidators from './lib/request-validator.ts';
+import compileApiKeys from './lib/api-keys.ts';
+import compileUsagePlan from './lib/usage-plan.ts';
+import compileUsagePlanKeys from './lib/usage-plan-keys.ts';
+import compileResources from './lib/resources.ts';
+import compileCors from './lib/cors.ts';
+import compileMethods from './lib/method/index.ts';
+import compileAuthorizers from './lib/authorizers.ts';
+import compileDeployment from './lib/deployment.ts';
+import compilePermissions from './lib/permissions.ts';
+import compileStage from './lib/stage.ts';
+import getMethodAuthorization from './lib/method/authorization.ts';
+import getMethodIntegration from './lib/method/integration.ts';
+import getMethodResponses from './lib/method/responses.ts';
 
 function caseInsensitive(str) {
   return { type: 'string', regexp: new RegExp(`^${str}$`, 'i').toString() };
@@ -265,10 +262,11 @@ class AwsCompileApigEvents {
 
       // TODO should be removed once AWS fixes the CloudFormation problems using a separate Stage
       'after:deploy:deploy': async () => {
-        const getServiceState = require('../../../../lib/get-service-state').getServiceState;
+        const getServiceState = (await import('../../../../lib/get-service-state.ts')).default
+          .getServiceState;
 
         const state = getServiceState.call(this);
-        const updateStage = require('./lib/hack/update-stage').updateStage;
+        const updateStage = (await import('./lib/hack/update-stage.ts')).default.updateStage;
 
         this.state = state;
         return updateStage.call(this);
@@ -276,9 +274,9 @@ class AwsCompileApigEvents {
 
       // TODO should be removed once AWS fixes the removal via CloudFormation
       'before:remove:remove': async () => {
-        const globalValidate = require('../../../../lib/validate').validate;
-        const disassociateUsagePlan =
-          require('./lib/hack/disassociate-usage-plan').disassociateUsagePlan;
+        const globalValidate = (await import('../../../../lib/validate.ts')).default.validate;
+        const disassociateUsagePlan = (await import('./lib/hack/disassociate-usage-plan.ts'))
+          .default.disassociateUsagePlan;
 
         await globalValidate.call(this);
         return disassociateUsagePlan.call(this);
@@ -287,4 +285,4 @@ class AwsCompileApigEvents {
   }
 }
 
-module.exports = AwsCompileApigEvents;
+export default AwsCompileApigEvents;

@@ -1,10 +1,8 @@
-'use strict';
-
-const expect = require('chai').expect;
-const AwsProvider = require('../../../../../../../../lib/plugins/aws/provider');
-const AwsCompileCloudWatchLogEvents = require('../../../../../../../../lib/plugins/aws/package/compile/events/cloud-watch-log');
-const runServerless = require('../../../../../../../utils/run-serverless');
-const { createAwsEventCompilerContext } = require('./test-utils');
+import { expect } from 'chai';
+import AwsProvider from '../../../../../../../../lib/plugins/aws/provider.ts';
+import AwsCompileCloudWatchLogEvents from '../../../../../../../../lib/plugins/aws/package/compile/events/cloud-watch-log.ts';
+import runServerless from '../../../../../../../utils/run-serverless.ts';
+import { createAwsEventCompilerContext } from './test-utils.ts';
 
 function createAwsCompileCloudWatchLogEvents(config = {}) {
   const { awsCompileEvents } = createAwsEventCompilerContext(AwsCompileCloudWatchLogEvents, config);

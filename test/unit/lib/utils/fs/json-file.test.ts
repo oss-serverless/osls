@@ -1,12 +1,9 @@
-'use strict';
-
-const fs = require('fs');
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect } from 'chai';
+import { readJson, writeJson } from '../../../../../lib/utils/fs/json-file.ts';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
 const fsp = fs.promises;
-const path = require('path');
-const { expect } = require('chai');
-
-const { readJson, writeJson } = require('../../../../../lib/utils/fs/json-file');
-const { getTmpDirPath } = require('../../../../utils/fs');
 
 describe('test/unit/lib/utils/fs/json-file.test.js', () => {
   let tmpDir;

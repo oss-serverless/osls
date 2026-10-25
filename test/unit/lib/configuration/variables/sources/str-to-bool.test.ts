@@ -1,10 +1,7 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const resolveMeta = require('../../../../../../lib/configuration/variables/resolve-meta');
-const resolve = require('../../../../../../lib/configuration/variables/resolve');
-const strToBoolSource = require('../../../../../../lib/configuration/variables/sources/str-to-bool');
+import { expect } from 'chai';
+import resolveMeta from '../../../../../../lib/configuration/variables/resolve-meta.ts';
+import resolve from '../../../../../../lib/configuration/variables/resolve.ts';
+import strToBoolSource from '../../../../../../lib/configuration/variables/sources/str-to-bool.ts';
 
 describe('test/unit/lib/configuration/variables/sources/str-to-bool.test.js', () => {
   let configuration;

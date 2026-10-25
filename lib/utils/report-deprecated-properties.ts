@@ -1,7 +1,5 @@
-'use strict';
-
-const logDeprecation = require('./log-deprecation');
-const { getByPath } = require('./object-path');
+import logDeprecation from './log-deprecation.ts';
+import { getByPath } from './object-path.ts';
 
 const getMessage = (props, serviceConfig) => {
   const warnings = [];
@@ -22,7 +20,7 @@ const getMessage = (props, serviceConfig) => {
   return null;
 };
 
-module.exports = (code, props, { serviceConfig } = {}) => {
+export default (code, props, { serviceConfig } = {}) => {
   const msg = getMessage(props, serviceConfig);
   if (msg) {
     logDeprecation(code, msg, { serviceConfig });

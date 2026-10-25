@@ -1,15 +1,15 @@
-'use strict';
+import { addPermission, removePermission } from './lib/permissions.ts';
 
-const { addPermission, removePermission } = require('./lib/permissions');
-const {
+import {
   createEventBus,
   deleteEventBus,
   updateRuleConfiguration,
   updateTargetConfiguration,
   removeRuleConfiguration,
   removeTargetConfiguration,
-} = require('./lib/event-bridge');
-const { getEnvironment, getLambdaArn, handlerWrapper } = require('../utils');
+} from './lib/event-bridge.ts';
+
+import { getEnvironment, getLambdaArn, handlerWrapper } from '../utils.ts';
 
 async function handler(event, context) {
   if (event.RequestType === 'Create') {
@@ -123,6 +123,6 @@ async function remove(event, context) {
     );
 }
 
-module.exports = {
+export default {
   handler: handlerWrapper(handler, 'CustomResourceEventBridge'),
 };

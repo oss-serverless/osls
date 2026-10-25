@@ -1,15 +1,14 @@
-'use strict';
-
-const isObject = require('type/object/is');
-const awsArnRegExs = require('../../../../../utils/arn-regular-expressions');
-const resolveLambdaTarget = require('../../../../../utils/resolve-lambda-target');
-const ServerlessError = require('../../../../../../../serverless-error');
-const {
+import isObject from 'type/object/is.js';
+import awsArnRegExs from '../../../../../utils/arn-regular-expressions.ts';
+import resolveLambdaTarget from '../../../../../utils/resolve-lambda-target.ts';
+import ServerlessError from '../../../../../../../serverless-error.ts';
+import {
   createRegistry,
   hasOwn,
   safeShallowAssign,
-} = require('../../../../../../../utils/safe-object');
-const { log } = require('../../../../../../../utils/serverless-utils/log');
+} from '../../../../../../../utils/safe-object.ts';
+import log2 from '../../../../../../../utils/serverless-utils/log.ts';
+const { log } = log2;
 
 const NOT_FOUND = -1;
 const DEFAULT_STATUS_CODES = {
@@ -44,7 +43,7 @@ const DEFAULT_STATUS_CODES = {
 
 const union = (left, right) => Array.from(new Set([...(left || []), ...(right || [])]));
 
-module.exports = {
+export default {
   validate() {
     const events = [];
     const corsPreflight = createRegistry();

@@ -1,13 +1,11 @@
-'use strict';
-
-const fsp = require('fs').promises;
-const path = require('path');
-const Utils = require('../../../../../lib/classes/utils');
-const YamlParser = require('../../../../../lib/classes/yaml-parser');
-const writeFileSync = require('../../../../../lib/utils/fs/write-file-sync');
-const readFileSync = require('../../../../../lib/utils/fs/read-file-sync');
-const { expect } = require('chai');
-const { getTmpFilePath } = require('../../../../utils/fs');
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
+import Utils from '../../../../../lib/classes/utils.ts';
+import YamlParser from '../../../../../lib/classes/yaml-parser.ts';
+import writeFileSync from '../../../../../lib/utils/fs/write-file-sync.ts';
+import readFileSync from '../../../../../lib/utils/fs/read-file-sync.ts';
+import { expect } from 'chai';
+import { getTmpFilePath } from '../../../../utils/fs.ts';
 
 const createHarness = () => {
   const serverlessLike = {};

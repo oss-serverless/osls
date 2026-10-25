@@ -1,8 +1,6 @@
-'use strict';
+import { isDeepStrictEqual } from 'node:util';
 
-const { isDeepStrictEqual } = require('node:util');
-const promiseLimit = require('ext/promise/limit').bind(Promise);
-const {
+import {
   APIGatewayClient,
   CreateStageCommand,
   GetDeploymentsCommand,
@@ -11,11 +9,14 @@ const {
   TagResourceCommand,
   UntagResourceCommand,
   UpdateStageCommand,
-} = require('@aws-sdk/client-api-gateway');
-const { CloudWatchLogsClient, DeleteLogGroupCommand } = require('@aws-sdk/client-cloudwatch-logs');
-const ServerlessError = require('../../../../../../../../serverless-error');
-const { safeShallowAssign } = require('../../../../../../../../utils/safe-object');
-const { isApiGatewayNotFoundError } = require('../../../../../../../../aws/aws-sdk-v3-error');
+} from '@aws-sdk/client-api-gateway';
+
+import { CloudWatchLogsClient, DeleteLogGroupCommand } from '@aws-sdk/client-cloudwatch-logs';
+import ServerlessError from '../../../../../../../../serverless-error.ts';
+import { safeShallowAssign } from '../../../../../../../../utils/safe-object.ts';
+import { isApiGatewayNotFoundError } from '../../../../../../../../aws/aws-sdk-v3-error.ts';
+import promiseLimit2 from 'ext/promise/limit.js';
+const promiseLimit = promiseLimit2.bind(Promise);
 
 const defaultApiGatewayLogFormat = [
   'requestId: $context.requestId',
@@ -36,7 +37,7 @@ const defaultApiGatewayLogLevel = 'INFO';
 // NOTE: This code was written since there are problem setting up dedicated CloudFormation
 // Stage resource (see https://github.com/serverless/serverless/pull/5692#issuecomment-467849311 for more information).
 
-module.exports = {
+export default {
   defaultApiGatewayLogLevel,
   async updateStage() {
     const provider = this.state.service.provider;

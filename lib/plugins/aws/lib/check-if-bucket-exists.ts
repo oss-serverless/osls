@@ -1,11 +1,9 @@
-'use strict';
-
-const ServerlessError = require('../../../serverless-error');
-const { S3Client, HeadBucketCommand } = require('@aws-sdk/client-s3');
-const {
+import ServerlessError from '../../../serverless-error.ts';
+import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
+import {
   isS3HeadBucketNotFoundError,
   isS3HeadBucketForbiddenError,
-} = require('../../../aws/aws-sdk-v3-error');
+} from '../../../aws/aws-sdk-v3-error.ts';
 
 function getS3Client(context) {
   context.s3ClientPromise ||= context.provider
@@ -14,7 +12,7 @@ function getS3Client(context) {
   return context.s3ClientPromise;
 }
 
-module.exports = {
+export default {
   async checkIfBucketExists(bucketName) {
     try {
       const s3 = await getS3Client(this);

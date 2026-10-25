@@ -1,7 +1,5 @@
-'use strict';
-
-const chai = require('chai');
-const runServerless = require('../../../../../../../../../utils/run-serverless');
+import * as chai from 'chai';
+import runServerless from '../../../../../../../../../utils/run-serverless.ts';
 
 const expect = chai.expect;
 

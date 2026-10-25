@@ -1,37 +1,37 @@
-'use strict';
-
-const os = require('os');
-const fsp = require('fs').promises;
-const path = require('path');
-const { pathToFileURL } = require('url');
-const { stripVTControlCharacters: stripAnsi } = require('node:util');
-const promiseLimit = require('ext/promise/limit').bind(Promise);
-const validate = require('../lib/validate');
-const stdin = require('../../../utils/get-stdin');
-const spawnExt = require('../../../utils/spawn');
-const inspect = require('util').inspect;
-const download = require('../../../utils/serverless-utils/download');
-const resolveCacheDir = require('../../../utils/resolve-cache-dir');
-const { extractZip } = require('../../../utils/extract-zip');
-const { randomUUID } = require('node:crypto');
-const ServerlessError = require('../../../serverless-error');
-const isObject = require('type/object/is');
-const dirExists = require('../../../utils/fs/dir-exists');
-const fileExists = require('../../../utils/fs/file-exists');
-const isStandalone = require('../../../utils/is-standalone-executable');
-const ensureArtifact = require('../../../utils/ensure-artifact');
-const ensureValidLayerPath = require('../../../utils/ensure-valid-layer-path');
-const { safeShallowAssign } = require('../../../utils/safe-object');
-const { isAwsCredentialsNotFoundError } = require('../../../aws/aws-sdk-v3-error');
-const { writeText, progress, log } = require('../../../utils/serverless-utils/log');
-const copy = require('../../../utils/fs/copy');
-const ensureFile = require('../../../utils/fs/ensure-file');
-const { LambdaClient, GetLayerVersionCommand } = require('@aws-sdk/client-lambda');
-const {
+import os from 'node:os';
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { stripVTControlCharacters as stripAnsi } from 'node:util';
+import validate from '../lib/validate.ts';
+import stdin from '../../../utils/get-stdin.ts';
+import spawnExt from '../../../utils/spawn.ts';
+import { inspect } from 'node:util';
+import download from '../../../utils/serverless-utils/download.ts';
+import resolveCacheDir from '../../../utils/resolve-cache-dir.ts';
+import { extractZip } from '../../../utils/extract-zip.ts';
+import { randomUUID } from 'node:crypto';
+import ServerlessError from '../../../serverless-error.ts';
+import isObject from 'type/object/is.js';
+import dirExists from '../../../utils/fs/dir-exists.ts';
+import fileExists from '../../../utils/fs/file-exists.ts';
+import isStandalone from '../../../utils/is-standalone-executable.ts';
+import ensureArtifact from '../../../utils/ensure-artifact.ts';
+import ensureValidLayerPath from '../../../utils/ensure-valid-layer-path.ts';
+import { safeShallowAssign } from '../../../utils/safe-object.ts';
+import { isAwsCredentialsNotFoundError } from '../../../aws/aws-sdk-v3-error.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
+import copy from '../../../utils/fs/copy.ts';
+import ensureFile from '../../../utils/fs/ensure-file.ts';
+import { LambdaClient, GetLayerVersionCommand } from '@aws-sdk/client-lambda';
+import {
   CloudFormationClient,
   ListExportsCommand,
   ListStackResourcesCommand,
-} = require('@aws-sdk/client-cloudformation');
+} from '@aws-sdk/client-cloudformation';
+import promiseLimit2 from 'ext/promise/limit.js';
+const promiseLimit = promiseLimit2.bind(Promise);
+const { writeText, progress, log } = log2;
 
 const cachePath = path.join(resolveCacheDir('serverless'), 'invokeLocal');
 
@@ -41,10 +41,10 @@ const dockerProgress = progress.get('invokeLocalDocker');
 const ensureRuntimeWrappers = isStandalone
   ? async () =>
       ensureArtifact('runtime-wrappers/validationFile', async (runtimeCachePath) => {
-        await copy(path.resolve(__dirname, 'runtime-wrappers'), runtimeCachePath);
+        await copy(path.resolve(import.meta.dirname, 'runtime-wrappers'), runtimeCachePath);
         return ensureFile(path.resolve(runtimeCachePath, 'validationFile'));
       })
-  : () => __dirname;
+  : () => import.meta.dirname;
 
 const javaClassNamePattern =
   /^(?:[A-Za-z_$][A-Za-z0-9_$]*\.)*[A-Za-z_$][A-Za-z0-9_$]*(?:\$[A-Za-z_$][A-Za-z0-9_$]*)*$/;
@@ -1075,4 +1075,4 @@ class AwsInvokeLocal {
   }
 }
 
-module.exports = AwsInvokeLocal;
+export default AwsInvokeLocal;

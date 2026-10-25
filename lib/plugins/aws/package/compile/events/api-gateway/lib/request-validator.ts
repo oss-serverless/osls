@@ -1,9 +1,7 @@
-'use strict';
+import isObject from 'type/object/is.js';
+import { safeSet } from '../../../../../../../utils/safe-object.ts';
 
-const isObject = require('type/object/is');
-const { safeSet } = require('../../../../../../../utils/safe-object');
-
-module.exports = {
+export default {
   compileRequestValidators() {
     const apiGatewayConfig = this.serverless.service.provider.apiGateway || {};
 

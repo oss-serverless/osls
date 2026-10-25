@@ -1,10 +1,8 @@
-'use strict';
-
-const chai = require('chai');
-const sinon = require('sinon');
-const runServerless = require('../../../../../../../../../utils/run-serverless');
-const { createApiGatewayCompilerContext } = require('../test-utils');
-const ServerlessError = require('../../../../../../../../../../lib/serverless-error');
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import runServerless from '../../../../../../../../../utils/run-serverless.ts';
+import { createApiGatewayCompilerContext } from '../test-utils.ts';
+import ServerlessError from '../../../../../../../../../../lib/serverless-error.ts';
 
 const expect = chai.expect;
 

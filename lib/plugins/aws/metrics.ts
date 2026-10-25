@@ -1,10 +1,11 @@
-'use strict';
+import validate from './lib/validate.ts';
+import log from '../../utils/serverless-utils/log.ts';
+import { parseTimeInput, subtractTime, formatDisplayTime } from './utils/time.ts';
+import { CloudWatchClient, GetMetricStatisticsCommand } from '@aws-sdk/client-cloudwatch';
+import promiseLimit2 from 'ext/promise/limit.js';
 
-const promiseLimit = require('ext/promise/limit').bind(Promise);
-const validate = require('./lib/validate');
-const { writeText, style } = require('../../utils/serverless-utils/log');
-const { parseTimeInput, subtractTime, formatDisplayTime } = require('./utils/time');
-const { CloudWatchClient, GetMetricStatisticsCommand } = require('@aws-sdk/client-cloudwatch');
+const promiseLimit = promiseLimit2.bind(Promise);
+const { writeText, style } = log;
 
 function getCloudWatchClient(context) {
   context.cloudWatchClientPromise ||= context.provider
@@ -144,4 +145,4 @@ class AwsMetrics {
   }
 }
 
-module.exports = AwsMetrics;
+export default AwsMetrics;

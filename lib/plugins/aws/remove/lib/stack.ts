@@ -1,16 +1,15 @@
-'use strict';
-
-const {
+import {
   CloudFormationClient,
   DeleteStackCommand,
   DescribeStacksCommand,
-} = require('@aws-sdk/client-cloudformation');
-const ServerlessError = require('../../../../serverless-error');
-const { log } = require('../../../../utils/serverless-utils/log');
-const {
+} from '@aws-sdk/client-cloudformation';
+import ServerlessError from '../../../../serverless-error.ts';
+import log2 from '../../../../utils/serverless-utils/log.ts';
+import {
   getAwsErrorMessage,
   isCloudFormationMissingStackError,
-} = require('../../../../aws/aws-sdk-v3-error');
+} from '../../../../aws/aws-sdk-v3-error.ts';
+const { log } = log2;
 
 function getCloudFormationClient(context) {
   context.cloudFormationClientPromise ||= context.provider
@@ -19,7 +18,7 @@ function getCloudFormationClient(context) {
   return context.cloudFormationClientPromise;
 }
 
-module.exports = {
+export default {
   async ensureStackIsNotDeletionProtected() {
     const stackName = this.provider.naming.getStackName();
     const cloudFormation = await getCloudFormationClient(this);

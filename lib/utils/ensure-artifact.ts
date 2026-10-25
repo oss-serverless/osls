@@ -1,10 +1,9 @@
-'use strict';
-
-const memoizee = require('memoizee');
-const { version } = require('../../package');
-const ensureExists = require('./ensure-exists');
-const path = require('path');
-const os = require('os');
+import memoizee from 'memoizee';
+import packageModule from '../../package.json' with { type: 'json' };
+import ensureExists from './ensure-exists.ts';
+import path from 'node:path';
+import os from 'node:os';
+const { version } = packageModule;
 
 const ensureArtifactInCache = memoizee(
   async (filename, cachePath, generate) => {
@@ -33,4 +32,4 @@ ensureArtifact.delete = (filename, options = {}) => {
   return ensureArtifactInCache.delete(filename, cachePath);
 };
 
-module.exports = ensureArtifact;
+export default ensureArtifact;

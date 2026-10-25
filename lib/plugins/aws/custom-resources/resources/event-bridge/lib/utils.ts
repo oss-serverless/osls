@@ -1,6 +1,4 @@
-'use strict';
-
-const crypto = require('crypto');
+import crypto from 'node:crypto';
 
 function getEventBusName(eventBus) {
   if (eventBus && eventBus.startsWith('arn')) {
@@ -23,7 +21,9 @@ function getEventBusTargetId(ruleName) {
   return targetId;
 }
 
-module.exports = {
+export { getEventBusName, getEventBusTargetId };
+
+export default {
   getEventBusName,
   getEventBusTargetId,
 };

@@ -1,11 +1,9 @@
-'use strict';
-
-const path = require('path');
-const fsp = require('fs').promises;
-const chai = require('chai');
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import * as chai from 'chai';
+import requireWithImportFallback from '../../../../lib/utils/require-with-import-fallback.ts';
 
 const { expect } = chai;
-const requireWithImportFallback = require('../../../../lib/utils/require-with-import-fallback');
 
 describe('test/unit/lib/utils/require-with-import-fallback.test.js', () => {
   let modulePath;

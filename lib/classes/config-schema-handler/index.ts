@@ -1,13 +1,12 @@
-'use strict';
-
-const isObject = require('type/object/is');
-const ensurePlainObject = require('type/plain-object/ensure');
-const schema = require('../../config-schema');
-const ServerlessError = require('../../serverless-error');
-const normalizeAjvErrors = require('./normalize-ajv-errors');
-const resolveAjvValidate = require('./resolve-ajv-validate');
-const { log, style } = require('../../utils/serverless-utils/log');
-const { setByPath } = require('../../utils/object-path');
+import isObject from 'type/object/is.js';
+import ensurePlainObject from 'type/plain-object/ensure.js';
+import schema from '../../config-schema.ts';
+import ServerlessError from '../../serverless-error.ts';
+import normalizeAjvErrors from './normalize-ajv-errors.ts';
+import resolveAjvValidate from './resolve-ajv-validate.ts';
+import log2 from '../../utils/serverless-utils/log.ts';
+import { setByPath } from '../../utils/object-path.ts';
+const { log, style } = log2;
 
 const FUNCTION_NAME_PATTERN = '^[a-zA-Z0-9-_]+$';
 const ERROR_PREFIX = 'Configuration error';
@@ -388,4 +387,4 @@ function deepFreeze(object) {
   return Object.freeze(object);
 }
 
-module.exports = ConfigSchemaHandler;
+export default ConfigSchemaHandler;

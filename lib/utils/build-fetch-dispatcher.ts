@@ -1,12 +1,10 @@
-'use strict';
-
-const { EnvHttpProxyAgent, ProxyAgent } = require('undici');
-const { getCACertificates } = require('../aws/config');
+import { EnvHttpProxyAgent, ProxyAgent } from 'undici';
+import { getCACertificates } from '../aws/config.ts';
 
 // Dispatcher for the framework's plain fetch() calls, mirroring the proxy and custom CA
 // configuration that AWS SDK clients receive. Built per call so environment changes are
 // honored.
-module.exports = () => {
+export default () => {
   const caCerts = getCACertificates();
   const tlsOptions = caCerts.length > 0 ? { ca: caCerts } : undefined;
   const agentOptions = tlsOptions

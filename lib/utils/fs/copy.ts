@@ -1,8 +1,6 @@
-'use strict';
-
-const fs = require('fs');
+import fs from 'node:fs';
+import path from 'node:path';
 const fsp = fs.promises;
-const path = require('path');
 
 const shouldCopy = async (sourcePath, destinationPath, options) => {
   if (typeof options.filter !== 'function') return true;
@@ -39,7 +37,7 @@ const copyDereferenced = async (sourcePath, destinationPath, options) => {
   await copyFile(sourcePath, destinationPath, options);
 };
 
-module.exports = async (sourcePath, destinationPath, options = {}) => {
+export default async (sourcePath, destinationPath, options = {}) => {
   await fsp.mkdir(path.dirname(destinationPath), { recursive: true });
   if (options.dereference) {
     // Native fs.cp can preserve nested symlinks despite dereference on supported Node releases.

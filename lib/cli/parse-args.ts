@@ -1,13 +1,9 @@
-// TODO: Consider publishing as independent package
-
-'use strict';
-
-const ServerlessError = require('../serverless-error');
-const paramRegExp = require('./param-reg-exp');
+import ServerlessError from '../serverless-error.ts';
+import paramRegExp from './param-reg-exp.ts';
 
 const isParamName = RegExp.prototype.test.bind(paramRegExp);
 
-module.exports = (
+export default (
   args,
   { boolean = new Set(), alias = new Map(), string = new Set(), multiple = new Set() }
 ) => {

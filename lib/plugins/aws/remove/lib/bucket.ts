@@ -1,18 +1,19 @@
-'use strict';
-
-const { log } = require('../../../../utils/serverless-utils/log');
-const ServerlessError = require('../../../../serverless-error');
-const isS3ListAccessDeniedError = require('../../utils/is-s3-list-access-denied-error');
-const {
+import log2 from '../../../../utils/serverless-utils/log.ts';
+import ServerlessError from '../../../../serverless-error.ts';
+import isS3ListAccessDeniedError from '../../utils/is-s3-list-access-denied-error.ts';
+import {
   getAwsErrorCode,
   isCloudFormationMissingResourceError,
-} = require('../../../../aws/aws-sdk-v3-error');
-const {
+} from '../../../../aws/aws-sdk-v3-error.ts';
+
+import {
   S3Client,
   DeleteObjectsCommand,
   ListObjectsV2Command,
   ListObjectVersionsCommand,
-} = require('@aws-sdk/client-s3');
+} from '@aws-sdk/client-s3';
+
+const { log } = log2;
 
 const maxDeleteObjectsCount = 1000;
 
@@ -29,7 +30,7 @@ function getS3Client(context) {
   return context.s3ClientPromise;
 }
 
-module.exports = {
+export default {
   async setServerlessDeploymentBucketName() {
     try {
       const bucketName = await this.provider.getServerlessDeploymentBucketName();

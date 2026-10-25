@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const resolveFinal = require('../../../../../lib/cli/commands-schema/resolve-final');
+import { expect } from 'chai';
+import resolveFinal from '../../../../../lib/cli/commands-schema/resolve-final.ts';
 
 describe('test/unit/lib/cli/commands-schema/resolve-final.test.js', () => {
   describe('Non-AWS provider', () => {

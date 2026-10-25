@@ -1,10 +1,8 @@
-'use strict';
-
-const path = require('path');
-const ServerlessError = require('../../serverless-error');
-const cliCommandsSchema = require('../../cli/commands-schema');
-const zipService = require('./lib/zip-service');
-const packageService = require('./lib/package-service');
+import path from 'node:path';
+import ServerlessError from '../../serverless-error.ts';
+import cliCommandsSchema from '../../cli/commands-schema/index.ts';
+import zipService from './lib/zip-service.ts';
+import packageService from './lib/package-service.ts';
 
 class Package {
   constructor(serverless, options) {
@@ -43,4 +41,4 @@ class Package {
   }
 }
 
-module.exports = Package;
+export default Package;

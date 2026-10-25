@@ -1,8 +1,6 @@
-'use strict';
-
-const chai = require('chai');
-const runServerless = require('../../../../../../../../utils/run-serverless');
-const templateBody = require('../../../../../../../../fixtures/programmatic/iot-fleet-provisioning/template.json');
+import * as chai from 'chai';
+import runServerless from '../../../../../../../../utils/run-serverless.ts';
+import templateBody from '../../../../../../../../fixtures/programmatic/iot-fleet-provisioning/template.json' with { type: 'json' };
 
 const { expect } = chai;
 

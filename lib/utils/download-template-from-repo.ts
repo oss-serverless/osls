@@ -1,19 +1,18 @@
-'use strict';
-
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
-const URL = require('url');
-const download = require('./serverless-utils/download');
-const buildFetchDispatcher = require('./build-fetch-dispatcher');
-const qs = require('querystring');
-const spawn = require('./spawn');
-const untildify = require('./untildify');
-const renameService = require('./rename-service').renameService;
-const ServerlessError = require('../serverless-error');
-const copyDirContentsSync = require('./fs/copy-dir-contents-sync');
-const dirExistsSync = require('./fs/dir-exists-sync');
-const { removeSync } = require('./fs/remove');
+import path from 'node:path';
+import os from 'node:os';
+import fs from 'node:fs';
+import URL from 'node:url';
+import download from './serverless-utils/download.ts';
+import buildFetchDispatcher from './build-fetch-dispatcher.ts';
+import qs from 'node:querystring';
+import spawn from './spawn.ts';
+import untildify from './untildify.ts';
+import renameService2 from './rename-service.ts';
+import ServerlessError from '../serverless-error.ts';
+import copyDirContentsSync from './fs/copy-dir-contents-sync.ts';
+import dirExistsSync from './fs/dir-exists-sync.ts';
+import { removeSync } from './fs/remove.ts';
+const renameService = renameService2.renameService;
 
 /**
  * Returns directory path
@@ -434,7 +433,9 @@ async function downloadTemplateFromRepo(inputUrl, requestedServiceName, download
   }
 }
 
-module.exports = {
+export { downloadTemplateFromRepo, parseRepoURL };
+
+export default {
   downloadTemplateFromRepo,
   parseRepoURL,
 };

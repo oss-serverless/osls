@@ -1,16 +1,15 @@
-'use strict';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import glob from '../../../utils/glob.ts';
+import micromatch from 'micromatch';
+import ServerlessError from '../../../serverless-error.ts';
+import parseS3URI from '../../aws/utils/parse-s3-uri.ts';
+import { createRegistry } from '../../../utils/safe-object.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
+import ensureValidLayerPath from '../../../utils/ensure-valid-layer-path.ts';
+const { log } = log2;
 
-const path = require('path');
-const fsp = require('fs').promises;
-const glob = require('../../../utils/glob');
-const micromatch = require('micromatch');
-const ServerlessError = require('../../../serverless-error');
-const parseS3URI = require('../../aws/utils/parse-s3-uri');
-const { createRegistry } = require('../../../utils/safe-object');
-const { log } = require('../../../utils/serverless-utils/log');
-const ensureValidLayerPath = require('../../../utils/ensure-valid-layer-path');
-
-module.exports = {
+export default {
   defaultExcludes: [
     '.git/**',
     '.gitignore',

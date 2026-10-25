@@ -1,19 +1,18 @@
-'use strict';
-
 /**
  * Test: YamlParser Function Class
  */
 
-const http = require('http');
-const yaml = require('js-yaml');
-const path = require('path');
-const { pathToFileURL } = require('url');
-const Utils = require('../../../../lib/classes/utils');
-const YamlParser = require('../../../../lib/classes/yaml-parser');
-const { getTmpFilePath, getTmpDirPath } = require('../../../utils/fs');
+import http from 'node:http';
+
+import * as yaml from 'js-yaml';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import Utils from '../../../../lib/classes/utils.ts';
+import YamlParser from '../../../../lib/classes/yaml-parser.ts';
+import { getTmpFilePath, getTmpDirPath } from '../../../utils/fs.ts';
 
 // Configure chai
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 const createHarness = () => {
   const serverlessLike = {};

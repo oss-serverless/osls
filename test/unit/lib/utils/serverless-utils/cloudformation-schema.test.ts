@@ -1,8 +1,6 @@
-'use strict';
-
-const expect = require('chai').expect;
-const yaml = require('js-yaml');
-const cloudformationSchema = require('../../../../../lib/utils/serverless-utils/cloudformation-schema');
+import { expect } from 'chai';
+import * as yaml from 'js-yaml';
+import cloudformationSchema from '../../../../../lib/utils/serverless-utils/cloudformation-schema.ts';
 
 const load = (input) => yaml.load(input, { schema: cloudformationSchema });
 

@@ -1,9 +1,7 @@
-'use strict';
-
-const parse = require('../../../../../lib/utils/fs/parse');
+import parse from '../../../../../lib/utils/fs/parse.ts';
 
 // Configure chai
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 const shortHandOptions = [
   {

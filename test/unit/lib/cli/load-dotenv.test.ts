@@ -1,14 +1,11 @@
-'use strict';
-
-const path = require('path');
-const sinon = require('sinon');
-const { overrideEnv } = require('../../../utils/process');
-const fsp = require('fs').promises;
-const loadEnv = require('../../../../lib/cli/load-dotenv');
-const dotenv = require('dotenv');
-const ServerlessError = require('../../../../lib/serverless-error');
-
-const expect = require('chai').expect;
+import path from 'node:path';
+import * as sinon from 'sinon';
+import { overrideEnv } from '../../../utils/process.ts';
+import { promises as fsp } from 'node:fs';
+import loadEnv from '../../../../lib/cli/load-dotenv.ts';
+import dotenv from 'dotenv';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import { expect } from 'chai';
 
 describe('test/unit/lib/cli/load-dotenv.test.js', () => {
   let restoreEnv;

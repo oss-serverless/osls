@@ -1,10 +1,8 @@
-'use strict';
-
-const { expect } = require('chai');
-const {
+import { expect } from 'chai';
+import {
   createExternalRefAccessDeniedError,
   getExternalRefAccessDeniedError,
-} = require('../../../../../lib/classes/yaml-parser/external-ref-errors');
+} from '../../../../../lib/classes/yaml-parser/external-ref-errors.ts';
 
 describe('yaml-parser/external-ref-errors', () => {
   it('finds access denied errors through nested causes and aggregate errors', () => {

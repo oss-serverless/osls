@@ -1,28 +1,27 @@
-'use strict';
-
-const ServerlessError = require('../../../serverless-error');
-const writeServiceOutputs = require('../../../cli/write-service-outputs');
-const extendedValidate = require('./lib/extended-validate');
-const setBucketName = require('../lib/set-bucket-name');
-const checkForChanges = require('./lib/check-for-changes');
-const monitorStack = require('../lib/monitor-stack');
-const checkIfBucketExists = require('../lib/check-if-bucket-exists');
-const getCreateChangeSetParams = require('../lib/get-create-change-set-params');
-const getSharedStackActionParams = require('../lib/get-shared-stack-action-params');
-const getCreateStackParams = require('../lib/get-create-stack-params');
-const getUpdateStackParams = require('../lib/get-update-stack-params');
-const getExecuteChangeSetParams = require('../lib/get-execute-change-set-params');
-const waitForChangeSetCreation = require('../lib/wait-for-change-set-creation');
-const uploadZipFile = require('../lib/upload-zip-file');
-const createStack = require('./lib/create-stack');
-const cleanupS3Bucket = require('./lib/cleanup-s3-bucket');
-const uploadArtifacts = require('./lib/upload-artifacts');
-const validateTemplate = require('./lib/validate-template');
-const updateStack = require('../lib/update-stack');
-const ensureValidBucketExists = require('./lib/ensure-valid-bucket-exists');
-const path = require('path');
-const { style, log, progress, writeText } = require('../../../utils/serverless-utils/log');
-const memoize = require('memoizee');
+import ServerlessError from '../../../serverless-error.ts';
+import writeServiceOutputs from '../../../cli/write-service-outputs.ts';
+import extendedValidate from './lib/extended-validate.ts';
+import setBucketName from '../lib/set-bucket-name.ts';
+import checkForChanges from './lib/check-for-changes.ts';
+import monitorStack from '../lib/monitor-stack.ts';
+import checkIfBucketExists from '../lib/check-if-bucket-exists.ts';
+import getCreateChangeSetParams from '../lib/get-create-change-set-params.ts';
+import getSharedStackActionParams from '../lib/get-shared-stack-action-params.ts';
+import getCreateStackParams from '../lib/get-create-stack-params.ts';
+import getUpdateStackParams from '../lib/get-update-stack-params.ts';
+import getExecuteChangeSetParams from '../lib/get-execute-change-set-params.ts';
+import waitForChangeSetCreation from '../lib/wait-for-change-set-creation.ts';
+import uploadZipFile from '../lib/upload-zip-file.ts';
+import createStack from './lib/create-stack.ts';
+import cleanupS3Bucket from './lib/cleanup-s3-bucket.ts';
+import uploadArtifacts from './lib/upload-artifacts.ts';
+import validateTemplate from './lib/validate-template.ts';
+import updateStack from '../lib/update-stack.ts';
+import ensureValidBucketExists from './lib/ensure-valid-bucket-exists.ts';
+import path from 'node:path';
+import log2 from '../../../utils/serverless-utils/log.ts';
+import memoize from 'memoizee';
+const { style, log, progress, writeText } = log2;
 
 const mainProgress = progress.get('main');
 
@@ -242,4 +241,4 @@ class AwsDeploy {
   }
 }
 
-module.exports = AwsDeploy;
+export default AwsDeploy;

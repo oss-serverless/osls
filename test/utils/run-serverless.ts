@@ -1,8 +1,7 @@
-'use strict';
+import path from 'node:path';
+import setupRunServerlessFixturesEngine from '../lib/setup-run-serverless-fixtures-engine.ts';
 
-const path = require('path');
-
-module.exports = require('../lib/setup-run-serverless-fixtures-engine')({
-  fixturesDir: path.resolve(__dirname, '../fixtures/programmatic'),
-  serverlessDir: path.resolve(__dirname, '../../'),
+export default setupRunServerlessFixturesEngine({
+  fixturesDir: path.resolve(import.meta.dirname, '../fixtures/programmatic'),
+  serverlessDir: path.resolve(import.meta.dirname, '../../'),
 });

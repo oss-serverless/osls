@@ -1,8 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-const sinon = require('sinon');
-const createCachedAwsVariableSourceCommandSender = require('../../../../../../../lib/configuration/variables/sources/instance-dependent/create-cached-aws-variable-source-command-sender');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import createCachedAwsVariableSourceCommandSender from '../../../../../../../lib/configuration/variables/sources/instance-dependent/create-cached-aws-variable-source-command-sender.ts';
 
 describe('test/unit/lib/configuration/variables/sources/instance-dependent/create-cached-aws-variable-source-command-sender.test.js', () => {
   class TestCommand {

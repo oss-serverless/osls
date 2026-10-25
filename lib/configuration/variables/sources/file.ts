@@ -1,13 +1,11 @@
-'use strict';
-
-const ensureString = require('type/string/ensure');
-const isPlainFunction = require('type/plain-function/is');
-const path = require('path');
-const fsp = require('fs').promises;
-const yaml = require('js-yaml');
-const cloudformationSchema = require('../../../utils/serverless-utils/cloudformation-schema');
-const ServerlessError = require('../../../serverless-error');
-const { canFollowProperty } = require('../../../utils/safe-object');
+import ensureString from 'type/string/ensure.js';
+import isPlainFunction from 'type/plain-function/is.js';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import * as yaml from 'js-yaml';
+import cloudformationSchema from '../../../utils/serverless-utils/cloudformation-schema.ts';
+import ServerlessError from '../../../serverless-error.ts';
+import { canFollowProperty } from '../../../utils/safe-object.ts';
 
 const readFile = async (filePath, serviceDir) => {
   try {
@@ -21,7 +19,7 @@ const readFile = async (filePath, serviceDir) => {
   }
 };
 
-module.exports = {
+export default {
   resolve: async ({
     serviceDir,
     params,

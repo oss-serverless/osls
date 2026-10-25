@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const serviceCommands = require('../../../../../lib/cli/commands-schema/service');
+import { expect } from 'chai';
+import serviceCommands from '../../../../../lib/cli/commands-schema/service.ts';
 
 describe('test/unit/lib/cli/commands-schema/service.test.js', () => {
   it('should expose no service commands', () =>

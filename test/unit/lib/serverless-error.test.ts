@@ -1,8 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const ServerlessError = require('../../../lib/serverless-error');
+import { expect } from 'chai';
+import ServerlessError from '../../../lib/serverless-error.ts';
 
 describe('test/unit/lib/serverless-error.test.js', () => {
   it('should store message', () => {

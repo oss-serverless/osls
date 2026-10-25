@@ -1,7 +1,5 @@
-'use strict';
-
-const ensureApiGatewayCloudWatchRole = require('../../lib/ensure-api-gateway-cloud-watch-role');
-const ServerlessError = require('../../../../../../../serverless-error');
+import ensureApiGatewayCloudWatchRole from '../../lib/ensure-api-gateway-cloud-watch-role.ts';
+import ServerlessError from '../../../../../../../serverless-error.ts';
 
 const defaultLogLevel = 'INFO';
 const validLogLevels = new Set(['INFO', 'ERROR']);
@@ -14,7 +12,7 @@ const defaultLogFormat = [
   '$context.requestId',
 ].join(' ');
 
-module.exports = {
+export default {
   async compileStage() {
     const { service, provider } = this.serverless.service;
     const stage = this.options.stage;

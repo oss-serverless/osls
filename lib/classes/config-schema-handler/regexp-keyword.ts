@@ -1,4 +1,4 @@
-'use strict';
+import compileCodegen from 'ajv/dist/compile/codegen';
 
 // Implementation has been heavily inspired by `ajv-keywords` implementation from:
 // https://github.com/ajv-validator/ajv-keywords/blob/9656614be0104fe71d229459a5217ccac11958a6/src/definitions/regexp.ts
@@ -9,7 +9,7 @@
 // After the issue is addressed, or if `npm@6` is no longer supported, this module can be removed
 // and we can go back to using `ajv-keywords` directly.
 
-const { _ } = require('ajv/dist/compile/codegen');
+const { _ } = compileCodegen;
 
 const regexpMetaSchema = {
   type: 'object',
@@ -32,7 +32,7 @@ const usePattern = ({ gen, it: { opts } }, pattern, flags = opts.unicodeRegExp ?
   });
 };
 
-module.exports = {
+export default {
   keyword: 'regexp',
   type: 'string',
   schemaType: ['string', 'object'],

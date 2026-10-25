@@ -1,7 +1,5 @@
-'use strict';
-
-const isPlainObject = require('type/plain-object/is');
-const { isUnsafePropertyKey } = require('./object-path');
+import isPlainObject from 'type/plain-object/is.js';
+import { isUnsafePropertyKey } from './object-path.ts';
 
 const hasOwn = Object.prototype.hasOwnProperty;
 
@@ -133,4 +131,4 @@ const mergePlainObjects = (target, ...sources) => {
   return target;
 };
 
-module.exports = mergePlainObjects;
+export default mergePlainObjects;

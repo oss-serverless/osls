@@ -1,15 +1,13 @@
-'use strict';
-
-const runServerless = require('../../../../utils/run-serverless');
-const AwsProvider = require('../../../../../lib/plugins/aws/provider');
-const AwsRollback = require('../../../../../lib/plugins/aws/rollback');
-const Serverless = require('../../../../../lib/serverless');
-const chai = require('chai');
-const assert = require('chai').assert;
-const sinon = require('sinon');
-const logEmitter = require('log/lib/emitter');
-const { S3Client, ListObjectsV2Command, GetObjectCommand } = require('@aws-sdk/client-s3');
-const { Readable } = require('stream');
+import runServerless from '../../../../utils/run-serverless.ts';
+import AwsProvider from '../../../../../lib/plugins/aws/provider.ts';
+import AwsRollback from '../../../../../lib/plugins/aws/rollback.ts';
+import Serverless from '../../../../../lib/serverless.ts';
+import * as chai from 'chai';
+import { assert } from 'chai';
+import * as sinon from 'sinon';
+import logEmitter from 'log/lib/emitter.js';
+import { S3Client, ListObjectsV2Command, GetObjectCommand } from '@aws-sdk/client-s3';
+import { Readable } from 'node:stream';
 
 const expect = chai.expect;
 

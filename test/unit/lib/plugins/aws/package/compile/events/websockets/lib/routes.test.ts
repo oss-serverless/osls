@@ -1,7 +1,5 @@
-'use strict';
-
-const expect = require('chai').expect;
-const { createWebsocketsCompilerContext } = require('../test-utils');
+import { expect } from 'chai';
+import { createWebsocketsCompilerContext } from '../test-utils.ts';
 
 describe('#compileRoutes()', () => {
   let awsCompileWebsocketsEvents;

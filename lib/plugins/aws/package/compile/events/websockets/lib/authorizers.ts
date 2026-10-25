@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = {
+export default {
   compileAuthorizers() {
     this.validated.events.forEach((event) => {
       if (!event.authorizer) {

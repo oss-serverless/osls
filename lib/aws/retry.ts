@@ -1,8 +1,7 @@
-'use strict';
-
-const wait = require('../utils/sleep');
-const { log } = require('../utils/serverless-utils/log');
-const { isAwsThrottlingError, isTransientNetworkError } = require('./aws-sdk-v3-error');
+import wait from '../utils/sleep.ts';
+import log2 from '../utils/serverless-utils/log.ts';
+import { isAwsThrottlingError, isTransientNetworkError } from './aws-sdk-v3-error.ts';
+const { log } = log2;
 
 // Jitter so processes throttled together do not retry in lockstep (4 to 7 s by default, as in v3)
 const jitteredDelay = (delayMs) => Math.round(delayMs * (0.8 + Math.random() * 0.6));
@@ -30,7 +29,7 @@ const createRetry =
 // On top of the SDK's own per-request retries: sustained throttling outlives the SDK
 // retry budget during polling and bulk uploads, and body-phase network failures occur
 // after send() resolves, outside the SDK retry middleware entirely.
-module.exports = {
+export default {
   retryOnThrottlingError: createRetry(isAwsThrottlingError, {
     defaultMaxRetries: 4,
     defaultDelayMs: 5000,

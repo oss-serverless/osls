@@ -1,9 +1,7 @@
-'use strict';
-
-const chai = require('chai');
-const path = require('path');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
+import * as chai from 'chai';
+import path from 'node:path';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
 
 const expect = chai.expect;
 

@@ -1,11 +1,10 @@
-'use strict';
-
-const { isDeepStrictEqual } = require('node:util');
-const url = require('url');
-const isObject = require('type/object/is');
-const ServerlessError = require('../../../../../serverless-error');
-const { hasOwn, safeSet, safeShallowAssign } = require('../../../../../utils/safe-object');
-const { log, style } = require('../../../../../utils/serverless-utils/log');
+import { isDeepStrictEqual } from 'node:util';
+import url from 'node:url';
+import isObject from 'type/object/is.js';
+import ServerlessError from '../../../../../serverless-error.ts';
+import { hasOwn, safeSet, safeShallowAssign } from '../../../../../utils/safe-object.ts';
+import log2 from '../../../../../utils/serverless-utils/log.ts';
+const { log, style } = log2;
 
 const originLimits = { maxTimeout: 30, maxMemorySize: 10240 };
 const viewerLimits = { maxTimeout: 5, maxMemorySize: 128 };
@@ -728,4 +727,4 @@ class AwsCompileCloudFrontEvents {
   }
 }
 
-module.exports = AwsCompileCloudFrontEvents;
+export default AwsCompileCloudFrontEvents;

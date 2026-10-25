@@ -1,10 +1,9 @@
-'use strict';
+import { promises as fsp } from 'node:fs';
+import log2 from '../lib/utils/serverless-utils/log.ts';
+import healthStatusFilename from '../lib/utils/health-status-filename.ts';
+const { writeText, log } = log2;
 
-const fsp = require('fs').promises;
-const { writeText, log } = require('../lib/utils/serverless-utils/log');
-const healthStatusFilename = require('../lib/utils/health-status-filename');
-
-module.exports = async () => {
+export default async () => {
   const healthStatus = await (async () => {
     try {
       return await fsp.readFile(healthStatusFilename);

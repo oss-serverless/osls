@@ -1,9 +1,8 @@
-'use strict';
+import buildFetchDispatcher from '../../../utils/build-fetch-dispatcher.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
+const { log, writeText, style } = log2;
 
-const buildFetchDispatcher = require('../../../utils/build-fetch-dispatcher');
-const { log, writeText, style } = require('../../../utils/serverless-utils/log');
-
-module.exports = {
+export default {
   async getPlugins() {
     const endpoint = 'https://raw.githubusercontent.com/serverless/plugins/master/plugins.json';
 

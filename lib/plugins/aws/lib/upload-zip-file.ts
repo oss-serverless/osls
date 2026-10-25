@@ -1,14 +1,13 @@
-'use strict';
-
-const path = require('path');
-const fs = require('fs');
+import path from 'node:path';
+import fs from 'node:fs';
+import setS3UploadEncryptionOptions from '../../../aws/set-s3-upload-encryption-options.ts';
+import getHashForFilePath from '../../../utils/get-hash-for-file-path.ts';
+import uploadS3Object from './upload-s3-object.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
 const fsp = fs.promises;
-const log = require('../../../utils/serverless-utils/log').log.get('deploy:upload');
-const setS3UploadEncryptionOptions = require('../../../aws/set-s3-upload-encryption-options');
-const getHashForFilePath = require('../../../utils/get-hash-for-file-path');
-const uploadS3Object = require('./upload-s3-object');
+const log = log2.log.get('deploy:upload');
 
-module.exports = {
+export default {
   async uploadZipFile({ filename, s3KeyDirname, basename }) {
     if (!basename) basename = filename.split(path.sep).pop();
 

@@ -1,8 +1,7 @@
-'use strict';
+import log from '../../utils/serverless-utils/log.ts';
+const { style } = log;
 
-const { style } = require('../../utils/serverless-utils/log');
-
-module.exports = (commandName, commandSchema) => {
+export default (commandName, commandSchema) => {
   const indentFillLength = 30;
 
   const usage = commandSchema.usage;

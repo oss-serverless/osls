@@ -1,21 +1,22 @@
-'use strict';
-
-const {
+import {
   LambdaClient,
   GetFunctionCommand,
   UpdateFunctionCodeCommand,
-} = require('@aws-sdk/client-lambda');
-const ServerlessError = require('../../serverless-error');
-const validate = require('./lib/validate');
-const buildFetchDispatcher = require('../../utils/build-fetch-dispatcher');
-const { style, log, progress } = require('../../utils/serverless-utils/log');
-const {
+} from '@aws-sdk/client-lambda';
+import ServerlessError from '../../serverless-error.ts';
+import validate from './lib/validate.ts';
+import buildFetchDispatcher from '../../utils/build-fetch-dispatcher.ts';
+import log2 from '../../utils/serverless-utils/log.ts';
+
+import {
   getAwsErrorCode,
   getAwsErrorMessage,
   getAwsErrorStatusCode,
   isAwsCredentialError,
   isLambdaResourceNotFoundError,
-} = require('../../aws/aws-sdk-v3-error');
+} from '../../aws/aws-sdk-v3-error.ts';
+
+const { style, log, progress } = log2;
 
 const mainProgress = progress.get('main');
 
@@ -172,4 +173,4 @@ class AwsRollbackFunction {
   }
 }
 
-module.exports = AwsRollbackFunction;
+export default AwsRollbackFunction;

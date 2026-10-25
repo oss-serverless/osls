@@ -1,8 +1,7 @@
-'use strict';
-
-const chai = require('chai');
-const proxyquire = require('proxyquire').noCallThru();
-const sinon = require('sinon');
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import proxyquire2 from 'proxyquire';
+const proxyquire = proxyquire2.noCallThru();
 
 const { expect } = chai;
 

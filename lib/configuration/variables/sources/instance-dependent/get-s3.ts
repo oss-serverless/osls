@@ -1,14 +1,13 @@
-'use strict';
+import ensureString from 'type/string/ensure.js';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import ServerlessError from '../../../../serverless-error.ts';
+import s3BodyToString from '../../../../aws/s3-body-to-string.ts';
+import createCachedAwsVariableSourceCommandSender from './create-cached-aws-variable-source-command-sender.ts';
+import { isS3GetObjectNoSuchKeyError } from '../../../../aws/aws-sdk-v3-error.ts';
+import retry from '../../../../aws/retry.ts';
+const { retryOnTransientNetworkError } = retry;
 
-const ensureString = require('type/string/ensure');
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const ServerlessError = require('../../../../serverless-error');
-const s3BodyToString = require('../../../../aws/s3-body-to-string');
-const createCachedAwsVariableSourceCommandSender = require('./create-cached-aws-variable-source-command-sender');
-const { isS3GetObjectNoSuchKeyError } = require('../../../../aws/aws-sdk-v3-error');
-const { retryOnTransientNetworkError } = require('../../../../aws/retry');
-
-module.exports = (serverlessInstance) => {
+export default (serverlessInstance) => {
   const sender = createCachedAwsVariableSourceCommandSender({
     getProvider: () => serverlessInstance.getProvider('aws'),
     Client: S3Client,

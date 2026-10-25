@@ -1,10 +1,8 @@
-'use strict';
-
-const { expect } = require('chai');
-const {
+import { expect } from 'chai';
+import {
   getLambdaArn,
   getEnvironment,
-} = require('../../../../../../../lib/plugins/aws/custom-resources/resources/utils');
+} from '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts';
 
 describe('#getLambdaArn()', () => {
   it('should return the Lambda arn', () => {

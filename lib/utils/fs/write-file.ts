@@ -1,9 +1,7 @@
-'use strict';
-
-const fsp = require('fs').promises;
-const path = require('path');
-const jc = require('json-cycle');
-const yaml = require('js-yaml');
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
+import jc from 'json-cycle';
+import * as yaml from 'js-yaml';
 
 async function writeFile(filePath, conts, cycles) {
   let contents = conts || '';
@@ -28,4 +26,4 @@ async function writeFile(filePath, conts, cycles) {
   });
 }
 
-module.exports = writeFile;
+export default writeFile;

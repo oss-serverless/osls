@@ -1,10 +1,8 @@
-'use strict';
-
-const expect = require('chai').expect;
-const mergeCustomProviderResources = require('../../../../../../../lib/plugins/aws/package/lib/merge-custom-provider-resources');
-const coreCloudFormationTemplateSource = require('../../../../../../../lib/plugins/aws/package/lib/core-cloudformation-template.json');
-const ServerlessError = require('../../../../../../../lib/serverless-error');
-const runServerless = require('../../../../../../utils/run-serverless');
+import { expect } from 'chai';
+import mergeCustomProviderResources from '../../../../../../../lib/plugins/aws/package/lib/merge-custom-provider-resources.ts';
+import coreCloudFormationTemplateSource from '../../../../../../../lib/plugins/aws/package/lib/core-cloudformation-template.json' with { type: 'json' };
+import ServerlessError from '../../../../../../../lib/serverless-error.ts';
+import runServerless from '../../../../../../utils/run-serverless.ts';
 
 describe('mergeCustomProviderResources', () => {
   let awsPackage;

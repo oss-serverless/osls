@@ -1,11 +1,11 @@
-'use strict';
-
-const runServerless = require('../../../utils/run-serverless');
-const { version } = require('../../../../package');
-const Service = require('../../../../lib/classes/service');
+import runServerless from '../../../utils/run-serverless.ts';
+import packageModule from '../../../../package.json' with { type: 'json' };
+import Service from '../../../../lib/classes/service.ts';
 
 // Configure chai
-const expect = require('chai').expect;
+import { expect } from 'chai';
+
+const { version } = packageModule;
 
 describe('Service', () => {
   describe('#load()', () => {

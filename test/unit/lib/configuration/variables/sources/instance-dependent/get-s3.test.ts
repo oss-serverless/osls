@@ -1,13 +1,10 @@
-'use strict';
-
-const { Readable } = require('stream');
-const { expect } = require('chai');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-
-const resolveMeta = require('../../../../../../../lib/configuration/variables/resolve-meta');
-const resolve = require('../../../../../../../lib/configuration/variables/resolve');
-const selfSource = require('../../../../../../../lib/configuration/variables/sources/self');
+import { Readable } from 'node:stream';
+import { expect } from 'chai';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import resolveMeta from '../../../../../../../lib/configuration/variables/resolve-meta.ts';
+import resolve from '../../../../../../../lib/configuration/variables/resolve.ts';
+import selfSource from '../../../../../../../lib/configuration/variables/sources/self.ts';
 
 describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-s3.test.js', () => {
   let configuration;

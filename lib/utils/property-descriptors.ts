@@ -1,5 +1,3 @@
-'use strict';
-
 const methodDescriptor = (value, options = {}) =>
   Object.assign(Object.create(null), options, {
     value,
@@ -16,4 +14,5 @@ const getterDescriptor = (get, options = {}) =>
     enumerable: false,
   });
 
-module.exports = { getterDescriptor, methodDescriptor };
+export { getterDescriptor, methodDescriptor };
+export default { getterDescriptor, methodDescriptor };

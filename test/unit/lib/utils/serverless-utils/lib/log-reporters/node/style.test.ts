@@ -1,7 +1,5 @@
-'use strict';
-
-const expect = require('chai').expect;
-const proxyquire = require('proxyquire');
+import { expect } from 'chai';
+import proxyquire from 'proxyquire';
 
 describe('test/unit/lib/utils/serverless-utils/lib/log-reporters/node/style.test.js', () => {
   it('uses stderr colors for shared style decorators', () => {

@@ -1,8 +1,6 @@
-'use strict';
+import path from 'node:path';
 
-const path = require('path');
-
-module.exports = {
+export default {
   async saveServiceState() {
     const serviceStateFileName = this.provider.naming.getServiceStateFileName();
 

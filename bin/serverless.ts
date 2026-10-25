@@ -1,16 +1,19 @@
 #!/usr/bin/env node
-
-'use strict';
+import isSupportedNodeVersion from '../lib/cli/is-supported-node-version.ts';
+import packageModule from '../package.json' with { type: 'json' };
+import isStandaloneExecutable from '../lib/utils/is-standalone-executable.ts';
+import standalonePatch from '../lib/utils/standalone-patch.ts';
+import triage from '../lib/cli/triage.ts';
+import serverless from '../scripts/serverless.ts';
+import runCompose from '../lib/cli/run-compose.ts';
 
 // `EvalError` is used to not pollute global namespace but still have the value accessible globally
 // Can already be set, if we're in context of local fallback
 const isMainModule = !EvalError.$serverlessCommandStartTime;
 if (isMainModule) EvalError.$serverlessCommandStartTime = process.hrtime();
 
-const isSupportedNodeVersion = require('../lib/cli/is-supported-node-version');
-
 if (!isSupportedNodeVersion(process.version)) {
-  const serverlessVersion = require('../package.json').version;
+  const serverlessVersion = packageModule.version;
   process.stderr.write(
     `Error: osls v${serverlessVersion} does not support ` +
       `Node.js ${process.version}. Please use a supported release. ` +
@@ -26,18 +29,18 @@ const crashAsync = (error) => {
 };
 
 if (isMainModule) {
-  if (require('../lib/utils/is-standalone-executable')) {
-    require('../lib/utils/standalone-patch');
+  if (isStandaloneExecutable) {
+    standalonePatch;
   }
 }
 
-require('../lib/cli/triage')()
+triage()
   .then((cliName) => {
     switch (cliName) {
       case 'serverless':
-        return require('../scripts/serverless');
+        return serverless;
       case '@osls/compose':
-        return require('../lib/cli/run-compose')();
+        return runCompose();
       default:
         throw new Error(`Unrecognized CLI name "${cliName}"`);
     }

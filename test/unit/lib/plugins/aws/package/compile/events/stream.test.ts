@@ -1,9 +1,7 @@
-'use strict';
-
-const expect = require('chai').expect;
-const AwsCompileStreamEvents = require('../../../../../../../../lib/plugins/aws/package/compile/events/stream');
-const runServerless = require('../../../../../../../utils/run-serverless');
-const { createAwsEventCompilerContext } = require('./test-utils');
+import { expect } from 'chai';
+import AwsCompileStreamEvents from '../../../../../../../../lib/plugins/aws/package/compile/events/stream.ts';
+import runServerless from '../../../../../../../utils/run-serverless.ts';
+import { createAwsEventCompilerContext } from './test-utils.ts';
 
 const dynamodbStreamArn = 'arn:aws:dynamodb:region:account:table/foo/stream/1';
 const kinesisStreamArn = 'arn:aws:kinesis:us-east-1:123456789012:stream/some-long-name';

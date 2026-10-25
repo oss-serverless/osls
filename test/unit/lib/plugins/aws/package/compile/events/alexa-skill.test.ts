@@ -1,9 +1,7 @@
-'use strict';
-
-const expect = require('chai').expect;
-const AwsProvider = require('../../../../../../../../lib/plugins/aws/provider');
-const AwsCompileAlexaSkillEvents = require('../../../../../../../../lib/plugins/aws/package/compile/events/alexa-skill');
-const { createAwsEventCompilerContext } = require('./test-utils');
+import { expect } from 'chai';
+import AwsProvider from '../../../../../../../../lib/plugins/aws/provider.ts';
+import AwsCompileAlexaSkillEvents from '../../../../../../../../lib/plugins/aws/package/compile/events/alexa-skill.ts';
+import { createAwsEventCompilerContext } from './test-utils.ts';
 
 describe('AwsCompileAlexaSkillEvents', () => {
   let awsCompileAlexaSkillEvents;

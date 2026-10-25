@@ -1,20 +1,18 @@
-'use strict';
-
-const os = require('os');
-const path = require('path');
-const EventEmitter = require('events');
-const { PassThrough } = require('stream');
-const JsZip = require('jszip');
-const glob = require('../../../../../../lib/utils/glob');
-const fs = require('fs');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const isObject = require('type/object/is');
-const Utils = require('../../../../../../lib/classes/utils');
-const { getTmpDirPath } = require('../../../../../utils/fs');
+import os from 'node:os';
+import path from 'node:path';
+import EventEmitter from 'node:events';
+import { PassThrough } from 'node:stream';
+import JsZip from 'jszip';
+import glob from '../../../../../../lib/utils/glob.ts';
+import fs from 'node:fs';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import isObject from 'type/object/is.js';
+import Utils from '../../../../../../lib/classes/utils.ts';
+import { getTmpDirPath } from '../../../../../utils/fs.ts';
 
 // Configure chai
-const { expect } = require('chai');
+import { expect } from 'chai';
 
 const describeLargeZipSmoke = process.env.SERVERLESS_LARGE_ZIP_SMOKE ? describe : describe.skip;
 
@@ -933,8 +931,10 @@ describe('zipService', () => {
     });
 
     it('treats pre-construction module-export getFileContent mutation as an override', async () => {
-      const zipService = require('../../../../../../lib/plugins/package/lib/zip-service');
-      const ActualPackage = require('../../../../../../lib/plugins/package/package');
+      const zipService = (await import('../../../../../../lib/plugins/package/lib/zip-service.ts'))
+        .default;
+      const ActualPackage = (await import('../../../../../../lib/plugins/package/package.ts'))
+        .default;
       const originalGetFileContent = zipService.getFileContent;
       zipService.getFileContent = async () => Buffer.from('transformed');
 
@@ -1439,10 +1439,9 @@ describe('zipService', () => {
 
   describe('#zipFiles()', () => {
     it('should throw an error if no files are provided', () =>
-      expect(packagePlugin.zipFiles([], path.resolve(__dirname, 'tmp.zip'))).to.be.rejectedWith(
-        Error,
-        'No files to package'
-      ));
+      expect(
+        packagePlugin.zipFiles([], path.resolve(import.meta.dirname, 'tmp.zip'))
+      ).to.be.rejectedWith(Error, 'No files to package'));
 
     it('configures metadata stat concurrency with ext/promise/limit', () => {
       let configuredLimit;

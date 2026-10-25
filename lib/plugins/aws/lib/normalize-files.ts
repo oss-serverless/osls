@@ -1,8 +1,6 @@
-'use strict';
+import deepSortObjectByKey from '../../../utils/deep-sort-object-by-key.ts';
 
-const deepSortObjectByKey = require('../../../utils/deep-sort-object-by-key');
-
-module.exports = {
+export default {
   normalizeCloudFormationTemplate(template) {
     const normalizedTemplate = structuredClone(template);
 

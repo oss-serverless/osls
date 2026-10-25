@@ -1,17 +1,16 @@
-'use strict';
-
-const os = require('os');
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
-const fileExistsSync = require('../utils/fs/file-exists-sync');
-const writeFileSync = require('../utils/fs/write-file-sync');
-const copyDirContentsSync = require('../utils/fs/copy-dir-contents-sync');
-const readFileSync = require('../utils/fs/read-file-sync');
-const readFile = require('../utils/fs/read-file');
-const walkDirSync = require('../utils/fs/walk-dir-sync');
-const dirExistsSync = require('../utils/fs/dir-exists-sync');
-const version = require('../../package.json').version;
+import os from 'node:os';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import fileExistsSync from '../utils/fs/file-exists-sync.ts';
+import writeFileSync from '../utils/fs/write-file-sync.ts';
+import copyDirContentsSync from '../utils/fs/copy-dir-contents-sync.ts';
+import readFileSync from '../utils/fs/read-file-sync.ts';
+import readFile from '../utils/fs/read-file.ts';
+import walkDirSync from '../utils/fs/walk-dir-sync.ts';
+import dirExistsSync from '../utils/fs/dir-exists-sync.ts';
+import packageModule from '../../package.json' with { type: 'json' };
+const version = packageModule.version;
 
 class Utils {
   constructor(serverless) {
@@ -92,4 +91,4 @@ class Utils {
   }
 }
 
-module.exports = Utils;
+export default Utils;

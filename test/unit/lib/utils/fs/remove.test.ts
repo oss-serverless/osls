@@ -1,12 +1,9 @@
-'use strict';
-
-const fs = require('fs');
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect } from 'chai';
+import { remove, removeSync } from '../../../../../lib/utils/fs/remove.ts';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
 const fsp = fs.promises;
-const path = require('path');
-const { expect } = require('chai');
-
-const { remove, removeSync } = require('../../../../../lib/utils/fs/remove');
-const { getTmpDirPath } = require('../../../../utils/fs');
 
 describe('test/unit/lib/utils/fs/remove.test.js', () => {
   let tmpDir;

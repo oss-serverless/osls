@@ -1,9 +1,8 @@
-'use strict';
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
 
-const chai = require('chai');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const {
+import {
   APIGatewayClient,
   CreateStageCommand,
   GetDeploymentsCommand,
@@ -12,15 +11,15 @@ const {
   TagResourceCommand,
   UntagResourceCommand,
   UpdateStageCommand,
-} = require('@aws-sdk/client-api-gateway');
-const { CloudWatchLogsClient, DeleteLogGroupCommand } = require('@aws-sdk/client-cloudwatch-logs');
-const Serverless = require('../../../../../../../../../../../lib/serverless');
-const AwsProvider = require('../../../../../../../../../../../lib/plugins/aws/provider');
-const {
-  updateStage,
-  defaultApiGatewayLogLevel,
-} = require('../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/update-stage');
-const runServerless = require('../../../../../../../../../../utils/run-serverless');
+} from '@aws-sdk/client-api-gateway';
+
+import { CloudWatchLogsClient, DeleteLogGroupCommand } from '@aws-sdk/client-cloudwatch-logs';
+import Serverless from '../../../../../../../../../../../lib/serverless.ts';
+import AwsProvider from '../../../../../../../../../../../lib/plugins/aws/provider.ts';
+import updateStage2 from '../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/update-stage.ts';
+import runServerless from '../../../../../../../../../../utils/run-serverless.ts';
+
+const { updateStage, defaultApiGatewayLogLevel } = updateStage2;
 
 const { expect } = chai;
 

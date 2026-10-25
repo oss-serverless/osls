@@ -1,20 +1,18 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const {
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import {
   LambdaClient,
   GetFunctionCommand,
   UpdateFunctionCodeCommand,
-} = require('@aws-sdk/client-lambda');
-const ServerlessError = require('../../../../../lib/serverless-error');
-const Serverless = require('../../../../../lib/serverless');
-const AwsProvider = require('../../../../../lib/plugins/aws/provider');
-const CLI = require('../../../../../lib/classes/cli');
-const AwsRollbackFunction = require('../../../../../lib/plugins/aws/rollback-function.js');
-const configureAwsSdkV3Stub = require('../../../../lib/configure-aws-sdk-v3-stub');
-const runServerless = require('../../../../utils/run-serverless');
+} from '@aws-sdk/client-lambda';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import Serverless from '../../../../../lib/serverless.ts';
+import AwsProvider from '../../../../../lib/plugins/aws/provider.ts';
+import CLI from '../../../../../lib/classes/cli.ts';
+import AwsRollbackFunction from '../../../../../lib/plugins/aws/rollback-function.ts';
+import configureAwsSdkV3Stub from '../../../../lib/configure-aws-sdk-v3-stub.ts';
+import runServerless from '../../../../utils/run-serverless.ts';
 
 describe('AwsRollbackFunction', () => {
   let serverless;

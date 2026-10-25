@@ -1,8 +1,6 @@
-'use strict';
+import awsArnRegExs from '../../../../../utils/arn-regular-expressions.ts';
 
-const awsArnRegExs = require('../../../../../utils/arn-regular-expressions');
-
-module.exports = {
+export default {
   compileAuthorizers() {
     this.validated.events.forEach((event) => {
       if (event.http.authorizer && event.http.authorizer.arn) {

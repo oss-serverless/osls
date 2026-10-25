@@ -1,10 +1,9 @@
-'use strict';
-
-const os = require('os');
-const credentials = require('./utils/credentials');
-const ServerlessError = require('../../serverless-error');
-const cliCommandsSchema = require('../../cli/commands-schema');
-const { log } = require('../../utils/serverless-utils/log');
+import os from 'node:os';
+import credentials from './utils/credentials.ts';
+import ServerlessError from '../../serverless-error.ts';
+import cliCommandsSchema from '../../cli/commands-schema/index.ts';
+import log2 from '../../utils/serverless-utils/log.ts';
+const { log } = log2;
 
 class AwsConfigCredentials {
   constructor(serverless, options) {
@@ -73,4 +72,4 @@ class AwsConfigCredentials {
   }
 }
 
-module.exports = AwsConfigCredentials;
+export default AwsConfigCredentials;

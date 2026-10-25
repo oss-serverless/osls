@@ -1,8 +1,6 @@
-'use strict';
-
-const fs = require('node:fs');
-const path = require('node:path');
-const fastGlob = require('fast-glob');
+import fs from 'node:fs';
+import path from 'node:path';
+import fastGlob from 'fast-glob';
 
 const toArray = (patterns) => {
   return Array.isArray(patterns) ? patterns : [patterns];
@@ -162,4 +160,4 @@ glob.sync = (patterns, options = {}) => {
   return collectResultsSync(buildTasks(expandedPatterns, globOptions));
 };
 
-module.exports = glob;
+export default glob;

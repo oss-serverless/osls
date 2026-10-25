@@ -1,9 +1,7 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const jc = require('json-cycle');
-const yaml = require('js-yaml');
+import fs from 'node:fs';
+import path from 'node:path';
+import jc from 'json-cycle';
+import * as yaml from 'js-yaml';
 
 function writeFileSync(filePath, conts, cycles) {
   let contents = conts || '';
@@ -28,4 +26,4 @@ function writeFileSync(filePath, conts, cycles) {
   return fs.writeFileSync(filePath, contents);
 }
 
-module.exports = writeFileSync;
+export default writeFileSync;

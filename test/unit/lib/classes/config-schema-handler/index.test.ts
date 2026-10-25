@@ -1,14 +1,12 @@
-'use strict';
-
-const chai = require('chai');
-const runServerless = require('../../../../utils/run-serverless');
-const ConfigSchemaHandler = require('../../../../../lib/classes/config-schema-handler');
+import * as chai from 'chai';
+import runServerless from '../../../../utils/run-serverless.ts';
+import ConfigSchemaHandler from '../../../../../lib/classes/config-schema-handler/index.ts';
+import STAGE_NAME_PATTERN from '../../../../../lib/utils/stage-pattern.ts';
 
 const { getConfigurationValidationResult } = ConfigSchemaHandler;
 
 const expect = chai.expect;
 const FUNCTION_NAME_PATTERN = '^[a-zA-Z0-9-_]+$';
-const STAGE_NAME_PATTERN = require('../../../../../lib/utils/stage-pattern');
 
 const createConfigSchemaHandler = (configurationInput) =>
   new ConfigSchemaHandler({

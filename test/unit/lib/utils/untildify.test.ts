@@ -1,9 +1,8 @@
-'use strict';
+import * as sinon from 'sinon';
+import { expect } from 'chai';
+import proxyquire2 from 'proxyquire';
 
-const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
-const sinon = require('sinon');
-
-const { expect } = require('chai');
+const proxyquire = proxyquire2.noCallThru().noPreserveCache();
 
 const loadUntildify = ({
   homeDirectory = '/home/test-user',

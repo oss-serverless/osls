@@ -1,9 +1,7 @@
-'use strict';
+import path from 'node:path';
+import { removeSync } from '../../../../utils/fs/remove.ts';
 
-const path = require('path');
-const { removeSync } = require('../../../../utils/fs/remove');
-
-module.exports = {
+export default {
   async moveArtifactsToPackage() {
     const packagePath =
       this.options.package ||

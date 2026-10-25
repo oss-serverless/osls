@@ -1,13 +1,13 @@
-'use strict';
+import { stripVTControlCharacters as stripAnsi } from 'node:util';
+import log2 from '../utils/serverless-utils/log.ts';
+import packageModule from '../../package.json' with { type: 'json' };
+import isStandaloneExecutable from '../utils/is-standalone-executable.ts';
+import tokenizeException from '../utils/tokenize-exception.ts';
+import isLocallyInstalled from './is-locally-installed.ts';
+const { style, writeText, log } = log2;
+const slsVersion = packageModule.version;
 
-const { stripVTControlCharacters: stripAnsi } = require('node:util');
-const { style, writeText, log } = require('../utils/serverless-utils/log');
-const slsVersion = require('./../../package').version;
-const isStandaloneExecutable = require('../utils/is-standalone-executable');
-const tokenizeException = require('../utils/tokenize-exception');
-const isLocallyInstalled = require('./is-locally-installed');
-
-module.exports = (exception) => {
+export default (exception) => {
   const exceptionTokens = tokenizeException(exception);
   const isUserError = exceptionTokens.isUserError;
 

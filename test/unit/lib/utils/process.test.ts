@@ -1,18 +1,14 @@
-'use strict';
-
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-
-const { expect } = require('chai');
-
-const {
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { expect } from 'chai';
+import {
   createEnv,
   overrideArgv,
   overrideCwd,
   overrideEnv,
   overrideStdoutWrite,
-} = require('../../../utils/process');
+} from '../../../utils/process.ts';
 
 describe('test/unit/lib/utils/process.test.js', () => {
   let originalEnv;

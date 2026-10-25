@@ -1,12 +1,9 @@
-'use strict';
-
-const path = require('path');
-const writeFileSync = require('../../../../lib/utils/fs/write-file-sync');
-const readFileSync = require('../../../../lib/utils/fs/read-file-sync');
-const yamlAstParser = require('../../../../lib/utils/yaml-ast-parser');
-const { getTmpDirPath } = require('../../../utils/fs');
-
-const expect = require('chai').expect;
+import path from 'node:path';
+import writeFileSync from '../../../../lib/utils/fs/write-file-sync.ts';
+import readFileSync from '../../../../lib/utils/fs/read-file-sync.ts';
+import yamlAstParser from '../../../../lib/utils/yaml-ast-parser.ts';
+import { getTmpDirPath } from '../../../utils/fs.ts';
+import { expect } from 'chai';
 
 describe('#yamlAstParser', () => {
   let tmpDirPath;

@@ -1,10 +1,10 @@
-'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import setupFixturesEngine from '../lib/setup-fixtures-engine.ts';
 
-const fs = require('node:fs');
-const path = require('node:path');
-const setupFixturesEngine = require('../lib/setup-fixtures-engine');
-
-const fixturesEngine = setupFixturesEngine(path.resolve(__dirname, '../fixtures/programmatic'));
+const fixturesEngine = setupFixturesEngine(
+  path.resolve(import.meta.dirname, '../fixtures/programmatic')
+);
 
 const resolveInsideService = (servicePath, relativePath) => {
   const filePath = path.resolve(servicePath, relativePath);
@@ -15,7 +15,7 @@ const resolveInsideService = (servicePath, relativePath) => {
   return filePath;
 };
 
-module.exports = async (fixtureName, options = {}) => {
+export default async (fixtureName, options = {}) => {
   const { configExt, serviceName, files = [] } = options;
   if (serviceName && configExt && Object.hasOwn(configExt, 'service')) {
     throw new Error('Use either `serviceName` or `configExt.service`, not both');

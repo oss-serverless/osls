@@ -1,13 +1,13 @@
-'use strict';
+import log from '../../utils/serverless-utils/log.ts';
+import packageModule from '../../../package.json' with { type: 'json' };
+import globalOptions from '../commands-schema/common-options/global.ts';
+import resolveInput from '../resolve-input.ts';
+import generateCommandUsage from './generate-command-usage.ts';
+import renderOptions from './options.ts';
+const { writeText, style } = log;
+const { version } = packageModule;
 
-const { writeText, style } = require('../../utils/serverless-utils/log');
-const { version } = require('../../../package');
-const globalOptions = require('../commands-schema/common-options/global');
-const resolveInput = require('../resolve-input');
-const generateCommandUsage = require('./generate-command-usage');
-const renderOptions = require('./options');
-
-module.exports = (loadedPlugins, resolvedInput = resolveInput()) => {
+export default (loadedPlugins, resolvedInput = resolveInput()) => {
   const { commandsSchema } = resolvedInput;
 
   writeText(

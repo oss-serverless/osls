@@ -1,9 +1,7 @@
-'use strict';
-
-const path = require('path');
-const { throwOptionsError } = require('./external-ref-errors');
-const { normalizeFileRefOptions } = require('./file-ref-policy');
-const { assertKnownOptions, assertOptionsObject } = require('./option-validation');
+import path from 'node:path';
+import { throwOptionsError } from './external-ref-errors.ts';
+import { normalizeFileRefOptions } from './file-ref-policy.ts';
+import { assertKnownOptions, assertOptionsObject } from './option-validation.ts';
 
 const normalizeStringArrayOption = (value, optionName) => {
   if (value === undefined) return [];
@@ -70,7 +68,9 @@ const normalizeExternalRefOptions = async (yamlFilePath, options = {}) => {
   };
 };
 
-module.exports = {
+export { normalizeExternalRefOptions, normalizeHttpRefOptions };
+
+export default {
   normalizeExternalRefOptions,
   normalizeHttpRefOptions,
 };

@@ -1,13 +1,12 @@
-'use strict';
-
-const fsp = require('fs').promises;
-const path = require('path');
-const proxyquire = require('proxyquire');
-const sandbox = require('sinon');
-const expect = require('chai').expect;
-const { overrideEnv } = require('../../../utils/process');
-const { getTmpDirPath, pathExists } = require('../../../utils/fs');
-const ServerlessError = require('../../../../lib/serverless-error');
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
+import proxyquire from 'proxyquire';
+import * as sandbox from 'sinon';
+import { expect } from 'chai';
+import { overrideEnv } from '../../../utils/process.ts';
+import { getTmpDirPath, pathExists } from '../../../utils/fs.ts';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import logDeprecation2 from '../../../../lib/utils/log-deprecation.ts';
 
 describe('test/unit/lib/utils/logDeprecation.test.js', () => {
   let restoreEnv;
@@ -22,13 +21,14 @@ describe('test/unit/lib/utils/logDeprecation.test.js', () => {
 
   afterEach(async () => {
     sandbox.restore();
-    const healthStatusFilename = require('../../../../lib/utils/health-status-filename');
+    const healthStatusFilename = (await import('../../../../lib/utils/health-status-filename.ts'))
+      .default;
     await fsp.unlink(healthStatusFilename).catch(() => null);
     restoreEnv();
   });
 
   it('should throw on deprecation if error notifications mode set in service config', () => {
-    const logDeprecation = require('../../../../lib/utils/log-deprecation');
+    const logDeprecation = logDeprecation2;
     let error;
 
     try {
@@ -48,7 +48,7 @@ describe('test/unit/lib/utils/logDeprecation.test.js', () => {
   });
 
   it('should honor env notification mode set after module load', () => {
-    const logDeprecation = require('../../../../lib/utils/log-deprecation');
+    const logDeprecation = logDeprecation2;
     let error;
 
     process.env.SLS_DEPRECATION_NOTIFICATION_MODE = 'error';
@@ -65,7 +65,7 @@ describe('test/unit/lib/utils/logDeprecation.test.js', () => {
   });
 
   it('should honor env disabled deprecations set after module load', () => {
-    const logDeprecation = require('../../../../lib/utils/log-deprecation');
+    const logDeprecation = logDeprecation2;
 
     process.env.SLS_DEPRECATION_DISABLE = 'CODE_DYNAMIC_ENV_DISABLE';
 
@@ -77,8 +77,9 @@ describe('test/unit/lib/utils/logDeprecation.test.js', () => {
   });
 
   it('should write deprecation docs URL to summary output', async () => {
-    const logDeprecation = require('../../../../lib/utils/log-deprecation');
-    const healthStatusFilename = require('../../../../lib/utils/health-status-filename');
+    const logDeprecation = (await import('../../../../lib/utils/log-deprecation.ts')).default;
+    const healthStatusFilename = (await import('../../../../lib/utils/health-status-filename.ts'))
+      .default;
 
     logDeprecation('CODE1', 'Start using deprecation log');
     await logDeprecation.printSummary();

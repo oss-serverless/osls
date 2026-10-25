@@ -1,7 +1,5 @@
-'use strict';
+import path from 'node:path';
+import resolveLocalServerlessPath from './local-serverless-path.ts';
 
-const path = require('path');
-const resolveLocalServerlessPath = require('./local-serverless-path');
-
-module.exports = ({ cwd = process.cwd() } = {}) =>
-  resolveLocalServerlessPath({ cwd }) === path.resolve(__dirname, '../../');
+export default ({ cwd = process.cwd() } = {}) =>
+  resolveLocalServerlessPath({ cwd }) === path.resolve(import.meta.dirname, '../../');

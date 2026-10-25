@@ -1,7 +1,5 @@
-'use strict';
-
-const expect = require('chai').expect;
-const runServerless = require('../../../../../utils/run-serverless');
+import { expect } from 'chai';
+import runServerless from '../../../../../utils/run-serverless.ts';
 
 describe('test/unit/lib/plugins/aws/info/display.test.js', () => {
   let serverless;

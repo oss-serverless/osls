@@ -1,8 +1,4 @@
-// Variables syntax parser, for a string input returns AST-like meta object
-
-'use strict';
-
-const ServerlessError = require('../../serverless-error');
+import ServerlessError from '../../serverless-error.ts';
 
 const alphaChars = new Set('abcdefghijklmnopqrstuvwxyz');
 const alphaNumericChars = new Set(
@@ -156,7 +152,7 @@ const parseLiteralSource = (literal, shouldFallbackToInput = false) => {
   }
 };
 
-module.exports = (inputValue) => {
+export default (inputValue) => {
   // State machine design pattern
   try {
     value = inputValue;

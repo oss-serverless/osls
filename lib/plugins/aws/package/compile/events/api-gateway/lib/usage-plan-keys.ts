@@ -1,7 +1,5 @@
-'use strict';
-
-const ServerlessError = require('../../../../../../../serverless-error');
-const isObject = require('type/object/is');
+import ServerlessError from '../../../../../../../serverless-error.ts';
+import isObject from 'type/object/is.js';
 
 function createUsagePlanKeyResource(that, usagePlanLogicalId, keyNumber, keyName) {
   const apiKeyLogicalId = that.provider.naming.getApiKeyLogicalId(keyNumber, keyName);
@@ -20,7 +18,7 @@ function createUsagePlanKeyResource(that, usagePlanLogicalId, keyNumber, keyName
   };
 }
 
-module.exports = {
+export default {
   compileUsagePlanKeys() {
     const apiKeys =
       this.serverless.service.provider.apiGateway &&

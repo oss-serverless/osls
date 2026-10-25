@@ -1,8 +1,6 @@
-'use strict';
+import inquirer from './index.ts';
 
-const inquirer = require('./');
-
-module.exports = async (message, options = {}) => {
+export default async (message, options = {}) => {
   const name = options.name || 'isConfirmed';
 
   return (

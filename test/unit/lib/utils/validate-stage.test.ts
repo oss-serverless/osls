@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const validateStage = require('../../../../lib/utils/validate-stage');
+import { expect } from 'chai';
+import validateStage from '../../../../lib/utils/validate-stage.ts';
 
 describe('test/unit/lib/utils/validate-stage.test.js', () => {
   it('exports the shared stage pattern', () => {

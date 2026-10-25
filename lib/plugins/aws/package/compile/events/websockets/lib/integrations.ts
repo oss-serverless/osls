@@ -1,8 +1,6 @@
-'use strict';
+import resolveLambdaTarget from '../../../../../utils/resolve-lambda-target.ts';
 
-const resolveLambdaTarget = require('../../../../../utils/resolve-lambda-target');
-
-module.exports = {
+export default {
   compileIntegrations() {
     this.validated.events.forEach((event) => {
       const websocketsIntegrationLogicalId = this.provider.naming.getWebsocketsIntegrationLogicalId(

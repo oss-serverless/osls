@@ -1,12 +1,9 @@
-'use strict';
-
-const path = require('path');
-const fs = require('fs');
-
-const fileExistsSync = require('./fs/file-exists-sync');
-const readFileSync = require('./fs/read-file-sync');
-const writeFileSync = require('./fs/write-file-sync');
-const ServerlessError = require('../serverless-error');
+import path from 'node:path';
+import fs from 'node:fs';
+import fileExistsSync from './fs/file-exists-sync.ts';
+import readFileSync from './fs/read-file-sync.ts';
+import writeFileSync from './fs/write-file-sync.ts';
+import ServerlessError from '../serverless-error.ts';
 
 function renameYmlService(name, ymlServiceFile) {
   const serverlessYml = fs

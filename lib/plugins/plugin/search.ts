@@ -1,8 +1,7 @@
-'use strict';
-
-const { log } = require('../../utils/serverless-utils/log');
-const cliCommandsSchema = require('../../cli/commands-schema');
-const pluginUtils = require('./lib/utils');
+import log2 from '../../utils/serverless-utils/log.ts';
+import cliCommandsSchema from '../../cli/commands-schema/index.ts';
+import pluginUtils from './lib/utils.ts';
+const { log } = log2;
 
 class PluginSearch {
   constructor(serverless, options) {
@@ -46,4 +45,4 @@ class PluginSearch {
   }
 }
 
-module.exports = PluginSearch;
+export default PluginSearch;

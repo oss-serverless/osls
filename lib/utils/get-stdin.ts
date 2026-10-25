@@ -1,6 +1,4 @@
-'use strict';
-
-const { TextDecoder, TextEncoder } = require('node:util');
+import { TextDecoder, TextEncoder } from 'node:util';
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder('utf8', {
@@ -8,7 +6,7 @@ const textDecoder = new TextDecoder('utf8', {
   ignoreBOM: false,
 });
 
-module.exports = async (stdin = process.stdin) => {
+export default async (stdin = process.stdin) => {
   if (stdin.isTTY) return '';
 
   const chunks = [];

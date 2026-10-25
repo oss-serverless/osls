@@ -1,6 +1,4 @@
-'use strict';
-
-const resolveLambdaTarget = require('../../../utils/resolve-lambda-target');
+import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
 
 class AwsCompileAlexaSkillEvents {
   constructor(serverless) {
@@ -79,4 +77,4 @@ class AwsCompileAlexaSkillEvents {
   }
 }
 
-module.exports = AwsCompileAlexaSkillEvents;
+export default AwsCompileAlexaSkillEvents;

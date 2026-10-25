@@ -1,14 +1,14 @@
-'use strict';
-
-const findAndGroupDeployments = require('../../utils/find-and-group-deployments');
-const getS3ObjectsFromStacks = require('../../utils/get-s3-objects-from-stacks');
-const { getAwsErrorCode } = require('../../../../aws/aws-sdk-v3-error');
-const { retryOnThrottlingError } = require('../../../../aws/retry');
-const isS3ListAccessDeniedError = require('../../utils/is-s3-list-access-denied-error');
-const parseDeploymentObjectKey = require('../../utils/parse-deployment-object-key');
-const ServerlessError = require('../../../../serverless-error');
-const { log } = require('../../../../utils/serverless-utils/log');
-const { S3Client, DeleteObjectsCommand, ListObjectsV2Command } = require('@aws-sdk/client-s3');
+import findAndGroupDeployments from '../../utils/find-and-group-deployments.ts';
+import getS3ObjectsFromStacks from '../../utils/get-s3-objects-from-stacks.ts';
+import { getAwsErrorCode } from '../../../../aws/aws-sdk-v3-error.ts';
+import retry from '../../../../aws/retry.ts';
+import isS3ListAccessDeniedError from '../../utils/is-s3-list-access-denied-error.ts';
+import parseDeploymentObjectKey from '../../utils/parse-deployment-object-key.ts';
+import ServerlessError from '../../../../serverless-error.ts';
+import log2 from '../../../../utils/serverless-utils/log.ts';
+import { S3Client, DeleteObjectsCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+const { retryOnThrottlingError } = retry;
+const { log } = log2;
 
 const maxDeleteObjectsCount = 1000;
 
@@ -58,7 +58,7 @@ async function listObjectsV2(s3, params) {
   return { Contents };
 }
 
-module.exports = {
+export default {
   async getObjectsToRemove() {
     const stacksToKeepCount =
       this.serverless.service.provider.deploymentBucketObject?.maxPreviousDeploymentArtifacts ?? 5;

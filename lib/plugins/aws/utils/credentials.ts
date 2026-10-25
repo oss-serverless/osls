@@ -1,9 +1,7 @@
-'use strict';
-
-const { join } = require('path');
-const { constants, promises: fsp } = require('fs');
-const os = require('os');
-const ServerlessError = require('../../../serverless-error');
+import { join } from 'node:path';
+import { constants, promises as fsp } from 'node:fs';
+import os from 'node:os';
+import ServerlessError from '../../../serverless-error.ts';
 
 const homedir = os.homedir();
 const awsConfigDirPath = join(homedir, '.aws');
@@ -57,7 +55,7 @@ const writeCredentialsContent = async (content) => {
   }
 };
 
-module.exports = {
+export default {
   async resolveFileProfiles() {
     if (!credentialsFilePath) return new Map();
     try {

@@ -1,12 +1,10 @@
-'use strict';
+import { expect } from 'chai';
+import fs from 'node:fs';
+import { overrideCwd, overrideEnv, overrideArgv } from '../../../../utils/process.ts';
+import path from 'node:path';
+import triage from '../../../../../lib/cli/triage.ts';
 
-const { expect } = require('chai');
-const fs = require('fs');
-const { overrideCwd, overrideEnv, overrideArgv } = require('../../../../utils/process');
-const path = require('path');
-const triage = require('../../../../../lib/cli/triage');
-
-const fixturesDirname = path.resolve(__dirname, 'fixtures');
+const fixturesDirname = path.resolve(import.meta.dirname, 'fixtures');
 
 describe('test/unit/lib/cli/triage/index.test.js', () => {
   before(() => overrideEnv({ variables: { SLS_GEO_LOCATION: 'us' } }));

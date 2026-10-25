@@ -1,20 +1,20 @@
-'use strict';
-
-const chai = require('chai');
-const resolveAjvValidate = require('../../../../../lib/classes/config-schema-handler/resolve-ajv-validate');
-const getSchemaHash = require('../../../../../lib/classes/config-schema-handler/schema-hash');
-const path = require('path');
-const os = require('os');
-const fsp = require('fs').promises;
-const proxyquire = require('proxyquire');
+import * as chai from 'chai';
+import resolveAjvValidate from '../../../../../lib/classes/config-schema-handler/resolve-ajv-validate.ts';
+import getSchemaHash from '../../../../../lib/classes/config-schema-handler/schema-hash.ts';
+import path from 'node:path';
+import os from 'node:os';
+import { promises as fsp } from 'node:fs';
+import proxyquire from 'proxyquire';
+import packageModule from 'ajv/package.json' with { type: 'json' };
+import packageModule2 from 'ajv-formats/package.json' with { type: 'json' };
 
 const expect = chai.expect;
 
 const getExpectedCachePath = (schemaHash) => {
   return path.resolve(
     process.env.SLS_SCHEMA_CACHE_BASE_DIR || os.homedir(),
-    `.serverless/artifacts/ajv-validate-ajv-${require('ajv/package').version}-ajv-formats-${
-      require('ajv-formats/package').version
+    `.serverless/artifacts/ajv-validate-ajv-${packageModule.version}-ajv-formats-${
+      packageModule2.version
     }`,
     `${schemaHash}.js`
   );
@@ -55,7 +55,7 @@ describe('test/unit/lib/classes/ConfigSchemaHandler/resolveAjvValidate.test.js',
   });
 
   it('regenerates the cached validator module if removed externally', async () => {
-    const realFsp = require('fs').promises;
+    const realFsp = (await import('node:fs')).default.promises;
     let injectedRemoval = false;
     const resolveAjvValidateFresh = proxyquire(
       '../../../../../lib/classes/config-schema-handler/resolve-ajv-validate',

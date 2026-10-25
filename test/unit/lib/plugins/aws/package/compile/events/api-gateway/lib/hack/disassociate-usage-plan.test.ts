@@ -1,22 +1,17 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const {
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import {
   APIGatewayClient,
   GetUsagePlansCommand,
   UpdateUsagePlanCommand,
-} = require('@aws-sdk/client-api-gateway');
-const {
-  CloudFormationClient,
-  DescribeStackResourceCommand,
-} = require('@aws-sdk/client-cloudformation');
-const Serverless = require('../../../../../../../../../../../lib/serverless');
-const AwsProvider = require('../../../../../../../../../../../lib/plugins/aws/provider');
-const disassociateUsagePlan = require('../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/disassociate-usage-plan');
-const releasePendingRequestsUntilSettled = require('../../../../../../../../../../utils/release-pending-requests-until-settled');
-const runServerless = require('../../../../../../../../../../utils/run-serverless');
+} from '@aws-sdk/client-api-gateway';
+import { CloudFormationClient, DescribeStackResourceCommand } from '@aws-sdk/client-cloudformation';
+import Serverless from '../../../../../../../../../../../lib/serverless.ts';
+import AwsProvider from '../../../../../../../../../../../lib/plugins/aws/provider.ts';
+import disassociateUsagePlan from '../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/disassociate-usage-plan.ts';
+import releasePendingRequestsUntilSettled from '../../../../../../../../../../utils/release-pending-requests-until-settled.ts';
+import runServerless from '../../../../../../../../../../utils/run-serverless.ts';
 
 function getApiGatewayMethod(command) {
   if (command instanceof GetUsagePlansCommand) return 'getUsagePlans';

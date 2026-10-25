@@ -1,6 +1,4 @@
-'use strict';
-
-const crypto = require('crypto');
+import crypto from 'node:crypto';
 
 const upperFirst = (value) => {
   const text = String(value);
@@ -38,7 +36,7 @@ const camelCase = (value) => {
  * also be centralized so that they co-occur and are more correlated spatially within the code base.
  * That is to say that they are easier to change together.
  */
-module.exports = {
+export default {
   // General
   normalizeName(name) {
     return `${upperFirst(name)}`;

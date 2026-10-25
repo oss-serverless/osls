@@ -1,20 +1,19 @@
-'use strict';
-
-const sinon = require('sinon');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const { PassThrough } = require('stream');
-const chai = require('chai');
-const { Upload } = require('@aws-sdk/lib-storage');
-const normalizeFiles = require('../../../../../../../lib/plugins/aws/lib/normalize-files');
-const AwsProvider = require('../../../../../../../lib/plugins/aws/provider');
-const AwsDeploy = require('../../../../../../../lib/plugins/aws/deploy/index');
-const Serverless = require('../../../../../../../lib/serverless');
-const { progress } = require('../../../../../../../lib/utils/serverless-utils/log');
-const skipOnDisabledSymlinksInWindows = require('../../../../../../lib/skip-on-disabled-symlinks-in-windows');
-const { createTmpDir, ensureFileSync, getTmpDirPath } = require('../../../../../../utils/fs');
-const runServerless = require('../../../../../../utils/run-serverless');
+import * as sinon from 'sinon';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { PassThrough } from 'node:stream';
+import * as chai from 'chai';
+import { Upload } from '@aws-sdk/lib-storage';
+import normalizeFiles from '../../../../../../../lib/plugins/aws/lib/normalize-files.ts';
+import AwsProvider from '../../../../../../../lib/plugins/aws/provider.ts';
+import AwsDeploy from '../../../../../../../lib/plugins/aws/deploy/index.ts';
+import Serverless from '../../../../../../../lib/serverless.ts';
+import log from '../../../../../../../lib/utils/serverless-utils/log.ts';
+import skipOnDisabledSymlinksInWindows from '../../../../../../lib/skip-on-disabled-symlinks-in-windows.ts';
+import { createTmpDir, ensureFileSync, getTmpDirPath } from '../../../../../../utils/fs.ts';
+import runServerless from '../../../../../../utils/run-serverless.ts';
+const { progress } = log;
 
 const expect = chai.expect;
 

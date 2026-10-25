@@ -1,15 +1,12 @@
-'use strict';
-
-const wait = require('../../../utils/sleep');
-const ServerlessError = require('../../../serverless-error');
-const { log, style, progress } = require('../../../utils/serverless-utils/log');
-const getMonitoringFrequency = require('../utils/get-monitoring-frequency');
-const {
-  CloudFormationClient,
-  DescribeStackEventsCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { isCloudFormationMissingStackError } = require('../../../aws/aws-sdk-v3-error');
-const { retryOnThrottlingError } = require('../../../aws/retry');
+import wait from '../../../utils/sleep.ts';
+import ServerlessError from '../../../serverless-error.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
+import getMonitoringFrequency from '../utils/get-monitoring-frequency.ts';
+import { CloudFormationClient, DescribeStackEventsCommand } from '@aws-sdk/client-cloudformation';
+import { isCloudFormationMissingStackError } from '../../../aws/aws-sdk-v3-error.ts';
+import retry from '../../../aws/retry.ts';
+const { log, style, progress } = log2;
+const { retryOnThrottlingError } = retry;
 
 const mainProgress = progress.get('main');
 const validStatuses = new Set(['CREATE_COMPLETE', 'UPDATE_COMPLETE', 'DELETE_COMPLETE']);
@@ -32,7 +29,7 @@ function getCloudFormationClient(context) {
   return context.cloudFormationClientPromise;
 }
 
-module.exports = {
+export default {
   async checkStackProgress(action, cfData, stackUrl, options, state = {}) {
     let {
       loggedEventIds = new Set(),

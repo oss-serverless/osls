@@ -1,14 +1,10 @@
-'use strict';
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import retry from '../../../../lib/aws/retry.ts';
 
-const chai = require('chai');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-
-const ServerlessError = require('../../../../lib/serverless-error');
-const {
-  retryOnThrottlingError,
-  retryOnTransientNetworkError,
-} = require('../../../../lib/aws/retry');
+const { retryOnThrottlingError, retryOnTransientNetworkError } = retry;
 
 const { expect } = chai;
 

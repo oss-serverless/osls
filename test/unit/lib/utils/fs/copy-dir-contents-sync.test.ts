@@ -1,13 +1,11 @@
-'use strict';
-
-const expect = require('chai').expect;
-const fs = require('fs');
-const path = require('path');
-const copyDirContentsSync = require('../../../../../lib/utils/fs/copy-dir-contents-sync');
-const fileExistsSync = require('../../../../../lib/utils/fs/file-exists-sync');
-const writeFileSync = require('../../../../../lib/utils/fs/write-file-sync');
-const skipOnDisabledSymlinksInWindows = require('../../../../lib/skip-on-disabled-symlinks-in-windows');
-const { removeSync } = require('../../../../utils/fs');
+import { expect } from 'chai';
+import fs from 'node:fs';
+import path from 'node:path';
+import copyDirContentsSync from '../../../../../lib/utils/fs/copy-dir-contents-sync.ts';
+import fileExistsSync from '../../../../../lib/utils/fs/file-exists-sync.ts';
+import writeFileSync from '../../../../../lib/utils/fs/write-file-sync.ts';
+import skipOnDisabledSymlinksInWindows from '../../../../lib/skip-on-disabled-symlinks-in-windows.ts';
+import { removeSync } from '../../../../utils/fs.ts';
 
 describe('#copyDirContentsSync()', () => {
   const afterCallback = () => {

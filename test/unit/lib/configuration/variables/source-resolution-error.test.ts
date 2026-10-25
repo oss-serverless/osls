@@ -1,8 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const VariableSourceResolutionError = require('../../../../../lib/configuration/variables/source-resolution-error');
+import { expect } from 'chai';
+import VariableSourceResolutionError from '../../../../../lib/configuration/variables/source-resolution-error.ts';
 
 describe('test/unit/lib/configuration/variables/source-resolution-error.test.js', () => {
   it('should store message', () => {

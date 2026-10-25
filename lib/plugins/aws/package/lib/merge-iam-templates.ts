@@ -1,8 +1,6 @@
-'use strict';
+import path from 'node:path';
 
-const path = require('path');
-
-module.exports = {
+export default {
   mergeIamTemplates() {
     // resolve early if no functions are provided
     if (!this.serverless.service.getAllFunctions().length) {

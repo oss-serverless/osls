@@ -1,10 +1,10 @@
-'use strict';
-
-const identity = require('ext/function/identity');
-const { stderrColors } = require('../../../../colors');
-const { methodDescriptor } = require('../../../../property-descriptors');
-const { style, log } = require('../../../log');
-const joinTextTokens = require('../../log/join-text-tokens');
+import identity from 'ext/function/identity.js';
+import colors from '../../../../colors.ts';
+import { methodDescriptor } from '../../../../property-descriptors.ts';
+import log2 from '../../../log.ts';
+import joinTextTokens from '../../log/join-text-tokens.ts';
+const { stderrColors } = colors;
+const { style, log } = log2;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 

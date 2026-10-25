@@ -1,16 +1,14 @@
-'use strict';
-
-const crypto = require('crypto');
-const fs = require('fs');
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 const fsp = fs.promises;
-const os = require('os');
-const path = require('path');
 
 const tmpDirPrefix = 'node-process-';
 
 let processTmpDirPromise;
 
-module.exports = async () => {
+export default async () => {
   if (!processTmpDirPromise) {
     processTmpDirPromise = fsp
       .mkdtemp(path.join(os.tmpdir(), `${tmpDirPrefix}${crypto.randomBytes(12).toString('hex')}-`))

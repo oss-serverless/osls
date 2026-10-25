@@ -1,11 +1,9 @@
-'use strict';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
 
-const path = require('path');
-const fsp = require('fs').promises;
+const localNpmBinPath = path.join(import.meta.dirname, '../../node_modules/npm/bin/npm-cli.js');
 
-const localNpmBinPath = path.join(__dirname, '../../node_modules/npm/bin/npm-cli.js');
-
-module.exports = fsp
+export default fsp
   .stat(localNpmBinPath)
   .then(
     (stats) => stats.isFile(),

@@ -1,9 +1,7 @@
-'use strict';
+import os from 'node:os';
+import path from 'node:path';
 
-const os = require('os');
-const path = require('path');
-
-module.exports = (id) => {
+export default (id) => {
   switch (os.platform()) {
     case 'darwin':
       return path.join(os.homedir(), 'Library', 'Caches', id);

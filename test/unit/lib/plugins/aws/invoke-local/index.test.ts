@@ -1,35 +1,36 @@
-'use strict';
-
-const http = require('http');
-const fs = require('fs');
-const fsp = fs.promises;
-const chai = require('chai');
-const sinon = require('sinon');
-const os = require('os');
-const path = require('path');
-const AdmZip = require('adm-zip');
-const EventEmitter = require('events');
-const proxyquire = require('proxyquire');
-const { overrideEnv } = require('../../../../../utils/process');
-const AwsProvider = require('../../../../../../lib/plugins/aws/provider');
-const {
+import http from 'node:http';
+import fs from 'node:fs';
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import os from 'node:os';
+import path from 'node:path';
+import AdmZip from 'adm-zip';
+import EventEmitter from 'node:events';
+import proxyquire from 'proxyquire';
+import { overrideEnv } from '../../../../../utils/process.ts';
+import AwsProvider from '../../../../../../lib/plugins/aws/provider.ts';
+import {
   CloudFormationClient,
   ListExportsCommand,
   ListStackResourcesCommand,
-} = require('@aws-sdk/client-cloudformation');
-const Serverless = require('../../../../../../lib/serverless');
-const ServerlessError = require('../../../../../../lib/serverless-error');
-const CLI = require('../../../../../../lib/classes/cli');
-const { getTmpDirPath } = require('../../../../../utils/fs');
-const skipWithNotice = require('../../../../../lib/skip-with-notice');
-const runServerless = require('../../../../../utils/run-serverless');
-const setupProgrammaticFixture = require('../../../../../utils/setup-programmatic-fixture');
-const spawnExt = require('../../../../../../lib/utils/spawn');
-const configureAwsSdkV3Stub = require('../../../../../lib/configure-aws-sdk-v3-stub');
-const releasePendingRequestsUntilSettled = require('../../../../../utils/release-pending-requests-until-settled');
+} from '@aws-sdk/client-cloudformation';
+import Serverless from '../../../../../../lib/serverless.ts';
+import ServerlessError from '../../../../../../lib/serverless-error.ts';
+import CLI from '../../../../../../lib/classes/cli.ts';
+import { getTmpDirPath } from '../../../../../utils/fs.ts';
+import skipWithNotice from '../../../../../lib/skip-with-notice.ts';
+import runServerless from '../../../../../utils/run-serverless.ts';
+import setupProgrammaticFixture from '../../../../../utils/setup-programmatic-fixture.ts';
+import spawnExt from '../../../../../../lib/utils/spawn.ts';
+import configureAwsSdkV3Stub from '../../../../../lib/configure-aws-sdk-v3-stub.ts';
+import releasePendingRequestsUntilSettled from '../../../../../utils/release-pending-requests-until-settled.ts';
+const fsp = fs.promises;
 
-const tmpServicePath = __dirname;
-const getStdinModulePath = path.resolve(__dirname, '../../../../../../lib/utils/get-stdin.js');
+const tmpServicePath = import.meta.dirname;
+const getStdinModulePath = path.resolve(
+  import.meta.dirname,
+  '../../../../../../lib/utils/get-stdin.js'
+);
 
 chai.should();
 

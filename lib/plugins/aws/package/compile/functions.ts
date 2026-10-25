@@ -1,20 +1,19 @@
-'use strict';
-
-const crypto = require('crypto');
-const fs = require('fs');
-const fsp = require('fs').promises;
-const path = require('path');
-const { isDeepStrictEqual } = require('node:util');
-const { pipeline } = require('node:stream/promises');
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const isObject = require('type/object/is');
-const ServerlessError = require('../../../../serverless-error');
-const deepSortObjectByKey = require('../../../../utils/deep-sort-object-by-key');
-const { hasOwn, safeShallowAssign } = require('../../../../utils/safe-object');
-const getHashForFilePath = require('../../../../utils/get-hash-for-file-path');
-const resolveLambdaTarget = require('../../utils/resolve-lambda-target');
-const parseS3URI = require('../../utils/parse-s3-uri');
-const { log } = require('../../../../utils/serverless-utils/log');
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
+import { pipeline } from 'node:stream/promises';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import isObject from 'type/object/is.js';
+import ServerlessError from '../../../../serverless-error.ts';
+import deepSortObjectByKey from '../../../../utils/deep-sort-object-by-key.ts';
+import { hasOwn, safeShallowAssign } from '../../../../utils/safe-object.ts';
+import getHashForFilePath from '../../../../utils/get-hash-for-file-path.ts';
+import resolveLambdaTarget from '../../utils/resolve-lambda-target.ts';
+import parseS3URI from '../../utils/parse-s3-uri.ts';
+import log2 from '../../../../utils/serverless-utils/log.ts';
+const { log } = log2;
 
 const defaultCors = {
   allowedOrigins: ['*'],
@@ -1220,4 +1219,4 @@ function extractLayerConfigurationsFromFunction(functionProperties, cfTemplate) 
   return layerConfigurations;
 }
 
-module.exports = AwsCompileFunctions;
+export default AwsCompileFunctions;

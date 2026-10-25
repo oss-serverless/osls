@@ -1,6 +1,4 @@
-'use strict';
-
-const isObject = require('type/object/is');
+import isObject from 'type/object/is.js';
 
 const PATH_TOKEN_RE = /[^.[\]]+|\[(?:(\d+)|(["'])(.*?)\2|([^[\]]+))\]/g;
 const UNSAFE_PROPERTY_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
@@ -74,7 +72,16 @@ const unsetByPath = (source, path) => {
   return delete current[segments.at(-1)];
 };
 
-module.exports = {
+export {
+  getByPath,
+  hasUnsafePathSegment,
+  isUnsafePropertyKey,
+  setByPath,
+  tokenizePath,
+  unsetByPath,
+};
+
+export default {
   getByPath,
   hasUnsafePathSegment,
   isUnsafePropertyKey,

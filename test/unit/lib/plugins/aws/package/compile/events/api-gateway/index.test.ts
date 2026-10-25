@@ -1,13 +1,11 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const AwsProvider = require('../../../../../../../../../lib/plugins/aws/provider');
-const { createApiGatewayCompilerContext } = require('./test-utils');
-const validate = require('../../../../../../../../../lib/plugins/aws/lib/validate');
-const getServiceState = require('../../../../../../../../../lib/plugins/aws/lib/get-service-state');
-const updateStage = require('../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/update-stage');
-const disassociateUsagePlan = require('../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/disassociate-usage-plan');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import AwsProvider from '../../../../../../../../../lib/plugins/aws/provider.ts';
+import { createApiGatewayCompilerContext } from './test-utils.ts';
+import validate from '../../../../../../../../../lib/plugins/aws/lib/validate.ts';
+import getServiceState from '../../../../../../../../../lib/plugins/aws/lib/get-service-state.ts';
+import updateStage from '../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/update-stage.ts';
+import disassociateUsagePlan from '../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/lib/hack/disassociate-usage-plan.ts';
 
 describe('AwsCompileApigEvents', () => {
   let awsCompileApigEvents;

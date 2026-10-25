@@ -1,20 +1,18 @@
-'use strict';
-
-const path = require('path');
-const expect = require('chai').expect;
-const fs = require('fs');
-const skipOnDisabledSymlinksInWindows = require('../../../../lib/skip-on-disabled-symlinks-in-windows');
-const fileExistsSync = require('../../../../../lib/utils/fs/file-exists-sync');
+import path from 'node:path';
+import { expect } from 'chai';
+import fs from 'node:fs';
+import skipOnDisabledSymlinksInWindows from '../../../../lib/skip-on-disabled-symlinks-in-windows.ts';
+import fileExistsSync from '../../../../../lib/utils/fs/file-exists-sync.ts';
 
 describe('#fileExistsSync()', () => {
   describe('When reading a file', () => {
     it('should detect if a file exists', () => {
-      const file = fileExistsSync(__filename);
+      const file = fileExistsSync(import.meta.filename);
       expect(file).to.equal(true);
     });
 
     it("should detect if a file doesn't exist", () => {
-      const noFile = fileExistsSync(path.join(__dirname, 'XYZ.json'));
+      const noFile = fileExistsSync(path.join(import.meta.dirname, 'XYZ.json'));
       expect(noFile).to.equal(false);
     });
   });
@@ -22,7 +20,7 @@ describe('#fileExistsSync()', () => {
   describe('When reading a symlink to a file', () => {
     it('should detect if the file exists', function () {
       try {
-        fs.symlinkSync(__filename, 'sym');
+        fs.symlinkSync(import.meta.filename, 'sym');
       } catch (error) {
         skipOnDisabledSymlinksInWindows(error, this);
         throw error;
@@ -46,7 +44,7 @@ describe('#fileExistsSync()', () => {
 
     it("should detect if the file doesn't exist w/ symlink to dir", function () {
       try {
-        fs.symlinkSync(__dirname, 'dir-sym');
+        fs.symlinkSync(import.meta.dirname, 'dir-sym');
       } catch (error) {
         skipOnDisabledSymlinksInWindows(error, this);
         throw error;

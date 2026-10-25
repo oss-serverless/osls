@@ -1,7 +1,5 @@
-'use strict';
-
-const ServerlessError = require('../../../serverless-error');
-const { hasOwn } = require('../../../utils/safe-object');
+import ServerlessError from '../../../serverless-error.ts';
+import { hasOwn } from '../../../utils/safe-object.ts';
 
 const getOwnValue = (object, key) =>
   object != null && hasOwn(object, key) ? object[key] : undefined;
@@ -46,7 +44,7 @@ const getErrorStatusCode = (error) => {
   );
 };
 
-module.exports = (error) => {
+export default (error) => {
   const errorCode = getErrorCode(error);
 
   return (

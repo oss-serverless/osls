@@ -1,14 +1,12 @@
-'use strict';
+import * as chai from 'chai';
+import os from 'node:os';
+import path from 'node:path';
+import awsNaming from '../../../../../../lib/plugins/aws/lib/naming.ts';
+import { createTmpDir, pathExists, remove } from '../../../../../utils/fs.ts';
+import customResources from '../../../../../../lib/plugins/aws/custom-resources/index.ts';
+import runServerless from '../../../../../utils/run-serverless.ts';
 
-const chai = require('chai');
-const os = require('os');
-const path = require('path');
-const awsNaming = require('../../../../../../lib/plugins/aws/lib/naming');
-const { createTmpDir, pathExists, remove } = require('../../../../../utils/fs');
-const {
-  addCustomResourceToService,
-} = require('../../../../../../lib/plugins/aws/custom-resources/index.js');
-const runServerless = require('../../../../../utils/run-serverless');
+const { addCustomResourceToService } = customResources;
 
 const expect = chai.expect;
 

@@ -1,19 +1,18 @@
-'use strict';
-
-const path = require('path');
-const ensureString = require('type/string/ensure');
-const ensurePlainObject = require('type/plain-object/ensure');
-const ensurePlainFunction = require('type/plain-function/ensure');
-const fs = require('fs');
+import path from 'node:path';
+import ensureString from 'type/string/ensure.js';
+import ensurePlainObject from 'type/plain-object/ensure.js';
+import ensurePlainFunction from 'type/plain-function/ensure.js';
+import fs from 'node:fs';
+import wait from '../../lib/utils/sleep.ts';
+import spawn from '../../lib/utils/spawn.ts';
+import memoizee from 'memoizee';
+import { load as loadYaml, dump as saveYaml } from 'js-yaml';
+import cloudformationSchema from '../../lib/utils/serverless-utils/cloudformation-schema.ts';
+import mergePlainObjects from '../../lib/utils/merge-plain-objects.ts';
+import provisionTmpDir from './provision-tmp-dir.ts';
+import log2 from 'log';
 const fsp = fs.promises;
-const wait = require('../../lib/utils/sleep');
-const spawn = require('../../lib/utils/spawn');
-const memoizee = require('memoizee');
-const log = require('log').get('serverless:test');
-const { load: loadYaml, dump: saveYaml } = require('js-yaml');
-const cloudformationSchema = require('../../lib/utils/serverless-utils/cloudformation-schema');
-const mergePlainObjects = require('../../lib/utils/merge-plain-objects');
-const provisionTmpDir = require('./provision-tmp-dir');
+const log = log2.get('serverless:test');
 
 const isFixtureConfigured = memoizee((fixturePath) => {
   let stats;
@@ -93,7 +92,7 @@ const setupFixture = memoizee(
 
 const nameTimeBase = new Date(2020, 8, 7).getTime();
 
-module.exports = memoizee((fixturesPath) => {
+export default memoizee((fixturesPath) => {
   return {
     setup: async (fixtureName, options = {}) => {
       const baseFixturePath = path.join(fixturesPath, ensureString(fixtureName));

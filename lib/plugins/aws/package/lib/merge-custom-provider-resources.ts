@@ -1,10 +1,8 @@
-'use strict';
+import ServerlessError from '../../../../serverless-error.ts';
+import mergePlainObjects from '../../../../utils/merge-plain-objects.ts';
+import { hasOwn, safeShallowAssign } from '../../../../utils/safe-object.ts';
 
-const ServerlessError = require('../../../../serverless-error');
-const mergePlainObjects = require('../../../../utils/merge-plain-objects');
-const { hasOwn, safeShallowAssign } = require('../../../../utils/safe-object');
-
-module.exports = {
+export default {
   mergeCustomProviderResources() {
     if (this.serverless.service.resources && !this.serverless.service.resources.Resources) {
       this.serverless.service.resources.Resources = {};

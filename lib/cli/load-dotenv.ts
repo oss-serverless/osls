@@ -1,10 +1,8 @@
-'use strict';
-
-const dotenv = require('dotenv');
-const dotenvExpand = require('dotenv-expand');
-const path = require('path');
-const ServerlessError = require('../serverless-error');
-const validateStage = require('../utils/validate-stage');
+import dotenv from 'dotenv';
+import dotenvExpand from 'dotenv-expand';
+import path from 'node:path';
+import ServerlessError from '../serverless-error.ts';
+import validateStage from '../utils/validate-stage.ts';
 
 const isMissingFileError = (error) => error.code === 'ENOENT';
 
@@ -18,7 +16,7 @@ const loadDotenvFrom = (envFilePath) => {
   return dotenvExpand.expand(config);
 };
 
-module.exports = (stage) => {
+export default (stage) => {
   stage = validateStage(stage);
   const defaultEnvFilePath = path.join(process.cwd(), '.env');
   const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`);

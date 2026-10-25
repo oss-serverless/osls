@@ -1,8 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-const listVersion = require('../../../../lib/cli/render-version');
-const observeOutput = require('../../../lib/observe-output');
+import { expect } from 'chai';
+import listVersion from '../../../../lib/cli/render-version.ts';
+import observeOutput from '../../../lib/observe-output.ts';
 
 describe('test/unit/lib/cli/list-version.test.js', () => {
   it('should log version', async () => {

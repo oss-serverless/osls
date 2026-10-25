@@ -1,19 +1,17 @@
-'use strict';
-
-const ensureString = require('type/string/ensure');
-const ensureIterable = require('type/iterable/ensure');
-const ensurePlainObject = require('type/plain-object/ensure');
-const ensurePlainFunction = require('type/plain-function/ensure');
-const { realpathSync } = require('fs');
-const path = require('path');
-const os = require('os');
-const { overrideEnv, overrideCwd, overrideArgv } = require('../utils/process');
-const sinon = require('sinon');
-const resolveEnv = require('./resolve-env');
-const observeOutput = require('./observe-output');
-const provisionTmpDir = require('./provision-tmp-dir');
-const configureAwsSdkV3Stub = require('./configure-aws-sdk-v3-stub');
-const { writeJsonFile } = require('../utils/fs');
+import ensureString from 'type/string/ensure.js';
+import ensureIterable from 'type/iterable/ensure.js';
+import ensurePlainObject from 'type/plain-object/ensure.js';
+import ensurePlainFunction from 'type/plain-function/ensure.js';
+import { realpathSync } from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import { overrideEnv, overrideCwd, overrideArgv } from '../utils/process.ts';
+import * as sinon from 'sinon';
+import resolveEnv from './resolve-env.ts';
+import observeOutput from './observe-output.ts';
+import provisionTmpDir from './provision-tmp-dir.ts';
+import configureAwsSdkV3Stub from './configure-aws-sdk-v3-stub.ts';
+import { writeJsonFile } from '../utils/fs.ts';
 
 const hasOwn = Function.call.bind(Object.prototype.hasOwnProperty);
 
@@ -51,7 +49,7 @@ const resolveCwd = async ({ cwd, config }) => {
   return tmpDirPath;
 };
 
-module.exports = async (
+export default async (
   serverlessPath,
   {
     awsSdkV3StubMap,

@@ -1,21 +1,21 @@
-'use strict';
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import path from 'node:path';
+import fs from 'node:fs';
+import proxyquire from 'proxyquire';
 
-const chai = require('chai');
-const sinon = require('sinon');
-const path = require('path');
-const fs = require('fs');
-const proxyquire = require('proxyquire');
-const {
+import {
   LambdaClient,
   GetFunctionCommand,
   UpdateFunctionCodeCommand,
   UpdateFunctionConfigurationCommand,
-} = require('@aws-sdk/client-lambda');
-const { IAMClient, GetRoleCommand } = require('@aws-sdk/client-iam');
-const AwsProvider = require('../../../../../lib/plugins/aws/provider');
-const Serverless = require('../../../../../lib/serverless');
-const runServerless = require('../../../../utils/run-serverless');
-const { getTmpDirPath } = require('../../../../utils/fs');
+} from '@aws-sdk/client-lambda';
+
+import { IAMClient, GetRoleCommand } from '@aws-sdk/client-iam';
+import AwsProvider from '../../../../../lib/plugins/aws/provider.ts';
+import Serverless from '../../../../../lib/serverless.ts';
+import runServerless from '../../../../utils/run-serverless.ts';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
 
 const expect = chai.expect;
 
@@ -779,7 +779,9 @@ describe('test/unit/lib/plugins/aws/deployFunction.test.js', () => {
         },
       },
       modulesCacheStub: {
-        [path.resolve(__dirname, '../../../../../lib/utils/sleep.js')]: sinon.stub().resolves(),
+        [path.resolve(import.meta.dirname, '../../../../../lib/utils/sleep.js')]: sinon
+          .stub()
+          .resolves(),
       },
       configExt: {
         functions: {

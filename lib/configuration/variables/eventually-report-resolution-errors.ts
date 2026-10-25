@@ -1,11 +1,10 @@
-'use strict';
+import path from 'node:path';
+import log2 from '../../utils/serverless-utils/log.ts';
+import ServerlessError from '../../serverless-error.ts';
+import resolveCliInput from '../../cli/resolve-input.ts';
+const { log } = log2;
 
-const path = require('path');
-const { log } = require('../../utils/serverless-utils/log');
-const ServerlessError = require('../../serverless-error');
-const resolveCliInput = require('../../cli/resolve-input');
-
-module.exports = (configurationPath, configuration, variablesMeta, options = {}) => {
+export default (configurationPath, configuration, variablesMeta, options = {}) => {
   if (!options) options = {};
   const isHelpRequest =
     options.isHelpRequest == null ? resolveCliInput().isHelpRequest : options.isHelpRequest;

@@ -1,13 +1,13 @@
-'use strict';
-
-const crypto = require('crypto');
-const path = require('path');
-const fs = require('fs');
-const promiseLimit = require('ext/promise/limit').bind(Promise);
-const getLambdaLayerArtifactPath = require('../../utils/get-lambda-layer-artifact-path');
-const { log } = require('../../../../utils/serverless-utils/log');
-const { CloudFormationClient, DescribeStacksCommand } = require('@aws-sdk/client-cloudformation');
-const { isCloudFormationMissingStackError } = require('../../../../aws/aws-sdk-v3-error');
+import crypto from 'node:crypto';
+import path from 'node:path';
+import fs from 'node:fs';
+import getLambdaLayerArtifactPath from '../../utils/get-lambda-layer-artifact-path.ts';
+import log2 from '../../../../utils/serverless-utils/log.ts';
+import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
+import { isCloudFormationMissingStackError } from '../../../../aws/aws-sdk-v3-error.ts';
+import promiseLimit2 from 'ext/promise/limit.js';
+const promiseLimit = promiseLimit2.bind(Promise);
+const { log } = log2;
 
 const getLayerArtifactHash = async (layerArtifactPath, layerForHash) =>
   new Promise((resolve, reject) => {
@@ -247,4 +247,4 @@ class AwsCompileLayers {
   }
 }
 
-module.exports = AwsCompileLayers;
+export default AwsCompileLayers;

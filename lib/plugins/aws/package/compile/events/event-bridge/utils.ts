@@ -1,6 +1,4 @@
-'use strict';
-
-const crypto = require('crypto');
+import crypto from 'node:crypto';
 
 const makeAndHashRuleName = ({ functionName, index }) => {
   const name = makeRuleName({ functionName, index });
@@ -32,7 +30,9 @@ const hashName = (name, suffix) =>
     .update(name)
     .digest('hex')}-${suffix}`;
 
-module.exports = {
+export { makeAndHashRuleName, makeRuleName, hashName, makeEventBusTargetId };
+
+export default {
   makeAndHashRuleName,
   makeRuleName,
   hashName,

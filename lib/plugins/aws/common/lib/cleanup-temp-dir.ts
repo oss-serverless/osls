@@ -1,9 +1,7 @@
-'use strict';
+import path from 'node:path';
+import { removeSync } from '../../../../utils/fs/remove.ts';
 
-const path = require('path');
-const { removeSync } = require('../../../../utils/fs/remove');
-
-module.exports = {
+export default {
   async cleanupTempDir() {
     if (this.serverless.serviceDir) {
       const serverlessTmpDirPath = path.join(this.serverless.serviceDir, '.serverless');

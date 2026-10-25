@@ -1,7 +1,6 @@
-'use strict';
+import stagePattern from './utils/stage-pattern.ts';
 
 const functionNamePattern = '^[a-zA-Z0-9-_]+$';
-const stagePattern = require('./utils/stage-pattern');
 
 const schema = {
   type: 'object',
@@ -141,4 +140,4 @@ const schema = {
   },
 };
 
-module.exports = schema;
+export default schema;

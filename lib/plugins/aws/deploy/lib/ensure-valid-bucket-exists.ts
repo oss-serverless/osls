@@ -1,22 +1,23 @@
-'use strict';
+import ServerlessError from '../../../../serverless-error.ts';
+import log2 from '../../../../utils/serverless-utils/log.ts';
+import * as jsyaml from 'js-yaml';
+import cloudformationSchema from '../../../../utils/serverless-utils/cloudformation-schema.ts';
+import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
 
-const ServerlessError = require('../../../../serverless-error');
-const { log, progress } = require('../../../../utils/serverless-utils/log');
-const jsyaml = require('js-yaml');
-const cloudformationSchema = require('../../../../utils/serverless-utils/cloudformation-schema');
-const { S3Client, HeadBucketCommand } = require('@aws-sdk/client-s3');
-const {
+import {
   CloudFormationClient,
   GetTemplateCommand,
   UpdateStackCommand,
   DeleteChangeSetCommand,
   CreateChangeSetCommand,
   ExecuteChangeSetCommand,
-} = require('@aws-sdk/client-cloudformation');
-const {
+} from '@aws-sdk/client-cloudformation';
+
+import {
   getS3BucketRegion,
   isCloudFormationMissingResourceError,
-} = require('../../../../aws/aws-sdk-v3-error');
+} from '../../../../aws/aws-sdk-v3-error.ts';
+const { log, progress } = log2;
 
 const mainProgress = progress.get('main');
 
@@ -34,7 +35,7 @@ function getCloudFormationClient(context) {
   return context.cloudFormationClientPromise;
 }
 
-module.exports = {
+export default {
   async ensureValidBucketExists() {
     // Ensure to set bucket name if it can be resolved
     // Result of this operation will determine how further validation will be performed

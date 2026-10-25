@@ -1,6 +1,4 @@
-'use strict';
-
-const isPlainObject = require('type/plain-object/is');
+import isPlainObject from 'type/plain-object/is.js';
 
 // NUL-prefixed tags cannot collide with a real (JSON-sourced) param value.
 const nul = String.fromCharCode(0);
@@ -51,4 +49,5 @@ const toCacheKey = (value) => {
   return json === undefined ? '' : json;
 };
 
-module.exports = { toCacheKey, canonicalize, identityToken };
+export { toCacheKey, canonicalize, identityToken };
+export default { toCacheKey, canonicalize, identityToken };

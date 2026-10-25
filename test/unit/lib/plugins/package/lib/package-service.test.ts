@@ -1,17 +1,17 @@
-'use strict';
-
-const os = require('os');
-const path = require('path');
-const fsp = require('fs').promises;
-const proxyquire = require('proxyquire').noCallThru();
-const sinon = require('sinon');
-const { listFileProperties, listZipFiles } = require('../../../../../utils/fs');
-const runServerless = require('../../../../../utils/run-serverless');
-const setupProgrammaticFixture = require('../../../../../utils/setup-programmatic-fixture');
-const packageService = require('../../../../../../lib/plugins/package/lib/package-service');
+import os from 'node:os';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import * as sinon from 'sinon';
+import { listFileProperties, listZipFiles } from '../../../../../utils/fs.ts';
+import runServerless from '../../../../../utils/run-serverless.ts';
+import setupProgrammaticFixture from '../../../../../utils/setup-programmatic-fixture.ts';
+import packageService from '../../../../../../lib/plugins/package/lib/package-service.ts';
 
 // Configure chai
-const { expect } = require('chai');
+import { expect } from 'chai';
+
+import proxyquire2 from 'proxyquire';
+const proxyquire = proxyquire2.noCallThru();
 
 describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
   const awsSdkV3StubMap = {

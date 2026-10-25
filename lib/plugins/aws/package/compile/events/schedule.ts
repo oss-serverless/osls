@@ -1,8 +1,7 @@
-'use strict';
-
-const ServerlessError = require('../../../../../serverless-error');
-const resolveLambdaTarget = require('../../../utils/resolve-lambda-target');
-const { log, style } = require('../../../../../utils/serverless-utils/log');
+import ServerlessError from '../../../../../serverless-error.ts';
+import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
+import log2 from '../../../../../utils/serverless-utils/log.ts';
+const { log, style } = log2;
 
 const rateSyntax = '^rate\\((?:1 (?:minute|hour|day)|(?:1\\d+|[2-9]\\d*) (?:minute|hour|day)s)\\)$';
 const cronSyntax = '^cron\\(\\S+ \\S+ \\S+ \\S+ \\S+ \\S+\\)$';
@@ -371,4 +370,4 @@ class AwsCompileScheduledEvents {
   }
 }
 
-module.exports = AwsCompileScheduledEvents;
+export default AwsCompileScheduledEvents;

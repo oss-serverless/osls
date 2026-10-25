@@ -1,14 +1,10 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const AwsInfo = require('../../../../../../lib/plugins/aws/info/index');
-const { retryOnThrottlingError } = require('../../../../../../lib/aws/retry');
-const {
-  CloudFormationClient,
-  ListStackResourcesCommand,
-} = require('@aws-sdk/client-cloudformation');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import AwsInfo from '../../../../../../lib/plugins/aws/info/index.ts';
+import retry from '../../../../../../lib/aws/retry.ts';
+import { CloudFormationClient, ListStackResourcesCommand } from '@aws-sdk/client-cloudformation';
+const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
   retryOnThrottlingError: (task, options) =>

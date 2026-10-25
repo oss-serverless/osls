@@ -1,9 +1,7 @@
-'use strict';
-
-const { expect } = require('chai');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const { ECRClient, DescribeRepositoriesCommand } = require('@aws-sdk/client-ecr');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import { ECRClient, DescribeRepositoriesCommand } from '@aws-sdk/client-ecr';
 
 describe('test/unit/lib/plugins/aws/lib/check-if-ecr-repository-exists.test.js', () => {
   let context;

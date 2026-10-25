@@ -1,6 +1,4 @@
-'use strict';
-
-const AwsProvider = require('../../../../../../../../lib/plugins/aws/provider');
+import AwsProvider from '../../../../../../../../lib/plugins/aws/provider.ts';
 
 function createAwsEventCompilerContext(EventCompiler, config = {}) {
   const options = { stage: 'dev', region: 'us-east-1', ...config.options };
@@ -48,4 +46,5 @@ function createAwsEventCompilerContext(EventCompiler, config = {}) {
   return { serverless, provider, awsCompileEvents, options };
 }
 
-module.exports = { createAwsEventCompilerContext };
+export { createAwsEventCompilerContext };
+export default { createAwsEventCompilerContext };

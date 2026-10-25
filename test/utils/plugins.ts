@@ -1,7 +1,5 @@
-'use strict';
-
-const path = require('path');
-const { outputFileSync } = require('./fs');
+import path from 'node:path';
+import { outputFileSync } from './fs.ts';
 
 // mock to test functionality bound to a serverless plugin
 class ServerlessPlugin {
@@ -24,7 +22,9 @@ function installPlugin(installDir, PluginClass) {
   );
 }
 
-module.exports = {
+export { ServerlessPlugin, installPlugin };
+
+export default {
   ServerlessPlugin,
   installPlugin,
 };

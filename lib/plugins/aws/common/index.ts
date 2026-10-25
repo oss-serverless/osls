@@ -1,14 +1,13 @@
-'use strict';
-
 /*
  * Provide common lifecycle events for the AWS provider that can be invoked
  * and spawned from other AWS plugins. This makes it easy to hook lifecycle
  * events in
  */
 
-const validate = require('../lib/validate');
-const cleanupTempDir = require('./lib/cleanup-temp-dir');
-const artifacts = require('./lib/artifacts');
+import validate from '../lib/validate.ts';
+
+import cleanupTempDir from './lib/cleanup-temp-dir.ts';
+import artifacts from './lib/artifacts.ts';
 
 class AwsCommon {
   constructor(serverless, options) {
@@ -56,4 +55,4 @@ class AwsCommon {
   }
 }
 
-module.exports = AwsCommon;
+export default AwsCommon;

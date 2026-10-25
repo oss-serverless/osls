@@ -1,7 +1,5 @@
-'use strict';
-
 // Canonical CSS color keywords sourced from color-name@1.1.4.
-module.exports = {
+export default {
   aliceblue: [240, 248, 255],
   antiquewhite: [250, 235, 215],
   aqua: [0, 255, 255],

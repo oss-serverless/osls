@@ -1,21 +1,22 @@
-// Resolves all non instance dependent variables in a provided configuration
-// This util is not used in Serverless process flow, but is handy for side resolution of variables
-
-'use strict';
-
-const ensureString = require('type/string/ensure');
-const ensurePlainObject = require('type/plain-object/ensure');
-const ServerlessError = require('../../serverless-error');
-const resolveMeta = require('./resolve-meta');
-const resolve = require('./resolve');
+import ensureString from 'type/string/ensure.js';
+import ensurePlainObject from 'type/plain-object/ensure.js';
+import ServerlessError from '../../serverless-error.ts';
+import resolveMeta from './resolve-meta.ts';
+import resolve from './resolve.ts';
+import env2 from './sources/env.ts';
+import file2 from './sources/file.ts';
+import opt2 from './sources/opt.ts';
+import self2 from './sources/self.ts';
+import strToBool2 from './sources/str-to-bool.ts';
+import getSls from './sources/instance-dependent/get-sls.ts';
 
 const defaultSources = {
-  env: require('./sources/env'),
-  file: require('./sources/file'),
-  opt: require('./sources/opt'),
-  self: require('./sources/self'),
-  strToBool: require('./sources/str-to-bool'),
-  sls: require('./sources/instance-dependent/get-sls')(),
+  env: env2,
+  file: file2,
+  opt: opt2,
+  self: self2,
+  strToBool: strToBool2,
+  sls: getSls(),
 };
 
 const reportEventualErrors = (variablesMeta) => {
@@ -34,7 +35,7 @@ const reportEventualErrors = (variablesMeta) => {
   );
 };
 
-module.exports = async ({ serviceDir, servicePath, configuration, options, sources = null }) => {
+export default async ({ serviceDir, servicePath, configuration, options, sources = null }) => {
   serviceDir = ensureString(serviceDir || servicePath);
   ensurePlainObject(configuration);
   options = ensurePlainObject(options, { default: {} });

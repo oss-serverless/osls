@@ -1,8 +1,6 @@
-'use strict';
-
-const path = require('path');
-const { assertFileRefAllowed } = require('./file-ref-policy');
-const { readHttpRef } = require('./http-ref-reader');
+import path from 'node:path';
+import { assertFileRefAllowed } from './file-ref-policy.ts';
+import { readHttpRef } from './http-ref-reader.ts';
 
 let refParserModulePromise;
 
@@ -46,6 +44,8 @@ const readExternalDocument = async (documentUrl, externalRefs) => {
   throw new Error(`Unsupported $ref protocol: ${documentUrl}`);
 };
 
-module.exports = {
+export { readExternalDocument };
+
+export default {
   readExternalDocument,
 };

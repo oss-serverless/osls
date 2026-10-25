@@ -1,8 +1,6 @@
-'use strict';
-
-const { addPermission, removePermission, getStatementId } = require('./lib/permissions');
-const { updateConfiguration, removeConfiguration } = require('./lib/bucket');
-const { getEnvironment, getLambdaArn, handlerWrapper } = require('../utils');
+import { addPermission, removePermission, getStatementId } from './lib/permissions.ts';
+import { updateConfiguration, removeConfiguration } from './lib/bucket.ts';
+import { getEnvironment, getLambdaArn, handlerWrapper } from '../utils.ts';
 
 async function handler(event, context) {
   if (event.RequestType === 'Create') {
@@ -190,6 +188,6 @@ function ignoreDeniedNotificationCleanup(error) {
   throw error;
 }
 
-module.exports = {
+export default {
   handler: handlerWrapper(handler, 'CustomResourceExistingS3'),
 };

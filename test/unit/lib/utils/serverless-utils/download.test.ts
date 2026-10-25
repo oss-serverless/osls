@@ -1,15 +1,12 @@
-'use strict';
-
-const http = require('http');
-const crypto = require('crypto');
-const os = require('os');
-const path = require('path');
-const fsp = require('fs').promises;
-const AdmZip = require('adm-zip');
-const { expect } = require('chai');
-
-const download = require('../../../../../lib/utils/serverless-utils/download');
-const { pathExists, remove } = require('../../../../utils/fs');
+import http from 'node:http';
+import crypto from 'node:crypto';
+import os from 'node:os';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import AdmZip from 'adm-zip';
+import { expect } from 'chai';
+import download from '../../../../../lib/utils/serverless-utils/download.ts';
+import { pathExists, remove } from '../../../../utils/fs.ts';
 
 describe('serverless-utils/download', () => {
   let server;

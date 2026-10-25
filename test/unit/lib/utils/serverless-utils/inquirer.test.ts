@@ -1,8 +1,7 @@
-'use strict';
-
-const sinon = require('sinon');
-const proxyquire = require('proxyquire').noCallThru();
-const { expect } = require('chai');
+import * as sinon from 'sinon';
+import { expect } from 'chai';
+import proxyquire2 from 'proxyquire';
+const proxyquire = proxyquire2.noCallThru();
 
 describe('serverless-utils/inquirer', () => {
   afterEach(() => {

@@ -1,7 +1,5 @@
-'use strict';
-
-const https = require('https');
-const url = require('url');
+import https from 'node:https';
+import url from 'node:url';
 
 const logger = console;
 
@@ -100,7 +98,17 @@ const MAX_AWS_REQUEST_TRY = (() => {
   return userValue >= 0 ? userValue : DEFAULT_MAX_AWS_REQUEST_TRY;
 })();
 
-module.exports = {
+export {
+  logger,
+  response,
+  getEnvironment,
+  getLambdaArn,
+  handlerWrapper,
+  wait,
+  MAX_AWS_REQUEST_TRY,
+};
+
+export default {
   logger,
   response,
   getEnvironment,

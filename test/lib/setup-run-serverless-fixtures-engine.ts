@@ -1,13 +1,11 @@
-'use strict';
+import ensureString from 'type/string/ensure.js';
+import ensurePlainFunction from 'type/plain-function/ensure.js';
+import ensurePlainObject from 'type/plain-object/ensure.js';
+import path from 'node:path';
+import runServerless from './run-serverless.ts';
+import setupFixturesEngine from './setup-fixtures-engine.ts';
 
-const ensureString = require('type/string/ensure');
-const ensurePlainFunction = require('type/plain-function/ensure');
-const ensurePlainObject = require('type/plain-object/ensure');
-const path = require('path');
-const runServerless = require('./run-serverless');
-const setupFixturesEngine = require('./setup-fixtures-engine');
-
-module.exports = (setupOptions) => {
+export default (setupOptions) => {
   const fixturesDir = path.resolve(ensureString(ensurePlainObject(setupOptions).fixturesDir));
   const resolveServerlessDir = (() => {
     if (ensurePlainFunction(setupOptions.resolveServerlessDir, { isOptional: true })) {

@@ -1,9 +1,7 @@
-'use strict';
-
-const expect = require('chai').expect;
-const AwsProvider = require('../../../../../../../../lib/plugins/aws/provider');
-const AwsCompileSNSEvents = require('../../../../../../../../lib/plugins/aws/package/compile/events/sns');
-const { createAwsEventCompilerContext } = require('./test-utils');
+import { expect } from 'chai';
+import AwsProvider from '../../../../../../../../lib/plugins/aws/provider.ts';
+import AwsCompileSNSEvents from '../../../../../../../../lib/plugins/aws/package/compile/events/sns.ts';
+import { createAwsEventCompilerContext } from './test-utils.ts';
 
 describe('AwsCompileSNSEvents', () => {
   let awsCompileSNSEvents;

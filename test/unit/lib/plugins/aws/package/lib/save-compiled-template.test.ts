@@ -1,9 +1,7 @@
-'use strict';
-
-const expect = require('chai').expect;
-const runServerless = require('../../../../../../utils/run-serverless');
-const fs = require('fs').promises;
-const path = require('path');
+import { expect } from 'chai';
+import runServerless from '../../../../../../utils/run-serverless.ts';
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
 
 describe('#saveCompiledTemplate()', () => {
   it('should save the compiled template to disk', async () => {

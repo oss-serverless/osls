@@ -1,22 +1,20 @@
-'use strict';
-
-const fs = require('fs').promises;
-const crypto = require('crypto');
-const os = require('os');
-const path = require('path');
-const { EventEmitter } = require('events');
-const nodeStream = require('stream');
-const { expect } = require('chai');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const spawn = require('../../../../lib/utils/spawn');
+import { promises as fs } from 'node:fs';
+import crypto from 'node:crypto';
+import os from 'node:os';
+import path from 'node:path';
+import { EventEmitter } from 'node:events';
+import nodeStream from 'node:stream';
+import { expect } from 'chai';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import spawn from '../../../../lib/utils/spawn.ts';
 
 const loadSpawnWithStubs = (stubs) =>
   proxyquire.noCallThru().load('../../../../lib/utils/spawn', stubs);
 const loadSpawnSyncWithStubs = (stubs) =>
   proxyquire.noCallThru().load('../../../../lib/utils/spawn-sync', stubs);
 
-const repoRoot = path.resolve(__dirname, '../../../../');
+const repoRoot = path.resolve(import.meta.dirname, '../../../../');
 
 const collectJavaScriptFiles = async (directoryPath) => {
   const entries = await fs.readdir(directoryPath, { withFileTypes: true });

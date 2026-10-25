@@ -1,26 +1,25 @@
-'use strict';
+import * as chai from 'chai';
+import path from 'node:path';
+import fs from 'node:fs';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import { overrideEnv } from '../../../../utils/process.ts';
+import AwsProvider from '../../../../../lib/plugins/aws/provider.ts';
+import awsCredentialsDocsUrl from '../../../../../lib/aws/credentials-help-url.ts';
+import Serverless from '../../../../../lib/serverless.ts';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import runServerless from '../../../../utils/run-serverless.ts';
 
-const chai = require('chai');
-const path = require('path');
-const fs = require('fs');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const { overrideEnv } = require('../../../../utils/process');
-
-const AwsProvider = require('../../../../../lib/plugins/aws/provider');
-const awsCredentialsDocsUrl = require('../../../../../lib/aws/credentials-help-url');
-const Serverless = require('../../../../../lib/serverless');
-const ServerlessError = require('../../../../../lib/serverless-error');
-const runServerless = require('../../../../utils/run-serverless');
-const {
+import {
   CloudFormationClient,
   DescribeStackResourceCommand,
   ListStackResourcesCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { STSClient, GetCallerIdentityCommand } = require('@aws-sdk/client-sts');
+} from '@aws-sdk/client-cloudformation';
+
+import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 
 const expect = chai.expect;
-const spawnModulePath = path.resolve(__dirname, '../../../../../lib/utils/spawn.js');
+const spawnModulePath = path.resolve(import.meta.dirname, '../../../../../lib/utils/spawn.js');
 
 const createProviderStub = ({ provider = {}, config = {}, providerOptions = {} } = {}) => {
   const providerStub = Object.create(AwsProvider.prototype);
@@ -194,7 +193,7 @@ describe('AwsProvider', () => {
   describe('runtime schema parity', () => {
     it('should keep `awsLambdaRuntime` in sync with `AwsLambdaRuntime`', () => {
       const localServerless = createServerless();
-      const runtimeTypePath = path.resolve(__dirname, '../../../../../types/index.d.ts');
+      const runtimeTypePath = path.resolve(import.meta.dirname, '../../../../../types/index.d.ts');
       const runtimeTypeSource = fs.readFileSync(runtimeTypePath, 'utf8');
 
       localServerless.service.provider.name = 'aws';

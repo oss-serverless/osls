@@ -1,13 +1,12 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const logEmitter = require('log/lib/emitter');
-const { UpdateTerminationProtectionCommand } = require('@aws-sdk/client-cloudformation');
-const AwsDeletionProtection = require('../../../../../lib/plugins/aws/deletion-protection');
-const ServerlessError = require('../../../../../lib/serverless-error');
-const { retryOnThrottlingError } = require('../../../../../lib/aws/retry');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import logEmitter from 'log/lib/emitter.js';
+import { UpdateTerminationProtectionCommand } from '@aws-sdk/client-cloudformation';
+import AwsDeletionProtection from '../../../../../lib/plugins/aws/deletion-protection.ts';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import retry from '../../../../../lib/aws/retry.ts';
+const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
   retryOnThrottlingError: (task, options) =>

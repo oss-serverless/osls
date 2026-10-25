@@ -1,9 +1,7 @@
-'use strict';
-
-const chai = require('chai');
+import * as chai from 'chai';
+import resolveStage from '../../../../lib/utils/resolve-stage.ts';
 
 const expect = chai.expect;
-const resolveStage = require('../../../../lib/utils/resolve-stage');
 
 describe('test/unit/lib/utils/resolve-stage.test.js', () => {
   it('should return `stage` from options first if it is present', () => {

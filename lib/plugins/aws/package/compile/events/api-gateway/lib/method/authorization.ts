@@ -1,8 +1,6 @@
-'use strict';
+import awsArnRegExs from '../../../../../../utils/arn-regular-expressions.ts';
 
-const awsArnRegExs = require('../../../../../../utils/arn-regular-expressions');
-
-module.exports = {
+export default {
   getMethodAuthorization(http) {
     if (http.authorizer && http.authorizer.type === 'AWS_IAM') {
       return {

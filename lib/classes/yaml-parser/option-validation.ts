@@ -1,7 +1,5 @@
-'use strict';
-
-const isPlainObject = require('type/plain-object/is');
-const { throwOptionsError } = require('./external-ref-errors');
+import isPlainObject from 'type/plain-object/is.js';
+import { throwOptionsError } from './external-ref-errors.ts';
 
 const getOptionLabel = (optionName) =>
   optionName === 'options' ? 'YAML parser options' : `YAML parser option ${optionName}`;
@@ -21,7 +19,9 @@ const assertKnownOptions = (options, optionName, allowedOptions) => {
   }
 };
 
-module.exports = {
+export { assertKnownOptions, assertOptionsObject };
+
+export default {
   assertKnownOptions,
   assertOptionsObject,
 };

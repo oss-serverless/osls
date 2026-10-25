@@ -1,8 +1,6 @@
-'use strict';
-
-const expect = require('chai').expect;
-
-const { createColors, getColorLevel } = require('../../../../lib/utils/colors');
+import { expect } from 'chai';
+import colors2 from '../../../../lib/utils/colors.ts';
+const { createColors, getColorLevel } = colors2;
 
 describe('test/unit/lib/utils/colors.test.js', () => {
   it('reports no colors for non-tty streams by default', () => {

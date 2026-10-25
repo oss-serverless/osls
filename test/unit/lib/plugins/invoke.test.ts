@@ -1,8 +1,6 @@
-'use strict';
-
-const chai = require('chai');
-const { overrideEnv } = require('../../../utils/process');
-const Invoke = require('../../../../lib/plugins/invoke');
+import * as chai from 'chai';
+import { overrideEnv } from '../../../utils/process.ts';
+import Invoke from '../../../../lib/plugins/invoke.ts';
 
 const expect = chai.expect;
 

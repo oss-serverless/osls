@@ -1,10 +1,8 @@
-'use strict';
-
-const chai = require('chai');
-const path = require('path');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const { overrideEnv } = require('../../../utils/process');
+import * as chai from 'chai';
+import path from 'node:path';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import { overrideEnv } from '../../../utils/process.ts';
 
 const { expect } = chai;
 

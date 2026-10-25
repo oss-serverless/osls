@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const runServerless = require('../../utils/run-serverless');
+import { expect } from 'chai';
+import runServerless from '../../utils/run-serverless.ts';
 
 describe('test/lib/run-serverless.test.js', () => {
   it('does not overwrite caller-provided https-proxy-agent module stubs', async () => {

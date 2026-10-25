@@ -1,8 +1,6 @@
-'use strict';
-
-const chai = require('chai');
-const sinon = require('sinon');
-const PluginList = require('../../../../../lib/plugins/plugin/list');
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import PluginList from '../../../../../lib/plugins/plugin/list.ts';
 
 const expect = chai.expect;
 

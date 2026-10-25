@@ -1,11 +1,8 @@
-'use strict';
-
-const chai = require('chai');
-
-const observeOutput = require('../../../lib/observe-output');
-const handleError = require('../../../../lib/cli/handle-error');
-const isStandaloneExecutable = require('../../../../lib/utils/is-standalone-executable');
-const ServerlessError = require('../../../../lib/serverless-error');
+import * as chai from 'chai';
+import observeOutput from '../../../lib/observe-output.ts';
+import handleError from '../../../../lib/cli/handle-error.ts';
+import isStandaloneExecutable from '../../../../lib/utils/is-standalone-executable.ts';
+import ServerlessError from '../../../../lib/serverless-error.ts';
 
 const expect = chai.expect;
 

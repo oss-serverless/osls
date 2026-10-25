@@ -1,54 +1,61 @@
-'use strict';
-
-const {
+import {
   CloudFormationClient,
   DescribeStackResourceCommand,
   ListStackResourcesCommand,
-} = require('@aws-sdk/client-cloudformation');
-const {
+} from '@aws-sdk/client-cloudformation';
+
+import {
   ECRClient,
   GetAuthorizationTokenCommand,
   DescribeRepositoriesCommand,
   CreateRepositoryCommand,
   PutLifecyclePolicyCommand,
   DescribeImagesCommand,
-} = require('@aws-sdk/client-ecr');
-const { STSClient, GetCallerIdentityCommand } = require('@aws-sdk/client-sts');
-const naming = require('./lib/naming.js');
-const fsp = require('fs').promises;
-const getS3EndpointForRegion = require('./utils/get-s3-endpoint-for-region');
-const memoizeeMethods = require('memoizee/methods');
-const promiseLimit = require('ext/promise/limit').bind(Promise);
-const isObject = require('type/object/is');
-const { ALB_LISTENER_REGEXP } = require('./package/compile/events/alb/lib/validate');
-const path = require('path');
-const spawnExt = require('../../utils/spawn');
-const ServerlessError = require('../../serverless-error');
-const { buildClientConfig } = require('../../aws/config');
-const {
+} from '@aws-sdk/client-ecr';
+
+import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
+import naming from './lib/naming.ts';
+import { promises as fsp } from 'node:fs';
+import getS3EndpointForRegion from './utils/get-s3-endpoint-for-region.ts';
+import memoizeeMethods from 'memoizee/methods.js';
+import isObject from 'type/object/is.js';
+import validate from './package/compile/events/alb/lib/validate.ts';
+import path from 'node:path';
+import spawnExt from '../../utils/spawn.ts';
+import ServerlessError from '../../serverless-error.ts';
+import { buildClientConfig } from '../../aws/config.ts';
+import {
   getAwsSdkV3CredentialsProvider,
   getAwsSdkV3CredentialsProviderCacheKey,
-} = require('../../aws/credentials');
-const {
+} from '../../aws/credentials.ts';
+import {
   memoizeIdentityProvider,
   isIdentityExpired,
   doesIdentityRequireRefresh,
-} = require('@smithy/core');
-const { cfValue } = require('../../utils/aws-schema-get-cf-value');
-const reportDeprecatedProperties = require('../../utils/report-deprecated-properties');
-const { toCacheKey } = require('../../utils/to-cache-key');
-const { getByPath } = require('../../utils/object-path');
-const { methodDescriptor } = require('../../utils/property-descriptors');
-const { hasOwn } = require('../../utils/safe-object');
-const { progress, log } = require('../../utils/serverless-utils/log');
-const validateStage = require('../../utils/validate-stage');
-const {
+} from '@smithy/core';
+import awsSchemaGetCfValue from '../../utils/aws-schema-get-cf-value.ts';
+import reportDeprecatedProperties from '../../utils/report-deprecated-properties.ts';
+import { toCacheKey } from '../../utils/to-cache-key.ts';
+import { getByPath } from '../../utils/object-path.ts';
+import { methodDescriptor } from '../../utils/property-descriptors.ts';
+import { hasOwn } from '../../utils/safe-object.ts';
+import log2 from '../../utils/serverless-utils/log.ts';
+import validateStage from '../../utils/validate-stage.ts';
+
+import {
   getAwsSdkV3UnrecognizedProfile,
   isAwsSdkV3MissingCredentialsError,
   isEcrRepositoryNotFoundError,
-} = require('../../aws/aws-sdk-v3-error');
-const awsCredentialsDocsUrl = require('../../aws/credentials-help-url');
-const resolveLambdaTarget = require('./utils/resolve-lambda-target');
+} from '../../aws/aws-sdk-v3-error.ts';
+
+import awsCredentialsDocsUrl from '../../aws/credentials-help-url.ts';
+import resolveLambdaTarget from './utils/resolve-lambda-target.ts';
+import promiseLimit2 from 'ext/promise/limit.js';
+import configSchema from './package/compile/events/s3/config-schema.ts';
+const promiseLimit = promiseLimit2.bind(Promise);
+const { ALB_LISTENER_REGEXP } = validate;
+const { cfValue } = awsSchemaGetCfValue;
+const { progress, log } = log2;
 
 const isLambdaArn = RegExp.prototype.test.bind(/^arn:[^:]+:lambda:/);
 const isEcrUri = RegExp.prototype.test.bind(
@@ -1276,7 +1283,7 @@ class AwsProvider {
             deploymentMethod: { enum: ['changesets', 'direct'] },
             s3: {
               type: 'object',
-              additionalProperties: require('./package/compile/events/s3/config-schema'),
+              additionalProperties: configSchema,
             },
             stage: { $ref: '#/definitions/stage' },
             stackName: {
@@ -2587,4 +2594,4 @@ Object.defineProperties(
   })
 );
 
-module.exports = AwsProvider;
+export default AwsProvider;

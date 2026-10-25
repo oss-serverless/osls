@@ -1,7 +1,5 @@
-'use strict';
-
-const ServerlessError = require('../serverless-error');
-const { hasOwn } = require('../utils/safe-object');
+import ServerlessError from '../serverless-error.ts';
+import { hasOwn } from '../utils/safe-object.ts';
 
 const genericS3ListErrorCodes = new Set([
   'AWS_S3_LIST_OBJECTS_V2_ERROR',
@@ -314,7 +312,43 @@ function isSsmParameterNotFoundError(error) {
   return isAwsErrorCode(error, 'ParameterNotFound', 'AWS_S_S_M_GET_PARAMETER_PARAMETER_NOT_FOUND');
 }
 
-module.exports = {
+export {
+  getAwsErrorCode,
+  getAwsErrorMessage,
+  getAwsErrorStatusCode,
+  isAwsErrorCode,
+  isAwsErrorStatusCode,
+  isAwsCredentialError,
+  isAwsCredentialProviderError,
+  isAwsThrottlingError,
+  isTransientNetworkError,
+  isAwsCredentialsNotFoundError,
+  isAwsSdkV3MissingCredentialsError,
+  getAwsSdkV3UnrecognizedProfile,
+  isApiGatewayNotFoundError,
+  isCloudFormationValidationError,
+  isCloudFormationValidationErrorWithMessage,
+  isCloudFormationMissingResourceError,
+  isCloudFormationMissingStackError,
+  isCloudFormationNoUpdateError,
+  isCloudWatchLogsResourceNotFoundError,
+  isEcrAccessDeniedError,
+  isEcrRepositoryNotFoundError,
+  isLambdaAccessDeniedError,
+  isLambdaResourceConflictError,
+  isLambdaResourceNotFoundError,
+  createS3UploadError,
+  getS3BucketRegion,
+  isS3GetObjectNoSuchKeyError,
+  isS3HeadBucketForbiddenError,
+  isS3HeadBucketNotFoundError,
+  isS3HeadObjectForbiddenError,
+  isS3ListObjectsAccessDeniedError,
+  isS3ListObjectsNoSuchBucketError,
+  isSsmParameterNotFoundError,
+};
+
+export default {
   getAwsErrorCode,
   getAwsErrorMessage,
   getAwsErrorStatusCode,

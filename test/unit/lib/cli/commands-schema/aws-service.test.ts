@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const awsServiceCommands = require('../../../../../lib/cli/commands-schema/aws-service');
+import { expect } from 'chai';
+import awsServiceCommands from '../../../../../lib/cli/commands-schema/aws-service.ts';
 
 describe('test/unit/lib/cli/commands-schema/aws-service.test.js', () => {
   it('should expose no service commands', () =>

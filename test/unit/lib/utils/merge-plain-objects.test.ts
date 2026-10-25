@@ -1,8 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const mergePlainObjects = require('../../../../lib/utils/merge-plain-objects');
+import { expect } from 'chai';
+import mergePlainObjects from '../../../../lib/utils/merge-plain-objects.ts';
 
 describe('mergePlainObjects', () => {
   afterEach(() => {

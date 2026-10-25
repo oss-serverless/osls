@@ -1,8 +1,7 @@
-'use strict';
-
-const { expect } = require('chai');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire').noCallThru();
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import proxyquire2 from 'proxyquire';
+const proxyquire = proxyquire2.noCallThru();
 
 describe('ensureApiGatewayCloudWatchRole', () => {
   let provider;

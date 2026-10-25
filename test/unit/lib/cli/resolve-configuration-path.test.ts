@@ -1,16 +1,13 @@
-'use strict';
-
-const chai = require('chai');
+import * as chai from 'chai';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import { overrideArgv, overrideEnv } from '../../../utils/process.ts';
+import requireUncached from '../../../utils/require-uncached.ts';
+import { ensureDir, ensureFile } from '../../../utils/fs.ts';
+import resolveServerlessConfigPath from '../../../../lib/cli/resolve-configuration-path.ts';
+import resolveInput from '../../../../lib/cli/resolve-input.ts';
 
 const { expect } = chai;
-
-const path = require('path');
-const fsp = require('fs').promises;
-const { overrideArgv, overrideEnv } = require('../../../utils/process');
-const requireUncached = require('../../../utils/require-uncached');
-const { ensureDir, ensureFile } = require('../../../utils/fs');
-const resolveServerlessConfigPath = require('../../../../lib/cli/resolve-configuration-path');
-const resolveInput = require('../../../../lib/cli/resolve-input');
 
 describe('test/unit/lib/cli/resolve-configuration-path.test.js', () => {
   let configurationPath;
@@ -95,7 +92,7 @@ describe('test/unit/lib/cli/resolve-configuration-path.test.js', () => {
       await overrideEnv(async () => {
         process.env.SLS_DEPRECATION_NOTIFICATION_MODE = 'warn';
         const uncached = requireUncached(() => ({
-          resolveServerlessConfigPath: require('../../../../lib/cli/resolve-configuration-path'),
+          resolveServerlessConfigPath: resolveServerlessConfigPath,
         }));
         await overrideArgv(
           {

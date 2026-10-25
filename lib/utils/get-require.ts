@@ -1,9 +1,7 @@
-'use strict';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import memoize from 'memoizee';
 
-const path = require('path');
-const { createRequire } = require('module');
-const memoize = require('memoizee');
-
-module.exports = memoize((dirname) => createRequire(path.resolve(dirname, 'require-resolver')), {
+export default memoize((dirname) => createRequire(path.resolve(dirname, 'require-resolver')), {
   primitive: true,
 });

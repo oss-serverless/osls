@@ -1,13 +1,12 @@
-'use strict';
-
-const { progress, style } = require('../../../utils/serverless-utils/log');
-const writeServiceOutputs = require('../../../cli/write-service-outputs');
-const validate = require('../lib/validate');
-const getStackInfo = require('./get-stack-info');
-const getResourceCount = require('./get-resource-count');
-const getApiKeyValues = require('./get-api-key-values');
-const display = require('./display');
-const { log } = require('../../../utils/serverless-utils/log');
+import log2 from '../../../utils/serverless-utils/log.ts';
+import writeServiceOutputs from '../../../cli/write-service-outputs.ts';
+import validate from '../lib/validate.ts';
+import getStackInfo from './get-stack-info.ts';
+import getResourceCount from './get-resource-count.ts';
+import getApiKeyValues from './get-api-key-values.ts';
+import display from './display.ts';
+const { progress, style } = log2;
+const { log } = log2;
 
 const mainProgress = progress.get('main');
 
@@ -78,4 +77,4 @@ class AwsInfo {
   }
 }
 
-module.exports = AwsInfo;
+export default AwsInfo;

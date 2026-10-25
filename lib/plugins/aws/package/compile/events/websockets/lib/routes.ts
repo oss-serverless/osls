@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = {
+export default {
   compileRoutes() {
     this.validated.events.forEach((event) => {
       const websocketsIntegrationLogicalId = this.provider.naming.getWebsocketsIntegrationLogicalId(

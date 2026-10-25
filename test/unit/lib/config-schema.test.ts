@@ -1,9 +1,7 @@
-'use strict';
-
-const runServerless = require('../../utils/run-serverless');
-const expect = require('chai').expect;
-const schema = require('../../../lib/config-schema');
-const STAGE_NAME_PATTERN = require('../../../lib/utils/stage-pattern');
+import runServerless from '../../utils/run-serverless.ts';
+import { expect } from 'chai';
+import schema from '../../../lib/config-schema.ts';
+import STAGE_NAME_PATTERN from '../../../lib/utils/stage-pattern.ts';
 
 describe('test/unit/lib/configSchema.test.js', () => {
   const cases = [

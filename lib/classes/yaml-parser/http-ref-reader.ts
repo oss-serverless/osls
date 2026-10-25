@@ -1,14 +1,14 @@
-'use strict';
+import dns from 'node:dns';
+import net from 'node:net';
+import { Agent } from 'undici';
 
-const dns = require('dns');
-const dnsPromises = dns.promises;
-const net = require('net');
-const { Agent } = require('undici');
-const {
+import {
   createExternalRefAccessDeniedError,
   denyExternalRef,
   getExternalRefAccessDeniedError,
-} = require('./external-ref-errors');
+} from './external-ref-errors.ts';
+
+const dnsPromises = dns.promises;
 
 const DEFAULT_HTTP_REDIRECTS = 5;
 const DEFAULT_HTTP_TIMEOUT = 60000;
@@ -263,6 +263,8 @@ const readHttpRef = async (documentUrl, fileInfo, HTTPResolver, options) => {
   return readHttpDocumentSafely(documentUrl, options);
 };
 
-module.exports = {
+export { readHttpRef };
+
+export default {
   readHttpRef,
 };

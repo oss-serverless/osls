@@ -1,11 +1,10 @@
-'use strict';
-
 // This module should stay dependency-free because it's used at local fallback triage.
 
-const path = require('path');
-const { createRequire } = require('module');
+import path from 'node:path';
 
-module.exports = ({ cwd = process.cwd() } = {}) => {
+import { createRequire } from 'node:module';
+
+export default ({ cwd = process.cwd() } = {}) => {
   try {
     return path.resolve(
       path.dirname(createRequire(path.resolve(cwd, 'require-resolver')).resolve('serverless')),

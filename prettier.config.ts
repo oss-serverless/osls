@@ -1,9 +1,11 @@
-'use strict';
+import type { Config } from 'prettier';
 
-module.exports = {
+const config: Config = {
   endOfLine: 'lf',
   printWidth: 100,
   quoteProps: 'consistent',
   singleQuote: true,
   trailingComma: 'es5',
 };
+
+export default config;

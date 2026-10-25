@@ -1,16 +1,14 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const { expect } = require('chai');
-const { execSync } = require('../utils/child-process');
-const serverlessExec = require('../serverless-binary');
-const { copyPathSync, getTmpDirPath } = require('../utils/fs');
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect } from 'chai';
+import { execSync } from '../utils/child-process.ts';
+import serverlessExec from '../serverless-binary.ts';
+import { copyPathSync, getTmpDirPath } from '../utils/fs.ts';
 
 const fixturePaths = {
-  regular: path.join(__dirname, 'fixtures/regular'),
-  individually: path.join(__dirname, 'fixtures/individually'),
-  artifact: path.join(__dirname, 'fixtures/artifact'),
+  regular: path.join(import.meta.dirname, 'fixtures/regular'),
+  individually: path.join(import.meta.dirname, 'fixtures/individually'),
+  artifact: path.join(import.meta.dirname, 'fixtures/artifact'),
 };
 
 describe('Integration test - Packaging - CloudFormation', () => {

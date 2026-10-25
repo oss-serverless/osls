@@ -1,8 +1,6 @@
-'use strict';
-
-const getS3EndpointForRegion = require('../../utils/get-s3-endpoint-for-region');
-const ServerlessError = require('../../../../serverless-error');
-const { CloudFormationClient, ValidateTemplateCommand } = require('@aws-sdk/client-cloudformation');
+import getS3EndpointForRegion from '../../utils/get-s3-endpoint-for-region.ts';
+import ServerlessError from '../../../../serverless-error.ts';
+import { CloudFormationClient, ValidateTemplateCommand } from '@aws-sdk/client-cloudformation';
 
 function getCloudFormationClient(context) {
   context.cloudFormationClientPromise ||= context.provider
@@ -11,7 +9,7 @@ function getCloudFormationClient(context) {
   return context.cloudFormationClientPromise;
 }
 
-module.exports = {
+export default {
   async validateTemplate() {
     const bucketName = this.bucketName;
     const artifactDirectoryName = this.serverless.service.package.artifactDirectoryName;

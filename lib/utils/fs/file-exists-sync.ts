@@ -1,6 +1,4 @@
-'use strict';
-
-const fs = require('fs');
+import fs from 'node:fs';
 
 function fileExistsSync(filePath) {
   try {
@@ -11,4 +9,4 @@ function fileExistsSync(filePath) {
   }
 }
 
-module.exports = fileExistsSync;
+export default fileExistsSync;

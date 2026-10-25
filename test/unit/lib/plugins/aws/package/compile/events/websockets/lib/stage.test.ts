@@ -1,11 +1,9 @@
-'use strict';
-
-const chai = require('chai');
+import * as chai from 'chai';
+import isObject from 'type/object/is.js';
+import runServerless from '../../../../../../../../../utils/run-serverless.ts';
+import { createWebsocketsCompilerContext } from '../test-utils.ts';
 
 const expect = chai.expect;
-const isObject = require('type/object/is');
-const runServerless = require('../../../../../../../../../utils/run-serverless');
-const { createWebsocketsCompilerContext } = require('../test-utils');
 
 describe('#compileStage()', () => {
   let awsCompileWebsocketsEvents;

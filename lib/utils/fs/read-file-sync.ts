@@ -1,11 +1,9 @@
-'use strict';
-
-const fs = require('fs');
-const parse = require('./parse');
+import fs from 'node:fs';
+import parse from './parse.ts';
 
 function readFileSync(filePath) {
   const contents = fs.readFileSync(filePath);
   return parse(filePath, contents);
 }
 
-module.exports = readFileSync;
+export default readFileSync;

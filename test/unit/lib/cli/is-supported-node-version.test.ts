@@ -1,8 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const isSupportedNodeVersion = require('../../../../lib/cli/is-supported-node-version');
+import { expect } from 'chai';
+import isSupportedNodeVersion from '../../../../lib/cli/is-supported-node-version.ts';
 
 describe('test/unit/lib/cli/is-supported-node-version.test.js', () => {
   it('rejects Node 18', () => {

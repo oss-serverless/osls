@@ -1,7 +1,5 @@
-'use strict';
-
-const runServerless = require('../../../../../../utils/run-serverless');
-const expect = require('chai').expect;
+import runServerless from '../../../../../../utils/run-serverless.ts';
+import { expect } from 'chai';
 
 describe('#generateCoreTemplate()', () => {
   const awsSdkV3StubMap = {

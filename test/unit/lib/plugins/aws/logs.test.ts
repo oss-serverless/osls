@@ -1,17 +1,15 @@
-'use strict';
-
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const AwsLogs = require('../../../../../lib/plugins/aws/logs');
-const ServerlessError = require('../../../../../lib/serverless-error');
-const {
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import AwsLogs from '../../../../../lib/plugins/aws/logs.ts';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import {
   CloudWatchLogsClient,
   DescribeLogStreamsCommand,
   FilterLogEventsCommand,
-} = require('@aws-sdk/client-cloudwatch-logs');
+} from '@aws-sdk/client-cloudwatch-logs';
 
 // Configure chai
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 function createServerlessContext(options) {
   const provider = {

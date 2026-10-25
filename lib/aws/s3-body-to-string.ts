@@ -1,6 +1,4 @@
-'use strict';
-
-const ServerlessError = require('../serverless-error');
+import ServerlessError from '../serverless-error.ts';
 
 function chunkToBuffer(chunk, encoding) {
   if (typeof chunk === 'string') {
@@ -95,4 +93,4 @@ async function s3BodyToString(body, { encoding = 'utf8' } = {}) {
   );
 }
 
-module.exports = s3BodyToString;
+export default s3BodyToString;

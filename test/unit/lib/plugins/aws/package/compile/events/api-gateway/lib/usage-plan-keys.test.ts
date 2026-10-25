@@ -1,7 +1,5 @@
-'use strict';
-
-const expect = require('chai').expect;
-const { createApiGatewayCompilerContext } = require('../test-utils');
+import { expect } from 'chai';
+import { createApiGatewayCompilerContext } from '../test-utils.ts';
 
 const capitalize = (value) => {
   const text = String(value).toLowerCase();

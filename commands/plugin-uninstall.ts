@@ -1,24 +1,21 @@
-'use strict';
+import spawn from '../lib/utils/spawn.ts';
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
+import isPlainObject from 'type/plain-object/is.js';
+import * as yaml from 'js-yaml';
+import cloudformationSchema from '../lib/utils/serverless-utils/cloudformation-schema.ts';
+import log2 from '../lib/utils/serverless-utils/log.ts';
+import yamlAstParser from '../lib/utils/yaml-ast-parser.ts';
+import npmCommandDeferred from '../lib/utils/npm-command-deferred.ts';
+import { readJson, writeJson } from '../lib/utils/fs/json-file.ts';
+import pluginManagement from '../lib/commands/plugin-management.ts';
+const { log, progress, style } = log2;
 
-const spawn = require('../lib/utils/spawn');
-const fsp = require('fs').promises;
-const path = require('path');
-const isPlainObject = require('type/plain-object/is');
-const yaml = require('js-yaml');
-const cloudformationSchema = require('../lib/utils/serverless-utils/cloudformation-schema');
-const { log, progress, style } = require('../lib/utils/serverless-utils/log');
-const yamlAstParser = require('../lib/utils/yaml-ast-parser');
-const npmCommandDeferred = require('../lib/utils/npm-command-deferred');
-const { readJson, writeJson } = require('../lib/utils/fs/json-file');
-const {
-  getServerlessFilePath,
-  parsePluginUninstallSpec,
-  validate,
-} = require('../lib/commands/plugin-management');
+const { getServerlessFilePath, parsePluginUninstallSpec, validate } = pluginManagement;
 
 const mainProgress = progress.get('main');
 
-module.exports = async ({ configuration, serviceDir, configurationFilename, options }) => {
+export default async ({ configuration, serviceDir, configurationFilename, options }) => {
   const commandRunStartTime = Date.now();
   validate({ serviceDir });
 
@@ -58,7 +55,7 @@ const removePluginFromServerlessFile = async ({ configurationFilePath, pluginNam
       : serverlessFileObj.plugins && serverlessFileObj.plugins.modules;
 
     if (plugins) {
-      for (let index = plugins.indexOf(pluginName); index !== -1; ) {
+      for (let index = plugins.indexOf(pluginName); index !== -1;) {
         plugins.splice(index, 1);
         index = plugins.indexOf(pluginName);
       }

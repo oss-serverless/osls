@@ -1,9 +1,7 @@
-'use strict';
-
 const maxIterations = 1000;
 const waitForMacrotask = () => new Promise((resolve) => setImmediate(resolve));
 
-module.exports = async (pendingResolvers, promise) => {
+export default async (pendingResolvers, promise) => {
   let isSettled = false;
   promise
     .finally(() => {

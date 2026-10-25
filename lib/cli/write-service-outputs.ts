@@ -1,8 +1,7 @@
-'use strict';
+import log from '../utils/serverless-utils/log.ts';
+const { writeText, style } = log;
 
-const { writeText, style } = require('../utils/serverless-utils/log');
-
-module.exports = (serviceOutputs) => {
+export default (serviceOutputs) => {
   for (const [section, entries] of serviceOutputs) {
     if (typeof entries === 'string') {
       writeText(`${style.aside(`${section}:`)} ${entries}`);

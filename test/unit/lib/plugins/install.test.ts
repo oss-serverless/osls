@@ -1,12 +1,9 @@
-'use strict';
-
-const Install = require('../../../../lib/plugins/install.js');
-const sinon = require('sinon');
-const download = require('../../../../lib/utils/download-template-from-repo');
-const path = require('path');
-const { ensureDirSync, getTmpDirPath } = require('../../../utils/fs');
-
-const { expect } = require('chai');
+import Install from '../../../../lib/plugins/install.ts';
+import * as sinon from 'sinon';
+import download from '../../../../lib/utils/download-template-from-repo.ts';
+import path from 'node:path';
+import { ensureDirSync, getTmpDirPath } from '../../../utils/fs.ts';
+import { expect } from 'chai';
 
 describe('Install', () => {
   let install;

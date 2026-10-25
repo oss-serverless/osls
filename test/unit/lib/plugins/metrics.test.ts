@@ -1,7 +1,5 @@
-'use strict';
-
-const expect = require('chai').expect;
-const Metrics = require('../../../../lib/plugins/metrics');
+import { expect } from 'chai';
+import Metrics from '../../../../lib/plugins/metrics.ts';
 
 describe('Metrics', () => {
   let metrics;

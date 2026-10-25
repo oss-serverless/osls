@@ -1,11 +1,9 @@
-// CLI params parser, to be used before we have deducted what commands and options are supported in given context
+import ensureMap from 'type/map/ensure.js';
+import parseArgs from './parse-args.ts';
+import paramRegExp from './param-reg-exp.ts';
+import commandsSchema2 from './commands-schema/index.ts';
 
-'use strict';
-
-const ensureMap = require('type/map/ensure');
-const parseArgs = require('./parse-args');
-
-const isParamName = RegExp.prototype.test.bind(require('./param-reg-exp'));
+const isParamName = RegExp.prototype.test.bind(paramRegExp);
 
 let cachedResult;
 
@@ -32,9 +30,7 @@ const resolveArgsSchema = (commandOptionsSchema) => {
 const resolveInput = function (commandsSchema, argv = process.argv.slice(2)) {
   if (arguments.length === 0 && cachedResult !== undefined) return cachedResult;
 
-  commandsSchema = ensureMap(
-    commandsSchema === undefined ? require('./commands-schema') : commandsSchema
-  );
+  commandsSchema = ensureMap(commandsSchema === undefined ? commandsSchema2 : commandsSchema);
   const firstParamIndex = argv.findIndex(isParamName);
 
   const commands = argv.slice(0, firstParamIndex === -1 ? Infinity : firstParamIndex);
@@ -68,4 +64,4 @@ resolveInput.clear = () => {
   cachedResult = undefined;
 };
 
-module.exports = resolveInput;
+export default resolveInput;

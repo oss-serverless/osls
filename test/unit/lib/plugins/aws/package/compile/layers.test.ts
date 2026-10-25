@@ -1,15 +1,13 @@
-'use strict';
-
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
-const chai = require('chai');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const { getTmpDirPath } = require('../../../../../../utils/fs');
-const runServerless = require('../../../../../../utils/run-serverless');
-const releasePendingRequestsUntilSettled = require('../../../../../../utils/release-pending-requests-until-settled');
-const { CloudFormationClient, DescribeStacksCommand } = require('@aws-sdk/client-cloudformation');
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import * as chai from 'chai';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import { getTmpDirPath } from '../../../../../../utils/fs.ts';
+import runServerless from '../../../../../../utils/run-serverless.ts';
+import releasePendingRequestsUntilSettled from '../../../../../../utils/release-pending-requests-until-settled.ts';
+import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 
 const expect = chai.expect;
 
@@ -432,7 +430,9 @@ describe('lib/plugins/aws/package/compile/layers/index.test.js', () => {
         activeRequests -= 1;
         return { Stacks: [{ Outputs: [] }] };
       });
-    const AwsCompileLayers = require('../../../../../../../lib/plugins/aws/package/compile/layers');
+    const AwsCompileLayers = (
+      await import('../../../../../../../lib/plugins/aws/package/compile/layers.ts')
+    ).default;
     const compiledCloudFormationTemplate = { Resources: {}, Outputs: {} };
     const provider = {
       getAwsSdkV3Config: sinon.stub().resolves({
@@ -482,7 +482,9 @@ describe('lib/plugins/aws/package/compile/layers/index.test.js', () => {
   });
 
   it('compares compiled layers without passing SDK clients or limiters', async () => {
-    const AwsCompileLayers = require('../../../../../../../lib/plugins/aws/package/compile/layers');
+    const AwsCompileLayers = (
+      await import('../../../../../../../lib/plugins/aws/package/compile/layers.ts')
+    ).default;
     const provider = {
       getAwsSdkV3Config: sinon.stub().throws(new Error('should not create a client')),
     };

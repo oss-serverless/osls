@@ -1,8 +1,6 @@
-'use strict';
-
-const spawn = require('cross-spawn');
-const { PassThrough } = require('stream');
-const { validateSpawnInput } = require('./spawn-policy');
+import spawn from 'cross-spawn';
+import { PassThrough } from 'node:stream';
+import { validateSpawnInput } from './spawn-policy.ts';
 
 const sensitiveOptionNamePattern =
   /(?:^|[-_])(?:auth|authorization|credential|password|passwd|pwd|secret|token|api[-_]?key|access[-_]?key)(?:$|[-_])/i;
@@ -68,7 +66,7 @@ const redactArgs = (args) => {
   return redactedArgs;
 };
 
-module.exports = (command, args = [], options = {}) => {
+export default (command, args = [], options = {}) => {
   if (args == null) args = [];
   options = options || {};
   validateSpawnInput(command, args, options);

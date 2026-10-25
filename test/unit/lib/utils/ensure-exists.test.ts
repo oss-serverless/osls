@@ -1,14 +1,10 @@
-'use strict';
-
-const chai = require('chai');
-const sinon = require('sinon');
-
-const ensureExists = require('../../../../lib/utils/ensure-exists');
-const { getTmpDirPath } = require('../../../utils/fs');
-
-const path = require('path');
-const fsp = require('fs').promises;
-const crypto = require('crypto');
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import ensureExists from '../../../../lib/utils/ensure-exists.ts';
+import { getTmpDirPath } from '../../../utils/fs.ts';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import crypto from 'node:crypto';
 
 const expect = chai.expect;
 

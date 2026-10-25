@@ -1,8 +1,6 @@
-'use strict';
+import parseDeploymentObjectKey from './parse-deployment-object-key.ts';
 
-const parseDeploymentObjectKey = require('./parse-deployment-object-key');
-
-module.exports = (s3Response, prefix, service, stage) => {
+export default (s3Response, prefix, service, stage) => {
   const grouped = new Map();
 
   for (const s3Object of s3Response.Contents || []) {

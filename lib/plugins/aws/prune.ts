@@ -1,21 +1,22 @@
-'use strict';
-
-const {
+import {
   LambdaClient,
   DeleteFunctionCommand,
   DeleteLayerVersionCommand,
   ListAliasesCommand,
   ListLayerVersionsCommand,
   ListVersionsByFunctionCommand,
-} = require('@aws-sdk/client-lambda');
-const ServerlessError = require('../../serverless-error');
-const { log } = require('../../utils/serverless-utils/log');
-const {
+} from '@aws-sdk/client-lambda';
+
+import ServerlessError from '../../serverless-error.ts';
+import log2 from '../../utils/serverless-utils/log.ts';
+import {
   getAwsErrorMessage,
   getAwsErrorStatusCode,
   isLambdaResourceNotFoundError,
-} = require('../../aws/aws-sdk-v3-error');
-const { retryOnThrottlingError } = require('../../aws/retry');
+} from '../../aws/aws-sdk-v3-error.ts';
+import retry from '../../aws/retry.ts';
+const { log } = log2;
+const { retryOnThrottlingError } = retry;
 
 const DEFAULT_PRUNE_VERSIONS = 10;
 
@@ -298,4 +299,4 @@ class AwsPrune {
   }
 }
 
-module.exports = AwsPrune;
+export default AwsPrune;

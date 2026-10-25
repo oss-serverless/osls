@@ -1,8 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-const ServerlessError = require('../../../../lib/serverless-error');
-const parseArgs = require('../../../../lib/cli/parse-args');
+import { expect } from 'chai';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import parseArgs from '../../../../lib/cli/parse-args.ts';
 
 describe('test/unit/lib/cli/parse-args.test.js', () => {
   let parsedArgs;

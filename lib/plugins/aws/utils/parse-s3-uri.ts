@@ -1,5 +1,3 @@
-'use strict';
-
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
 const s3UriPattern = /^s3:\/\/(?<bucket>[^/?#@\s]+)\/(?<key>[^?#]+)(?:[?#].*)?$/;
 const urlPattern = /^(?:https?:\/\/)?(?<host>[^/?#@\s]+)(?<path>\/[^?#]+)(?:[?#].*)?$/i;
@@ -8,7 +6,7 @@ const pathStyleHostPattern = /^s3(?:[.-][a-z0-9-]+)?\.amazonaws\.com$/i;
 
 const pathStylePathPattern = /^\/(?<bucket>[^/]+)\/(?<key>.+)$/;
 
-module.exports = (url) => {
+export default (url) => {
   if (typeof url !== 'string') return null;
 
   const s3UriMatch = url.match(s3UriPattern);

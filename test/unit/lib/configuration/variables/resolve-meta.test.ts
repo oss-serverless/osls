@@ -1,8 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const resolveMeta = require('../../../../../lib/configuration/variables/resolve-meta');
+import { expect } from 'chai';
+import resolveMeta from '../../../../../lib/configuration/variables/resolve-meta.ts';
 
 describe('test/unit/lib/configuration/variables/resolve-meta.test.js', () => {
   it('should resolve variables map', () => {

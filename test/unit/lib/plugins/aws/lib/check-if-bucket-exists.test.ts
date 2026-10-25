@@ -1,9 +1,7 @@
-'use strict';
-
-const { expect } = require('chai');
-const sinon = require('sinon');
-const { S3Client, HeadBucketCommand } = require('@aws-sdk/client-s3');
-const checkIfBucketExists = require('../../../../../../lib/plugins/aws/lib/check-if-bucket-exists');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
+import checkIfBucketExists from '../../../../../../lib/plugins/aws/lib/check-if-bucket-exists.ts';
 
 describe('test/unit/lib/plugins/aws/lib/check-if-bucket-exists.test.js', () => {
   let context;

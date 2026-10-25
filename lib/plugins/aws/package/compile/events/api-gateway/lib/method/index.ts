@@ -1,9 +1,7 @@
-'use strict';
+import isObject from 'type/object/is.js';
+import mergePlainObjects from '../../../../../../../../utils/merge-plain-objects.ts';
 
-const isObject = require('type/object/is');
-const mergePlainObjects = require('../../../../../../../../utils/merge-plain-objects');
-
-module.exports = {
+export default {
   compileMethods() {
     this.permissionMapping = [];
 

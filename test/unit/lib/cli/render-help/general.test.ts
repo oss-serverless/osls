@@ -1,8 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-const renderGeneralHelp = require('../../../../../lib/cli/render-help/general');
-const observeOutput = require('../../../../lib/observe-output');
+import { expect } from 'chai';
+import renderGeneralHelp from '../../../../../lib/cli/render-help/general.ts';
+import observeOutput from '../../../../lib/observe-output.ts';
 
 describe('test/unit/lib/cli/render-help/general.test.js', () => {
   it('should show help', async () => {

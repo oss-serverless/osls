@@ -1,13 +1,12 @@
-'use strict';
-
-const ServerlessError = require('../../../serverless-error');
-const {
+import ServerlessError from '../../../serverless-error.ts';
+import {
   CloudFormationClient,
   DescribeStacksCommand,
   ListExportsCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { ApiGatewayV2Client, GetApiCommand } = require('@aws-sdk/client-apigatewayv2');
-const { retryOnThrottlingError } = require('../../../aws/retry');
+} from '@aws-sdk/client-cloudformation';
+import { ApiGatewayV2Client, GetApiCommand } from '@aws-sdk/client-apigatewayv2';
+import retry from '../../../aws/retry.ts';
+const { retryOnThrottlingError } = retry;
 
 function getCloudFormationClient(context) {
   context.cloudFormationClientPromise ||= context.provider
@@ -44,7 +43,7 @@ async function resolveCfImportValue(context, name) {
   );
 }
 
-module.exports = {
+export default {
   async getStackInfo() {
     // NOTE: this is the global gatheredData object which will be passed around
     this.gatheredData = {

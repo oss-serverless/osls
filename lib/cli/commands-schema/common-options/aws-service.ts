@@ -1,6 +1,6 @@
-'use strict';
+import service from './service.ts';
 
-module.exports = {
+export default {
   'region': {
     usage: 'Region of the service',
     shortcut: 'r',
@@ -8,7 +8,7 @@ module.exports = {
   'aws-profile': {
     usage: 'AWS profile to use with the command',
   },
-  ...require('./service'),
+  ...service,
 };
 
 for (const optionSchema of Object.values(module.exports)) {

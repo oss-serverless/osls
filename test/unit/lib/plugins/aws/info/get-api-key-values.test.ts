@@ -1,16 +1,15 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const AwsInfo = require('../../../../../../lib/plugins/aws/info/index');
-const { retryOnThrottlingError } = require('../../../../../../lib/aws/retry');
-const {
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import AwsInfo from '../../../../../../lib/plugins/aws/info/index.ts';
+import retry from '../../../../../../lib/aws/retry.ts';
+import {
   CloudFormationClient,
   DescribeStackResourcesCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { APIGatewayClient, GetApiKeyCommand } = require('@aws-sdk/client-api-gateway');
-const releasePendingRequestsUntilSettled = require('../../../../../utils/release-pending-requests-until-settled');
+} from '@aws-sdk/client-cloudformation';
+import { APIGatewayClient, GetApiKeyCommand } from '@aws-sdk/client-api-gateway';
+import releasePendingRequestsUntilSettled from '../../../../../utils/release-pending-requests-until-settled.ts';
+const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
   retryOnThrottlingError: (task, options) =>

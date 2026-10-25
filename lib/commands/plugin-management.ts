@@ -1,8 +1,6 @@
-'use strict';
-
-const path = require('path');
-const semver = require('semver');
-const ServerlessError = require('../../lib/serverless-error');
+import path from 'node:path';
+import semver from 'semver';
+import ServerlessError from '../serverless-error.ts';
 
 const maxNpmPackageNameLength = 214;
 const npmPackageNamePattern = /^(?:@[a-z0-9][a-z0-9._~-]*\/)?[a-z0-9][a-z0-9._~-]*$/;
@@ -84,7 +82,7 @@ const parsePluginUninstallSpec = (raw) => {
   return { name };
 };
 
-module.exports = {
+export default {
   validate({ serviceDir }) {
     if (!serviceDir) {
       throw new ServerlessError(

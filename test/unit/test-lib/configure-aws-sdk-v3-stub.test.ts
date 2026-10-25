@@ -1,9 +1,7 @@
-'use strict';
-
-const { PassThrough } = require('node:stream');
-const { expect } = require('chai');
-const configureAwsSdkV3Stub = require('../../lib/configure-aws-sdk-v3-stub');
-const { createDeployAwsStubMap } = require('../../utils/aws-stub-maps');
+import { PassThrough } from 'node:stream';
+import { expect } from 'chai';
+import configureAwsSdkV3Stub from '../../lib/configure-aws-sdk-v3-stub.ts';
+import { createDeployAwsStubMap } from '../../utils/aws-stub-maps.ts';
 
 describe('test/unit/test-lib/configure-aws-sdk-v3-stub.test.js', () => {
   it('stubs client commands and records send context', async () => {

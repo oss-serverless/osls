@@ -1,13 +1,9 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const ensureArtifact = require('../../../../lib/utils/ensure-artifact');
-
-const path = require('path');
-const fsp = require('fs').promises;
-const crypto = require('crypto');
-const { pathExists } = require('../../../utils/fs');
+import { expect } from 'chai';
+import ensureArtifact from '../../../../lib/utils/ensure-artifact.ts';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import crypto from 'node:crypto';
+import { pathExists } from '../../../utils/fs.ts';
 
 describe('#ensureArtifact', () => {
   const testArtifactName = `test-${crypto.randomBytes(12).toString('hex')}`;

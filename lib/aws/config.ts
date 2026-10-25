@@ -1,9 +1,7 @@
-'use strict';
-
-const { HttpsProxyAgent } = require('https-proxy-agent');
-const https = require('https');
-const fs = require('fs');
-const { NodeHttpHandler } = require('@smithy/node-http-handler');
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import https from 'node:https';
+import fs from 'node:fs';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
 
 /**
  * Build AWS SDK v3 client configuration from environment and options
@@ -135,7 +133,9 @@ function getCACertificates() {
   return caCerts;
 }
 
-module.exports = {
+export { buildClientConfig, buildHttpOptions, getCACertificates, getMaxAttempts, getMaxRetries };
+
+export default {
   buildClientConfig,
   buildHttpOptions,
   getCACertificates,

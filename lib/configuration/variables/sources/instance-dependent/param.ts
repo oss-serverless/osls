@@ -1,10 +1,8 @@
-'use strict';
-
-const memoizee = require('memoizee');
-const ensureString = require('type/string/ensure');
-const ServerlessError = require('../../../../serverless-error');
-const { hasOwn } = require('../../../../utils/safe-object');
-const validateStage = require('../../../../utils/validate-stage');
+import memoizee from 'memoizee';
+import ensureString from 'type/string/ensure.js';
+import ServerlessError from '../../../../serverless-error.ts';
+import { hasOwn } from '../../../../utils/safe-object.ts';
+import validateStage from '../../../../utils/validate-stage.ts';
 
 const resolveParams = memoizee(async (stage, serverlessInstance) => {
   const configParams = new Map(
@@ -44,7 +42,7 @@ const resolveParams = memoizee(async (stage, serverlessInstance) => {
   return resultParams;
 });
 
-module.exports = (serverlessInstance) => {
+export default (serverlessInstance) => {
   return {
     resolve: async ({ address, resolveConfigurationProperty, options }) => {
       if (!address) {

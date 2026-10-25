@@ -1,13 +1,14 @@
-'use strict';
-
-const ensureString = require('type/string/ensure');
-const isPlainObject = require('type/plain-object/is');
-const path = require('path');
-const { pathToFileURL } = require('url');
-const fsp = require('fs').promises;
-const yaml = require('js-yaml');
-const cloudformationSchema = require('../utils/serverless-utils/cloudformation-schema');
-const ServerlessError = require('../serverless-error');
+import ensureString from 'type/string/ensure.js';
+import isPlainObject from 'type/plain-object/is.js';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { promises as fsp } from 'node:fs';
+import * as yaml from 'js-yaml';
+import cloudformationSchema from '../utils/serverless-utils/cloudformation-schema.ts';
+import ServerlessError from '../serverless-error.ts';
+import typescript from 'typescript';
+import fs2 from 'node:fs';
+import module2 from 'node:module';
 
 const readConfigurationFile = async (configurationPath) => {
   try {
@@ -28,13 +29,13 @@ const readConfigurationFile = async (configurationPath) => {
 
 const loadWithTypeScript = (configurationPath) => {
   try {
-    const ts = require('typescript');
-    const fs = require('fs');
+    const ts = typescript;
+    const fs = fs2;
     const source = fs.readFileSync(configurationPath, 'utf8');
-    
+
     const configDir = path.dirname(path.resolve(configurationPath));
     const tsconfigPath = ts.findConfigFile(configDir, ts.sys.fileExists, 'tsconfig.json');
-    
+
     let compilerOptions = {
       module: ts.ModuleKind.CommonJS,
       target: ts.ScriptTarget.ES2020,
@@ -42,35 +43,31 @@ const loadWithTypeScript = (configurationPath) => {
       moduleResolution: ts.ModuleResolutionKind.NodeJs,
       allowJs: true,
     };
-    
+
     if (tsconfigPath) {
       const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
       if (!configFile.error) {
-        const parsed = ts.parseJsonConfigFileContent(
-          configFile.config,
-          ts.sys,
-          configDir
-        );
+        const parsed = ts.parseJsonConfigFileContent(configFile.config, ts.sys, configDir);
         compilerOptions = { ...compilerOptions, ...parsed.options };
         // Ensure we can output CommonJS
         compilerOptions.module = ts.ModuleKind.CommonJS;
       }
     }
-    
+
     const result = ts.transpileModule(source, {
       compilerOptions,
       fileName: configurationPath,
     });
-    
-    const Module = require('module');
+
+    const Module = module2;
     const filename = configurationPath;
     const dirname = path.dirname(configurationPath);
-    
+
     const mod = new Module(filename);
     mod.filename = filename;
     mod.paths = Module._nodeModulePaths(dirname);
     mod._compile(result.outputText, filename);
-    
+
     const content = mod.exports;
     return content.default !== undefined ? content.default : content;
   } catch (error) {
@@ -113,8 +110,8 @@ const parseConfigurationFile = async (configurationPath) => {
           const content = loadWithTypeScript(configurationPath);
           return content;
         } catch (tsError) {
-          const tsx = require('tsx/cjs/api');
-          const content = tsx.require(configurationPath, __filename);
+          const tsx = await import('tsx/cjs/api');
+          const content = tsx.require(configurationPath, import.meta.filename);
           return content.default || content;
         }
       } catch (error) {
@@ -188,7 +185,7 @@ const parseConfigurationFile = async (configurationPath) => {
   }
 };
 
-module.exports = async (configurationPath) => {
+export default async (configurationPath) => {
   configurationPath = path.resolve(
     ensureString(configurationPath, {
       name: 'configurationPath',

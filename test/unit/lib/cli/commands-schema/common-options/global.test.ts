@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const globalCommonOptions = require('../../../../../../lib/cli/commands-schema/common-options/global');
+import { expect } from 'chai';
+import globalCommonOptions from '../../../../../../lib/cli/commands-schema/common-options/global.ts';
 
 describe('test/unit/lib/cli/commands-schema/common-options/global.test.js', () => {
   it('should expose global common options', () =>

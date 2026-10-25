@@ -1,6 +1,4 @@
-'use strict';
-
-const { createEnv } = require('../utils/process');
+import { createEnv } from '../utils/process.ts';
 
 const WIN32_SYSTEM_VAR_NAMES = new Set([
   'allusersprofile',
@@ -27,7 +25,7 @@ const resolveWin32SystemVarNames = () =>
     ? Object.keys(process.env).filter((name) => WIN32_SYSTEM_VAR_NAMES.has(name.toLowerCase()))
     : [];
 
-module.exports = (options = {}) => {
+export default (options = {}) => {
   if (!options) options = {};
   return createEnv({
     whitelist: [

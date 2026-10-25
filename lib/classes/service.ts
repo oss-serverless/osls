@@ -1,14 +1,13 @@
-'use strict';
-
-const ServerlessError = require('../serverless-error');
-const util = require('util');
-const semver = require('semver');
-const isObject = require('type/object/is');
-const isPlainObject = require('type/plain-object/is');
-const mergePlainObjects = require('../utils/merge-plain-objects');
-const { hasOwn } = require('../utils/safe-object');
-const { log } = require('../utils/serverless-utils/log');
-const validateStage = require('../utils/validate-stage');
+import ServerlessError from '../serverless-error.ts';
+import util from 'node:util';
+import semver from 'semver';
+import isObject from 'type/object/is.js';
+import isPlainObject from 'type/plain-object/is.js';
+import mergePlainObjects from '../utils/merge-plain-objects.ts';
+import { hasOwn } from '../utils/safe-object.ts';
+import log2 from '../utils/serverless-utils/log.ts';
+import validateStage from '../utils/validate-stage.ts';
+const { log } = log2;
 // const currentVersion = require('../../package').version;
 // const isLocallyInstalled = require('../cli/is-locally-installed');
 
@@ -364,4 +363,4 @@ class Service {
   }
 }
 
-module.exports = Service;
+export default Service;

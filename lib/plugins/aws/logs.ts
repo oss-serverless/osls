@@ -1,16 +1,15 @@
-'use strict';
-
-const wait = require('../../utils/sleep');
-const { writeText } = require('../../utils/serverless-utils/log');
-const validate = require('./lib/validate');
-const formatLambdaLogEvent = require('./utils/format-lambda-log-event');
-const { parseTimeInput, subtractTime } = require('./utils/time');
-const ServerlessError = require('../../serverless-error');
-const {
+import wait from '../../utils/sleep.ts';
+import log from '../../utils/serverless-utils/log.ts';
+import validate from './lib/validate.ts';
+import formatLambdaLogEvent from './utils/format-lambda-log-event.ts';
+import { parseTimeInput, subtractTime } from './utils/time.ts';
+import ServerlessError from '../../serverless-error.ts';
+import {
   CloudWatchLogsClient,
   DescribeLogStreamsCommand,
   FilterLogEventsCommand,
-} = require('@aws-sdk/client-cloudwatch-logs');
+} from '@aws-sdk/client-cloudwatch-logs';
+const { writeText } = log;
 
 class AwsLogs {
   constructor(serverless, options) {
@@ -115,4 +114,4 @@ class AwsLogs {
   }
 }
 
-module.exports = AwsLogs;
+export default AwsLogs;

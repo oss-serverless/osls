@@ -1,13 +1,13 @@
-'use strict';
-
-const {
+import {
   CloudFormationClient,
   UpdateTerminationProtectionCommand,
-} = require('@aws-sdk/client-cloudformation');
-const ServerlessError = require('../../serverless-error');
-const { log } = require('../../utils/serverless-utils/log');
-const { getAwsErrorMessage } = require('../../aws/aws-sdk-v3-error');
-const { retryOnThrottlingError } = require('../../aws/retry');
+} from '@aws-sdk/client-cloudformation';
+import ServerlessError from '../../serverless-error.ts';
+import log2 from '../../utils/serverless-utils/log.ts';
+import { getAwsErrorMessage } from '../../aws/aws-sdk-v3-error.ts';
+import retry from '../../aws/retry.ts';
+const { log } = log2;
+const { retryOnThrottlingError } = retry;
 
 class AwsDeletionProtection {
   constructor(serverless, options) {
@@ -95,4 +95,4 @@ class AwsDeletionProtection {
   }
 }
 
-module.exports = AwsDeletionProtection;
+export default AwsDeletionProtection;

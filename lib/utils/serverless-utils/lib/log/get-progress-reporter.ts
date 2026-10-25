@@ -1,12 +1,10 @@
-'use strict';
-
-const { EventEmitter } = require('events');
-const ensureString = require('type/string/ensure');
-const isObject = require('type/object/is');
-const createRandomString = require('ext/string/random');
-const globalState = require('../global-state');
-const memoizee = require('memoizee');
-const logLevels = require('log/levels');
+import { EventEmitter } from 'node:events';
+import ensureString from 'type/string/ensure.js';
+import isObject from 'type/object/is.js';
+import createRandomString from 'ext/string/random.js';
+import globalState from '../global-state.ts';
+import memoizee from 'memoizee';
+import logLevels from 'log/levels.json' with { type: 'json' };
 
 const progressEmitter = (() => {
   if (!globalState.progressEmitter) {
@@ -16,7 +14,7 @@ const progressEmitter = (() => {
   return globalState.progressEmitter;
 })();
 
-module.exports = memoizee(
+export default memoizee(
   (namespace) => {
     return {
       get: memoizee(

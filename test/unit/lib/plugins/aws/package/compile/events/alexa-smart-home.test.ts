@@ -1,9 +1,7 @@
-'use strict';
-
-const expect = require('chai').expect;
-const AwsProvider = require('../../../../../../../../lib/plugins/aws/provider');
-const AwsCompileAlexaSmartHomeEvents = require('../../../../../../../../lib/plugins/aws/package/compile/events/alexa-smart-home');
-const { createAwsEventCompilerContext } = require('./test-utils');
+import { expect } from 'chai';
+import AwsProvider from '../../../../../../../../lib/plugins/aws/provider.ts';
+import AwsCompileAlexaSmartHomeEvents from '../../../../../../../../lib/plugins/aws/package/compile/events/alexa-smart-home.ts';
+import { createAwsEventCompilerContext } from './test-utils.ts';
 
 describe('AwsCompileAlexaSmartHomeEvents', () => {
   let awsCompileAlexaSmartHomeEvents;

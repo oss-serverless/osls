@@ -1,6 +1,4 @@
-'use strict';
-
-const CSS_KEYWORDS = require('./color-keywords');
+import CSS_KEYWORDS from './color-keywords.ts';
 
 const ESC = '\u001B[';
 const RESET = `${ESC}0m`;
@@ -184,7 +182,7 @@ const createColors = ({ stream = process.stdout, env = process.env } = {}) => {
 const stdoutColors = createColors({ stream: process.stdout });
 const stderrColors = createColors({ stream: process.stderr });
 
-module.exports = {
+export default {
   ...stdoutColors,
   createColors,
   getColorLevel,

@@ -1,6 +1,4 @@
-'use strict';
-
-const { stripVTControlCharacters } = require('node:util');
+import { stripVTControlCharacters } from 'node:util';
 
 const moveUp = '\x1b[1A';
 const clearLine = '\x1b[2K';
@@ -269,4 +267,4 @@ class ProgressFooter {
   }
 }
 
-module.exports = (options) => new ProgressFooter(options);
+export default (options) => new ProgressFooter(options);

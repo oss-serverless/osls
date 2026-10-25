@@ -1,18 +1,19 @@
-'use strict';
-
-const promiseLimit = require('ext/promise/limit').bind(Promise);
-const { log, writeText } = require('../../utils/serverless-utils/log');
-const validate = require('./lib/validate');
-const parseDeploymentObjectKey = require('./utils/parse-deployment-object-key');
-const setBucketName = require('./lib/set-bucket-name');
-const ServerlessError = require('../../serverless-error');
-const { S3Client, paginateListObjectsV2 } = require('@aws-sdk/client-s3');
-const {
+import log2 from '../../utils/serverless-utils/log.ts';
+import validate from './lib/validate.ts';
+import parseDeploymentObjectKey from './utils/parse-deployment-object-key.ts';
+import setBucketName from './lib/set-bucket-name.ts';
+import ServerlessError from '../../serverless-error.ts';
+import { S3Client, paginateListObjectsV2 } from '@aws-sdk/client-s3';
+import {
   LambdaClient,
   GetFunctionCommand,
   ListVersionsByFunctionCommand,
-} = require('@aws-sdk/client-lambda');
-const { isS3ListObjectsAccessDeniedError } = require('../../aws/aws-sdk-v3-error');
+} from '@aws-sdk/client-lambda';
+import { isS3ListObjectsAccessDeniedError } from '../../aws/aws-sdk-v3-error.ts';
+import promiseLimit2 from 'ext/promise/limit.js';
+
+const promiseLimit = promiseLimit2.bind(Promise);
+const { log, writeText } = log2;
 
 class AwsDeployList {
   constructor(serverless, options) {
@@ -189,4 +190,4 @@ class AwsDeployList {
   }
 }
 
-module.exports = AwsDeployList;
+export default AwsDeployList;

@@ -1,15 +1,13 @@
-'use strict';
-
-const chai = require('chai');
-const sinon = require('sinon');
-const path = require('path');
-const { getTmpDirPath } = require('../../../../utils/fs');
-const runServerless = require('../../../../utils/run-serverless');
-const setupProgrammaticFixture = require('../../../../utils/setup-programmatic-fixture');
-const AwsInvoke = require('../../../../../lib/plugins/aws/invoke');
-const AwsProvider = require('../../../../../lib/plugins/aws/provider');
-const Serverless = require('../../../../../lib/serverless');
-const { InvokeCommand } = require('@aws-sdk/client-lambda');
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import path from 'node:path';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
+import runServerless from '../../../../utils/run-serverless.ts';
+import setupProgrammaticFixture from '../../../../utils/setup-programmatic-fixture.ts';
+import AwsInvoke from '../../../../../lib/plugins/aws/invoke.ts';
+import AwsProvider from '../../../../../lib/plugins/aws/provider.ts';
+import Serverless from '../../../../../lib/serverless.ts';
+import { InvokeCommand } from '@aws-sdk/client-lambda';
 
 const expect = chai.expect;
 
@@ -245,7 +243,7 @@ describe('test/unit/lib/plugins/aws/invoke.test.js', () => {
 
   it('should reject non-string durable execution names from programmatic options', async () => {
     const serverless = new Serverless({ commands: [], options: {} });
-    serverless.serviceDir = __dirname;
+    serverless.serviceDir = import.meta.dirname;
     const options = {
       'stage': 'dev',
       'region': 'us-east-1',
@@ -269,7 +267,7 @@ describe('test/unit/lib/plugins/aws/invoke.test.js', () => {
 
   it('should reject empty durable execution names from programmatic options', async () => {
     const serverless = new Serverless({ commands: [], options: {} });
-    serverless.serviceDir = __dirname;
+    serverless.serviceDir = import.meta.dirname;
     const options = {
       'stage': 'dev',
       'region': 'us-east-1',
@@ -757,7 +755,7 @@ describe('test/unit/lib/plugins/aws/invoke.test.js', () => {
   it('should support `--contextPath` param', async () => {
     const lambdaInvokeStub = sinon.stub();
     const contextDataFilePath = path.join(
-      __dirname,
+      import.meta.dirname,
       '..',
       '..',
       '..',

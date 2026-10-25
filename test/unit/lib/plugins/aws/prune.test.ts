@@ -1,13 +1,12 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const logEmitter = require('log/lib/emitter');
-const { ListVersionsByFunctionCommand } = require('@aws-sdk/client-lambda');
-const AwsPrune = require('../../../../../lib/plugins/aws/prune');
-const ServerlessError = require('../../../../../lib/serverless-error');
-const { retryOnThrottlingError } = require('../../../../../lib/aws/retry');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import logEmitter from 'log/lib/emitter.js';
+import { ListVersionsByFunctionCommand } from '@aws-sdk/client-lambda';
+import AwsPrune from '../../../../../lib/plugins/aws/prune.ts';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import retry from '../../../../../lib/aws/retry.ts';
+const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
   retryOnThrottlingError: (task, options) =>

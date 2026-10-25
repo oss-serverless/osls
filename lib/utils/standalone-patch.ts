@@ -1,14 +1,13 @@
-'use strict';
-
 // Workaround 'pkg' bug: https://github.com/zeit/pkg/issues/420
 // Copying files from snapshot via `fs.copyFileSync` crashes with ENOENT
 // Overriding copyFileSync with primitive alternative
 
-const fs = require('fs');
+import fs from 'node:fs';
+
+import path from 'node:path';
+import { promisify } from 'node:util';
 
 if (!fs.copyFile) return;
-
-const path = require('path');
 
 const originalCopyFile = fs.copyFile;
 const originalCopyFileSync = fs.copyFileSync;
@@ -70,7 +69,5 @@ fs.copyFileSync = function copyFileSync(src, dest, flags) {
 };
 
 if (!fs.promises) return;
-
-const { promisify } = require('util');
 
 fs.promises.copyFile = promisify(fs.copyFile);

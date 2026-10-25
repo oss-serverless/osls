@@ -1,10 +1,8 @@
-'use strict';
+import resolveInput from '../resolve-input.ts';
+import renderGeneralHelp from './general.ts';
+import renderCommandHelp from './command.ts';
 
-const resolveInput = require('../resolve-input');
-const renderGeneralHelp = require('./general');
-const renderCommandHelp = require('./command');
-
-module.exports = (loadedPlugins, resolvedInput = resolveInput()) => {
+export default (loadedPlugins, resolvedInput = resolveInput()) => {
   const { command } = resolvedInput;
   if (!command) {
     renderGeneralHelp(loadedPlugins, resolvedInput);

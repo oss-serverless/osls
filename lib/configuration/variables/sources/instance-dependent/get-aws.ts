@@ -1,12 +1,10 @@
-'use strict';
+import ensureString from 'type/string/ensure.js';
+import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
+import ServerlessError from '../../../../serverless-error.ts';
+import { hasOwn } from '../../../../utils/safe-object.ts';
+import createCachedAwsVariableSourceCommandSender from './create-cached-aws-variable-source-command-sender.ts';
 
-const ensureString = require('type/string/ensure');
-const { STSClient, GetCallerIdentityCommand } = require('@aws-sdk/client-sts');
-const ServerlessError = require('../../../../serverless-error');
-const { hasOwn } = require('../../../../utils/safe-object');
-const createCachedAwsVariableSourceCommandSender = require('./create-cached-aws-variable-source-command-sender');
-
-module.exports = (serverlessInstance) => {
+export default (serverlessInstance) => {
   const sender = createCachedAwsVariableSourceCommandSender({
     getProvider: () => serverlessInstance.getProvider('aws'),
     Client: STSClient,

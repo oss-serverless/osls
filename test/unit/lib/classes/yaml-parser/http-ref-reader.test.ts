@@ -1,9 +1,7 @@
-'use strict';
-
-const dns = require('dns');
-const http = require('http');
-const { expect } = require('chai');
-const { readHttpRef } = require('../../../../../lib/classes/yaml-parser/http-ref-reader');
+import dns from 'node:dns';
+import http from 'node:http';
+import { expect } from 'chai';
+import { readHttpRef } from '../../../../../lib/classes/yaml-parser/http-ref-reader.ts';
 
 describe('yaml-parser/http-ref-reader', () => {
   const HTTPResolver = {

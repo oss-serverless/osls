@@ -1,8 +1,7 @@
-'use strict';
-
-const cliCommandsSchema = require('../cli/commands-schema');
-const download = require('../utils/download-template-from-repo');
-const { log, progress, style } = require('../utils/serverless-utils/log');
+import cliCommandsSchema from '../cli/commands-schema/index.ts';
+import download from '../utils/download-template-from-repo.ts';
+import log2 from '../utils/serverless-utils/log.ts';
+const { log, progress, style } = log2;
 
 class Install {
   constructor(serverless, options) {
@@ -41,4 +40,4 @@ class Install {
   }
 }
 
-module.exports = Install;
+export default Install;

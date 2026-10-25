@@ -1,14 +1,12 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const ServerlessError = require('../../../../../../lib/serverless-error');
-const {
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import ServerlessError from '../../../../../../lib/serverless-error.ts';
+import {
   parseTimeInput,
   subtractTime,
   formatLogTimestamp,
   formatDisplayTime,
-} = require('../../../../../../lib/plugins/aws/utils/time');
+} from '../../../../../../lib/plugins/aws/utils/time.ts';
 
 describe('aws/utils/time', () => {
   describe('#parseTimeInput()', () => {

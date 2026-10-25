@@ -1,15 +1,14 @@
-'use strict';
-
-const path = require('path');
-const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
-const glob = require('../../../../../../lib/utils/glob');
-const requireUncached = require('../../../../../utils/require-uncached');
-const { listZipFiles } = require('../../../../../utils/fs');
-const { expect } = require('chai');
+import path from 'node:path';
+import glob from '../../../../../../lib/utils/glob.ts';
+import requireUncached from '../../../../../utils/require-uncached.ts';
+import { listZipFiles } from '../../../../../utils/fs.ts';
+import { expect } from 'chai';
+import proxyquire2 from 'proxyquire';
+const proxyquire = proxyquire2.noCallThru().noPreserveCache();
 
 // The directory that holds the files that generateZip zips up
 const resourcesDir = path.resolve(
-  __dirname,
+  import.meta.dirname,
   '../../../../../../lib/plugins/aws/custom-resources/resources/'
 );
 const generateZipPath = '../../../../../../lib/plugins/aws/custom-resources/generate-zip';
@@ -19,7 +18,9 @@ describe('test/unit/lib/plugins/aws/customResources/generateZip.test.js', () => 
   describe('when generating a zip file', () => {
     it('should generate a zip file with the contents of the resources directory', async () => {
       const zipFilePath = await requireUncached(async () =>
-        require('../../../../../../lib/plugins/aws/custom-resources/generate-zip')()
+        (
+          await import('../../../../../../lib/plugins/aws/custom-resources/generate-zip.ts')
+        ).default()
       );
 
       // List the files in the zip to make sure it is valid

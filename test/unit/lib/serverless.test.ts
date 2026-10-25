@@ -1,25 +1,26 @@
-'use strict';
-
-const chai = require('chai');
+import * as chai from 'chai';
+import Serverless from '../../../lib/serverless.ts';
+import semver from 'semver';
+import packageModule from '../../../package.json' with { type: 'json' };
+import YamlParser from '../../../lib/classes/yaml-parser.ts';
+import PluginManager from '../../../lib/classes/plugin-manager.ts';
+import Utils from '../../../lib/classes/utils.ts';
+import Service from '../../../lib/classes/service.ts';
+import ConfigSchemaHandler from '../../../lib/classes/config-schema-handler/index.ts';
+import CLI from '../../../lib/classes/cli.ts';
+import ServerlessError from '../../../lib/serverless-error.ts';
+import runServerless from '../../utils/run-serverless.ts';
+import spawn from '../../../lib/utils/spawn.ts';
+import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
+import path from 'node:path';
+import * as yaml from 'js-yaml';
+import config2 from '../../../lib/utils/serverless-utils/config.ts';
+import log2 from '../../../lib/utils/serverless-utils/log.ts';
+import extendConfigPluginIndex from '../../fixtures/programmatic/plugin/extend-config-plugin/index.js';
 
 const { expect } = chai;
 
-const Serverless = require('../../../lib/serverless');
-const semver = require('semver');
-const { version } = require('../../../package.json');
-
-const YamlParser = require('../../../lib/classes/yaml-parser');
-const PluginManager = require('../../../lib/classes/plugin-manager');
-const Utils = require('../../../lib/classes/utils');
-const Service = require('../../../lib/classes/service');
-const ConfigSchemaHandler = require('../../../lib/classes/config-schema-handler');
-const CLI = require('../../../lib/classes/cli');
-const ServerlessError = require('../../../lib/serverless-error');
-const runServerless = require('../../utils/run-serverless');
-const spawn = require('../../../lib/utils/spawn');
-const setupProgrammaticFixture = require('../../utils/setup-programmatic-fixture');
-const path = require('path');
-const yaml = require('js-yaml');
+const { version } = packageModule;
 
 const getByPath = (source, pathSegments) => {
   let current = source;
@@ -215,7 +216,7 @@ describe('Serverless', () => {
     it('resolves @serverless/utils/config through require.main.require', () => {
       const config = require.main.require('@serverless/utils/config');
       const configJs = require.main.require('@serverless/utils/config.js');
-      const vendoredConfig = require('../../../lib/utils/serverless-utils/config');
+      const vendoredConfig = config2;
 
       expect(config).to.equal(vendoredConfig);
       expect(configJs).to.equal(vendoredConfig);
@@ -226,7 +227,7 @@ describe('Serverless', () => {
     it('resolves @serverless/utils/log through require.main.require', () => {
       const log = require.main.require('@serverless/utils/log');
       const logJs = require.main.require('@serverless/utils/log.js');
-      const vendoredLog = require('../../../lib/utils/serverless-utils/log');
+      const vendoredLog = log2;
 
       expect(log).to.equal(vendoredLog);
       expect(logJs).to.equal(vendoredLog);
@@ -258,10 +259,9 @@ describe('test/unit/lib/serverless.test.js', () => {
   });
 
   describe('Extend configuration', () => {
-    const pluginConfig =
-      require('../../fixtures/programmatic/plugin/extend-config-plugin').pluginConfig;
+    const pluginConfig = extendConfigPluginIndex.pluginConfig;
 
-    const serverlessPath = path.resolve(__dirname, '../../../scripts/serverless.js');
+    const serverlessPath = path.resolve(import.meta.dirname, '../../../scripts/serverless.js');
 
     it('Extends configuration with given values', async () => {
       const customExt = { custom: {} };

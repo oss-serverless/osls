@@ -1,9 +1,7 @@
-'use strict';
-
-const ServerlessError = require('../../../../../../serverless-error');
-const { makeAndHashRuleName, makeEventBusTargetId, makeRuleName } = require('./utils');
-const resolveLambdaTarget = require('../../../../utils/resolve-lambda-target');
-const isObject = require('type/object/is');
+import ServerlessError from '../../../../../../serverless-error.ts';
+import { makeAndHashRuleName, makeEventBusTargetId, makeRuleName } from './utils.ts';
+import resolveLambdaTarget from '../../../../utils/resolve-lambda-target.ts';
+import isObject from 'type/object/is.js';
 
 class AwsCompileEventBridgeEvents {
   constructor(serverless, options) {
@@ -357,4 +355,4 @@ class AwsCompileEventBridgeEvents {
   }
 }
 
-module.exports = AwsCompileEventBridgeEvents;
+export default AwsCompileEventBridgeEvents;

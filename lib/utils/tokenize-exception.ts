@@ -1,8 +1,6 @@
-'use strict';
-
-const { inspect } = require('util');
-const isError = require('type/error/is');
-const { hasOwn } = require('./safe-object');
+import { inspect } from 'node:util';
+import isError from 'type/error/is.js';
+import { hasOwn } from './safe-object.ts';
 
 const userErrorNames = new Set(['ServerlessError']);
 
@@ -16,7 +14,7 @@ const toConstantCase = (name) =>
     .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
     .toUpperCase();
 
-module.exports = (exception) => {
+export default (exception) => {
   if (isError(exception)) {
     const isAwsServiceError = isAwsSdkV3ServiceError(exception);
     return {

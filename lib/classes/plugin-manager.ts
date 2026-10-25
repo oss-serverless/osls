@@ -1,15 +1,15 @@
-'use strict';
-
-const path = require('path');
-const isObject = require('type/object/is');
-const ServerlessError = require('../serverless-error');
-const mergePlainObjects = require('../utils/merge-plain-objects');
-const renderCommandHelp = require('../cli/render-help/command');
-const tokenizeException = require('../utils/tokenize-exception');
-const getRequire = require('../utils/get-require');
-const importModule = require('../utils/require-with-import-fallback');
-const { log, getPluginWriters } = require('../utils/serverless-utils/log');
-const { splitPackageSpec, validatePluginName } = require('../commands/plugin-management');
+import path from 'node:path';
+import isObject from 'type/object/is.js';
+import ServerlessError from '../serverless-error.ts';
+import mergePlainObjects from '../utils/merge-plain-objects.ts';
+import renderCommandHelp from '../cli/render-help/command.ts';
+import tokenizeException from '../utils/tokenize-exception.ts';
+import getRequire from '../utils/get-require.ts';
+import importModule from '../utils/require-with-import-fallback.ts';
+import log2 from '../utils/serverless-utils/log.ts';
+import pluginManagement from '../commands/plugin-management.ts';
+const { log, getPluginWriters } = log2;
+const { splitPackageSpec, validatePluginName } = pluginManagement;
 
 let hooksIdCounter = 0;
 let nestTracker = 0;
@@ -198,7 +198,7 @@ class PluginManager {
 
   async loadAllPlugins(servicePlugins) {
     isRegisteringExternalPlugins = false;
-    require('../plugins')
+    (await import('../plugins/index.ts')).default
       .filter(Boolean)
       .forEach((Plugin) => this.addPlugin(Plugin));
 
@@ -754,4 +754,4 @@ class PluginManager {
   }
 }
 
-module.exports = PluginManager;
+export default PluginManager;

@@ -1,9 +1,8 @@
-'use strict';
+import weakMemoizee from 'memoizee/weak.js';
+import customResources from '../../../../custom-resources/index.ts';
+const { addCustomResourceToService } = customResources;
 
-const weakMemoizee = require('memoizee/weak');
-const { addCustomResourceToService } = require('../../../../custom-resources');
-
-module.exports = weakMemoizee(
+export default weakMemoizee(
   async (provider) => {
     // There may be a specific role ARN provided in the configuration
     const config = provider.serverless.service.provider;

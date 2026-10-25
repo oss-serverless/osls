@@ -1,7 +1,6 @@
-'use strict';
-
-const { isProxy } = require('util').types;
-const { isUnsafePropertyKey } = require('./object-path');
+import util from 'node:util';
+import { isUnsafePropertyKey } from './object-path.ts';
+const { isProxy } = util.types;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -72,7 +71,17 @@ const getReachableByPath = (source, path) => {
   return current;
 };
 
-module.exports = {
+export {
+  canFollowProperty,
+  createRegistry,
+  getOwnByPath,
+  getReachableByPath,
+  hasOwn,
+  safeSet,
+  safeShallowAssign,
+};
+
+export default {
   canFollowProperty,
   createRegistry,
   getOwnByPath,

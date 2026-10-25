@@ -1,9 +1,7 @@
-'use strict';
-
-const path = require('path');
-const chai = require('chai');
-const sinon = require('sinon');
-const getServiceState = require('../../../../../../lib/plugins/aws/lib/get-service-state');
+import path from 'node:path';
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import getServiceState from '../../../../../../lib/plugins/aws/lib/get-service-state.ts';
 
 const expect = chai.expect;
 

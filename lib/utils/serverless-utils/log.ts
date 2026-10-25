@@ -1,15 +1,14 @@
-'use strict';
-
-const ensureString = require('type/string/ensure');
-const memoizee = require('memoizee');
-const logLevels = require('log/levels');
-const { getterDescriptor } = require('../property-descriptors');
-const globalState = require('./lib/global-state');
-const getOutputReporter = require('./lib/log/get-output-reporter');
-const getProgressReporter = require('./lib/log/get-progress-reporter');
+import ensureString from 'type/string/ensure.js';
+import memoizee from 'memoizee';
+import logLevels from 'log/levels.json' with { type: 'json' };
+import { getterDescriptor } from '../property-descriptors.ts';
+import globalState from './lib/global-state.ts';
+import getOutputReporter from './lib/log/get-output-reporter.ts';
+import getProgressReporter from './lib/log/get-progress-reporter.ts';
+import log2 from 'log';
 
 const log = (() => {
-  if (!globalState.log) globalState.log = require('log').get('serverless').notice;
+  if (!globalState.log) globalState.log = log2.get('serverless').notice;
   return globalState.log;
 })();
 

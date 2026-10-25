@@ -1,14 +1,12 @@
-'use strict';
-
-const validate = require('./lib/validate');
-const compileApi = require('./lib/api');
-const compileIntegrations = require('./lib/integrations');
-const compileRouteResponses = require('./lib/route-responses');
-const compilePermissions = require('./lib/permissions');
-const compileRoutes = require('./lib/routes');
-const compileDeployment = require('./lib/deployment');
-const compileStage = require('./lib/stage');
-const compileAuthorizers = require('./lib/authorizers');
+import validate from './lib/validate.ts';
+import compileApi from './lib/api.ts';
+import compileIntegrations from './lib/integrations.ts';
+import compileRouteResponses from './lib/route-responses.ts';
+import compilePermissions from './lib/permissions.ts';
+import compileRoutes from './lib/routes.ts';
+import compileDeployment from './lib/deployment.ts';
+import compileStage from './lib/stage.ts';
+import compileAuthorizers from './lib/authorizers.ts';
 
 class AwsCompileWebsockets {
   constructor(serverless, options) {
@@ -83,4 +81,4 @@ class AwsCompileWebsockets {
   }
 }
 
-module.exports = AwsCompileWebsockets;
+export default AwsCompileWebsockets;

@@ -1,8 +1,6 @@
-'use strict';
-
-const { addPermission, removePermission, getStatementId } = require('./lib/permissions');
-const { updateConfiguration, removeConfiguration, findUserPoolByName } = require('./lib/user-pool');
-const { getEnvironment, getLambdaArn, handlerWrapper } = require('../utils');
+import { addPermission, removePermission, getStatementId } from './lib/permissions.ts';
+import { updateConfiguration, removeConfiguration, findUserPoolByName } from './lib/user-pool.ts';
+import { getEnvironment, getLambdaArn, handlerWrapper } from '../utils.ts';
 
 async function handler(event, context) {
   if (event.RequestType === 'Create') {
@@ -178,6 +176,6 @@ function ignoreMissingPermission(error) {
   throw error;
 }
 
-module.exports = {
+export default {
   handler: handlerWrapper(handler, 'CustomResourceExistingCognitoUserPool'),
 };

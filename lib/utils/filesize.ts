@@ -1,6 +1,4 @@
-'use strict';
-
-const ensureNaturalNumber = require('type/natural-number/ensure');
+import ensureNaturalNumber from 'type/natural-number/ensure.js';
 
 const base = 1000;
 const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -9,7 +7,7 @@ const resolveSignificant = (size) => {
   return size >= base ? resolveSignificant(Math.floor(size / base)) : size;
 };
 
-module.exports = (size) => {
+export default (size) => {
   const ensuredSize = ensureNaturalNumber(size, { name: 'size' });
 
   if (Number(size) < 0) {

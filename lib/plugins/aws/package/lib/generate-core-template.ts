@@ -1,9 +1,7 @@
-'use strict';
+import path from 'node:path';
+import ServerlessError from '../../../../serverless-error.ts';
 
-const path = require('path');
-const ServerlessError = require('../../../../serverless-error');
-
-module.exports = {
+export default {
   generateCoreTemplate() {
     this.serverless.service.provider.compiledCloudFormationTemplate =
       this.serverless.utils.readFileSync(

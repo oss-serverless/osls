@@ -1,6 +1,4 @@
-'use strict';
-
-const path = require('path');
+import path from 'node:path';
 
 const runWithRestore = (callback, callbackArgs, restore) => {
   let result;
@@ -156,7 +154,9 @@ const overrideStreamWrite = (stream, restoreKey, customWrite, callback = null) =
 const overrideStdoutWrite = (customWrite, callback = null) =>
   overrideStreamWrite(process.stdout, 'restoreStdoutWrite', customWrite, callback);
 
-module.exports = {
+export { createEnv, overrideArgv, overrideCwd, overrideEnv, overrideStdoutWrite };
+
+export default {
   createEnv,
   overrideArgv,
   overrideCwd,

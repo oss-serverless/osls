@@ -1,9 +1,7 @@
-'use strict';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
 
-const crypto = require('crypto');
-const fs = require('fs');
-
-module.exports = async (filePath) => {
+export default async (filePath) => {
   const fileHash = crypto.createHash('sha256');
   fileHash.setEncoding('base64');
 

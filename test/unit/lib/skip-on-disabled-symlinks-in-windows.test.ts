@@ -1,9 +1,6 @@
-'use strict';
-
-const sinon = require('sinon');
-const { expect } = require('chai');
-
-const skipOnDisabledSymlinksInWindows = require('../../lib/skip-on-disabled-symlinks-in-windows');
+import * as sinon from 'sinon';
+import { expect } from 'chai';
+import skipOnDisabledSymlinksInWindows from '../../lib/skip-on-disabled-symlinks-in-windows.ts';
 
 describe('test/unit/lib/skip-on-disabled-symlinks-in-windows.test.js', () => {
   const originalPlatformDescriptor = Object.getOwnPropertyDescriptor(process, 'platform');

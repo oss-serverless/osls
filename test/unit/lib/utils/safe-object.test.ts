@@ -1,15 +1,13 @@
-'use strict';
+import { expect } from 'chai';
 
-const { expect } = require('chai');
-
-const {
+import {
   createRegistry,
   getOwnByPath,
   getReachableByPath,
   hasOwn,
   safeSet,
   safeShallowAssign,
-} = require('../../../../lib/utils/safe-object');
+} from '../../../../lib/utils/safe-object.ts';
 
 describe('safe-object', () => {
   afterEach(() => {

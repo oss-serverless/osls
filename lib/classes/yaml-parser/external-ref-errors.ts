@@ -1,6 +1,4 @@
-'use strict';
-
-const ServerlessError = require('../../serverless-error');
+import ServerlessError from '../../serverless-error.ts';
 
 const YAML_REF_ACCESS_DENIED = 'YAML_REF_ACCESS_DENIED';
 const YAML_REF_OPTIONS_ERROR = 'YAML_REF_OPTIONS_ERROR';
@@ -39,7 +37,17 @@ const throwOptionsError = (message) => {
   throw new ServerlessError(message, YAML_REF_OPTIONS_ERROR);
 };
 
-module.exports = {
+export {
+  createExternalRefAccessDeniedError,
+  denyExternalRef,
+  getExternalRefAccessDeniedError,
+  isExternalRefAccessDeniedError,
+  throwOptionsError,
+  YAML_REF_ACCESS_DENIED,
+  YAML_REF_OPTIONS_ERROR,
+};
+
+export default {
   createExternalRefAccessDeniedError,
   denyExternalRef,
   getExternalRefAccessDeniedError,

@@ -1,6 +1,4 @@
-'use strict';
-
-const ServerlessError = require('../serverless-error');
+import ServerlessError from '../serverless-error.ts';
 
 const validateSpawnInput = (command, args, options = {}) => {
   options = options || {};
@@ -25,4 +23,5 @@ const validateSpawnInput = (command, args, options = {}) => {
   }
 };
 
-module.exports = { validateSpawnInput };
+export { validateSpawnInput };
+export default { validateSpawnInput };

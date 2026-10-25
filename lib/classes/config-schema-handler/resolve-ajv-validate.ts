@@ -1,19 +1,22 @@
-'use strict';
-
-const Ajv = require('ajv').default;
-const path = require('path');
-const os = require('os');
-const Module = require('module');
-const standaloneCode = require('ajv/dist/standalone').default;
-const { log } = require('../../utils/serverless-utils/log');
-const fsp = require('fs').promises;
-const resolveTmpdir = require('../../utils/resolve-process-tmp-dir');
-const safeMoveFile = require('../../utils/fs/safe-move-file');
-const getSchemaHash = require('./schema-hash');
-const ensureExists = require('../../utils/ensure-exists');
-const ServerlessError = require('../../serverless-error');
-const ajvVersion = require('ajv/package').version;
-const ajvFormatsVersion = require('ajv-formats/package').version;
+import ajv2 from 'ajv';
+import path from 'node:path';
+import os from 'node:os';
+import Module from 'node:module';
+import distStandalone from 'ajv/dist/standalone';
+import log2 from '../../utils/serverless-utils/log.ts';
+import { promises as fsp } from 'node:fs';
+import resolveTmpdir from '../../utils/resolve-process-tmp-dir.ts';
+import safeMoveFile from '../../utils/fs/safe-move-file.ts';
+import getSchemaHash from './schema-hash.ts';
+import ensureExists from '../../utils/ensure-exists.ts';
+import ServerlessError from '../../serverless-error.ts';
+import packageModule from 'ajv/package.json' with { type: 'json' };
+import packageModule2 from 'ajv-formats/package.json' with { type: 'json' };
+const Ajv = ajv2.default;
+const standaloneCode = distStandalone.default;
+const { log } = log2;
+const ajvVersion = packageModule.version;
+const ajvFormatsVersion = packageModule2.version;
 
 const getCacheDir = () => {
   return path.resolve(
@@ -55,11 +58,11 @@ const getValidate = async (schema) => {
       strictRequired: false,
       code: { source: true },
     });
-    require('ajv-formats').default(ajv);
+    (await import('ajv-formats')).default.default(ajv);
     // Ensure AJV related packages work well when there are multiple AJV installations around
     // See: https://github.com/ajv-validator/ajv/issues/1390#issuecomment-763138202
     ajv.opts.code.formats = Ajv._`require("ajv-formats/dist/formats").fullFormats`;
-    ajv.addKeyword(require('./regexp-keyword'));
+    ajv.addKeyword((await import('./regexp-keyword.ts')).default);
     let validate;
     try {
       validate = ajv.compile(schema);
@@ -95,7 +98,7 @@ const getValidate = async (schema) => {
   }
   const validator = loadModuleFromString(
     loadedModuleCode,
-    path.resolve(__dirname, `[generated-ajv-validate]${filename}`)
+    path.resolve(import.meta.dirname, `[generated-ajv-validate]${filename}`)
   );
   if (typeof validator !== 'function') {
     log.error('Unexpected validator %o, resolved from source %s', validator, loadedModuleCode);
@@ -107,4 +110,4 @@ const getValidate = async (schema) => {
   return validator;
 };
 
-module.exports = getValidate;
+export default getValidate;

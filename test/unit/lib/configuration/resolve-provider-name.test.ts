@@ -1,9 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const resolveProviderName = require('../../../../lib/configuration/resolve-provider-name');
-const ServerlessError = require('../../../../lib/serverless-error');
+import { expect } from 'chai';
+import resolveProviderName from '../../../../lib/configuration/resolve-provider-name.ts';
+import ServerlessError from '../../../../lib/serverless-error.ts';
 
 describe('test/unit/lib/configuration/resolve-provider-name.test.js', () => {
   it('should read name from "provider"', () => {

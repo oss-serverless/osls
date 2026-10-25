@@ -1,9 +1,8 @@
-'use strict';
-
-const { S3Client } = require('@aws-sdk/client-s3');
-const { Upload } = require('@aws-sdk/lib-storage');
-const { createS3UploadError } = require('../../../aws/aws-sdk-v3-error');
-const { retryOnThrottlingError } = require('../../../aws/retry');
+import { S3Client } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import { createS3UploadError } from '../../../aws/aws-sdk-v3-error.ts';
+import retry from '../../../aws/retry.ts';
+const { retryOnThrottlingError } = retry;
 
 const uploadQueueSize = 6;
 const uploadPartSize = 5 * 1024 * 1024;
@@ -35,7 +34,7 @@ async function getS3UploadClient(provider) {
   return uploadClientPromises.get(cacheKey);
 }
 
-module.exports = async (provider, params) => {
+export default async (provider, params) => {
   const s3 = await getS3UploadClient(provider);
 
   const upload = async () => {

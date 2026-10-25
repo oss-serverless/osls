@@ -1,16 +1,15 @@
-'use strict';
-
-const path = require('path');
-const mergeCustomProviderResources = require('./lib/merge-custom-provider-resources');
-const stripNullPropsFromTemplateResources = require('./lib/strip-null-props-from-template-resources');
-const generateArtifactDirectoryName = require('./lib/generate-artifact-directory-name');
-const generateCoreTemplate = require('./lib/generate-core-template');
-const saveServiceState = require('./lib/save-service-state');
-const saveCompiledTemplate = require('./lib/save-compiled-template');
-const mergeIamTemplates = require('./lib/merge-iam-templates');
-const addExportNameForOutputs = require('./lib/add-export-name-for-outputs');
-const validateTemplate = require('./lib/validate-template');
-const { log, style, progress } = require('../../../utils/serverless-utils/log');
+import path from 'node:path';
+import mergeCustomProviderResources from './lib/merge-custom-provider-resources.ts';
+import stripNullPropsFromTemplateResources from './lib/strip-null-props-from-template-resources.ts';
+import generateArtifactDirectoryName from './lib/generate-artifact-directory-name.ts';
+import generateCoreTemplate from './lib/generate-core-template.ts';
+import saveServiceState from './lib/save-service-state.ts';
+import saveCompiledTemplate from './lib/save-compiled-template.ts';
+import mergeIamTemplates from './lib/merge-iam-templates.ts';
+import addExportNameForOutputs from './lib/add-export-name-for-outputs.ts';
+import validateTemplate from './lib/validate-template.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
+const { log, style, progress } = log2;
 
 const mainProgress = progress.get('main');
 
@@ -136,4 +135,4 @@ class AwsPackage {
   }
 }
 
-module.exports = AwsPackage;
+export default AwsPackage;

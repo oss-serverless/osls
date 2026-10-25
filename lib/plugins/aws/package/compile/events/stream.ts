@@ -1,7 +1,5 @@
-'use strict';
-
-const resolveLambdaTarget = require('../../../utils/resolve-lambda-target');
-const ServerlessError = require('../../../../../serverless-error');
+import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
+import ServerlessError from '../../../../../serverless-error.ts';
 
 class AwsCompileStreamEvents {
   constructor(serverless) {
@@ -394,4 +392,4 @@ class AwsCompileStreamEvents {
   }
 }
 
-module.exports = AwsCompileStreamEvents;
+export default AwsCompileStreamEvents;

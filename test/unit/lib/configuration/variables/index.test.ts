@@ -1,9 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const fsp = require('fs').promises;
-const resolve = require('../../../../../lib/configuration/variables');
+import { expect } from 'chai';
+import { promises as fsp } from 'node:fs';
+import resolve from '../../../../../lib/configuration/variables/index.ts';
 
 describe('test/unit/lib/configuration/variables/index.test.js', () => {
   let configuration;

@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = {
+export default {
   help: { usage: 'Show this message', shortcut: 'h', type: 'boolean' },
   version: { usage: 'Show version info', shortcut: 'v', type: 'boolean' },
   verbose: { usage: 'Show verbose logs', type: 'boolean' },

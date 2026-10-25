@@ -1,15 +1,13 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const childProcess = require('child_process');
-const { promisify } = require('util');
-const isObject = require('type/object/is');
-const AwsCompileApigEvents = require('../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway');
-const Serverless = require('../../../../../../../../../../../lib/serverless');
-const AwsProvider = require('../../../../../../../../../../../lib/plugins/aws/provider');
-const { createTmpDir } = require('../../../../../../../../../../utils/fs');
-const runServerless = require('../../../../../../../../../../utils/run-serverless');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import childProcess from 'node:child_process';
+import { promisify } from 'node:util';
+import isObject from 'type/object/is.js';
+import AwsCompileApigEvents from '../../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/index.ts';
+import Serverless from '../../../../../../../../../../../lib/serverless.ts';
+import AwsProvider from '../../../../../../../../../../../lib/plugins/aws/provider.ts';
+import { createTmpDir } from '../../../../../../../../../../utils/fs.ts';
+import runServerless from '../../../../../../../../../../utils/run-serverless.ts';
 
 if (!childProcess.execAsync) childProcess.execAsync = promisify(childProcess.exec);
 

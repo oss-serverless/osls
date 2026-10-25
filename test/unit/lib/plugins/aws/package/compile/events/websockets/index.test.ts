@@ -1,10 +1,8 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const AwsProvider = require('../../../../../../../../../lib/plugins/aws/provider');
-const runServerless = require('../../../../../../../../utils/run-serverless');
-const { createWebsocketsCompilerContext } = require('./test-utils');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import AwsProvider from '../../../../../../../../../lib/plugins/aws/provider.ts';
+import runServerless from '../../../../../../../../utils/run-serverless.ts';
+import { createWebsocketsCompilerContext } from './test-utils.ts';
 
 describe('AwsCompileWebsocketsEvents', () => {
   let awsCompileWebsocketsEvents;

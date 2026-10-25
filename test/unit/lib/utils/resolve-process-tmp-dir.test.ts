@@ -1,13 +1,12 @@
-'use strict';
-
-const fsp = require('fs').promises;
-const os = require('os');
-const path = require('path');
-const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
-const requireUncached = require('../../../utils/require-uncached');
-const sinon = require('sinon');
-
-const { expect } = require('chai');
+import { promises as fsp } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import requireUncached from '../../../utils/require-uncached.ts';
+import * as sinon from 'sinon';
+import { expect } from 'chai';
+import proxyquire2 from 'proxyquire';
+import resolveProcessTmpDir2 from '../../../../lib/utils/resolve-process-tmp-dir.ts';
+const proxyquire = proxyquire2.noCallThru().noPreserveCache();
 
 describe('test/unit/lib/utils/resolve-process-tmp-dir.test.js', () => {
   const randomHex = 'abcd'.repeat(6);
@@ -17,9 +16,7 @@ describe('test/unit/lib/utils/resolve-process-tmp-dir.test.js', () => {
   });
 
   it('creates and reuses a process temp directory', async () => {
-    const resolveProcessTmpDir = requireUncached(() =>
-      require('../../../../lib/utils/resolve-process-tmp-dir')
-    );
+    const resolveProcessTmpDir = requireUncached(() => resolveProcessTmpDir2);
 
     const firstTmpDir = await resolveProcessTmpDir();
     const secondTmpDir = await resolveProcessTmpDir();

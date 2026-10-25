@@ -1,8 +1,6 @@
-'use strict';
-
-const AwsProvider = require('../../../../../../../../../lib/plugins/aws/provider');
-const AwsCompileWebsocketsEvents = require('../../../../../../../../../lib/plugins/aws/package/compile/events/websockets/index');
-const { createTmpDir } = require('../../../../../../../../utils/fs');
+import AwsProvider from '../../../../../../../../../lib/plugins/aws/provider.ts';
+import AwsCompileWebsocketsEvents from '../../../../../../../../../lib/plugins/aws/package/compile/events/websockets/index.ts';
+import { createTmpDir } from '../../../../../../../../utils/fs.ts';
 
 function createWebsocketsCompilerContext(config = {}) {
   const options = { stage: 'dev', region: 'us-east-1', ...config.options };
@@ -55,4 +53,5 @@ function createWebsocketsCompilerContext(config = {}) {
   return { serverless, provider, awsCompileWebsocketsEvents, options };
 }
 
-module.exports = { createWebsocketsCompilerContext };
+export { createWebsocketsCompilerContext };
+export default { createWebsocketsCompilerContext };

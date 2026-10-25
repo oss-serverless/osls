@@ -1,6 +1,4 @@
-'use strict';
-
-const ServerlessError = require('../../../serverless-error');
+import ServerlessError from '../../../serverless-error.ts';
 
 const UNIT_IN_MS = {
   s: 1000,
@@ -151,4 +149,5 @@ const formatDisplayTime = (value) => {
   );
 };
 
-module.exports = { parseTimeInput, subtractTime, formatLogTimestamp, formatDisplayTime };
+export { parseTimeInput, subtractTime, formatLogTimestamp, formatDisplayTime };
+export default { parseTimeInput, subtractTime, formatLogTimestamp, formatDisplayTime };

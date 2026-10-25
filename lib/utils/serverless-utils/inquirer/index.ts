@@ -1,6 +1,4 @@
-'use strict';
-
-const readline = require('node:readline/promises');
+import readline from 'node:readline/promises';
 
 const parseConfirm = (value, defaultValue = true) => {
   const answer = String(value || '')
@@ -57,7 +55,7 @@ const prompt = async (questionConfig) => {
   return answers;
 };
 
-module.exports = {
+export default {
   prompt,
   createPromptModule() {
     return prompt;

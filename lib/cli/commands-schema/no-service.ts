@@ -1,8 +1,6 @@
-'use strict';
-
-const globalOptions = require('./common-options/global');
-const serviceOptions = require('./common-options/service');
-const awsServiceOptions = require('./common-options/aws-service');
+import globalOptions from './common-options/global.ts';
+import serviceOptions from './common-options/service.ts';
+import awsServiceOptions from './common-options/aws-service.ts';
 
 const commands = (module.exports = new Map());
 

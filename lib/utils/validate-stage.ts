@@ -1,7 +1,5 @@
-'use strict';
-
-const ServerlessError = require('../serverless-error');
-const STAGE_NAME_PATTERN = require('./stage-pattern');
+import ServerlessError from '../serverless-error.ts';
+import STAGE_NAME_PATTERN from './stage-pattern.ts';
 
 const stageNamePattern = new RegExp(STAGE_NAME_PATTERN);
 
@@ -16,5 +14,5 @@ const validateStage = (stage) => {
   return stage;
 };
 
-module.exports = validateStage;
+export default validateStage;
 module.exports.STAGE_NAME_PATTERN = STAGE_NAME_PATTERN;

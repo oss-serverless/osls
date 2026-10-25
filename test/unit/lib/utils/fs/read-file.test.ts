@@ -1,11 +1,9 @@
-'use strict';
-
-const writeFile = require('../../../../../lib/utils/fs/write-file');
-const readFile = require('../../../../../lib/utils/fs/read-file');
-const { getTmpFilePath } = require('../../../../utils/fs');
+import writeFile from '../../../../../lib/utils/fs/write-file.ts';
+import readFile from '../../../../../lib/utils/fs/read-file.ts';
+import { getTmpFilePath } from '../../../../utils/fs.ts';
 
 // Configure chai
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 describe('#readFile()', () => {
   it('should read a file asynchronously', async () => {

@@ -1,3 +1,1 @@
-'use strict';
-
-module.exports = require('./aws-service');
+export { default } from './aws-service.ts';

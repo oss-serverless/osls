@@ -1,8 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-const generateCommandUsage = require('../../../../../lib/cli/render-help/generate-command-usage');
-const commandsSchema = require('../../../../../lib/cli/commands-schema/no-service');
+import { expect } from 'chai';
+import generateCommandUsage from '../../../../../lib/cli/render-help/generate-command-usage.ts';
+import commandsSchema from '../../../../../lib/cli/commands-schema/no-service.ts';
 
 describe('test/unit/lib/cli/render-help/generate-command-usage.test.js', () => {
   it('should generate usage info', async () => {

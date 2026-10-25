@@ -1,9 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const ServerlessError = require('../../../../../lib/serverless-error');
-const parse = require('../../../../../lib/configuration/variables/parse');
+import { expect } from 'chai';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import parse from '../../../../../lib/configuration/variables/parse.ts';
 
 describe('test/unit/lib/configuration/variables/parse.test.js', () => {
   describe('Valid', () => {

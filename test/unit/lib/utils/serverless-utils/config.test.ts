@@ -1,16 +1,14 @@
-'use strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { expect } from 'chai';
+import requireUncached from '../../../../utils/require-uncached.ts';
+import * as sinon from 'sinon';
+import { overrideEnv, overrideCwd } from '../../../../utils/process.ts';
+import { ensureDir, pathExists, remove } from '../../../../utils/fs.ts';
+import config2 from '../../../../../lib/utils/serverless-utils/config.ts';
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { expect } = require('chai');
-const requireUncached = require('../../../../utils/require-uncached');
-const sinon = require('sinon');
-const { overrideEnv, overrideCwd } = require('../../../../utils/process');
-const { ensureDir, pathExists, remove } = require('../../../../utils/fs');
-
-const loadConfigModule = () =>
-  requireUncached(() => require('../../../../../lib/utils/serverless-utils/config'));
+const loadConfigModule = () => requireUncached(() => config2);
 
 const withIsolatedHome = async (name, callback) => {
   const homeDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), `${name}-home-`));

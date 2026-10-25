@@ -1,9 +1,7 @@
-'use strict';
+import crypto from 'node:crypto';
+import pickWebsocketsTemplatePart from './pick-websockets-template-part.ts';
 
-const crypto = require('crypto');
-const pickWebsocketsTemplatePart = require('./pick-websockets-template-part');
-
-module.exports = {
+export default {
   compileDeployment() {
     const dependentResourceIds = this.validated.events
       .map((event) => {

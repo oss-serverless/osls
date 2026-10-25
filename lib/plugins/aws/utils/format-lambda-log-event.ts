@@ -1,9 +1,8 @@
-'use strict';
+import log from '../../../utils/serverless-utils/log.ts';
+import { formatLogTimestamp } from './time.ts';
+const { style } = log;
 
-const { style } = require('../../../utils/serverless-utils/log');
-const { formatLogTimestamp } = require('./time');
-
-module.exports = (msgParam) => {
+export default (msgParam) => {
   let msg = msgParam;
 
   if (!msg.startsWith('REPORT')) msg = msg.trimRight();

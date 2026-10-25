@@ -1,9 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const ServerlessError = require('../../../../../../lib/serverless-error');
-const resolveExternalPluginSources = require('../../../../../../lib/configuration/variables/sources/resolve-external-plugin-sources');
+import { expect } from 'chai';
+import ServerlessError from '../../../../../../lib/serverless-error.ts';
+import resolveExternalPluginSources from '../../../../../../lib/configuration/variables/sources/resolve-external-plugin-sources.ts';
 
 describe('test/unit/lib/configuration/variables/sources/resolve-external-plugin-resources.test.js', () => {
   it('should resolve external plugin sources', () => {

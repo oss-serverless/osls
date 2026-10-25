@@ -1,9 +1,7 @@
-'use strict';
-
-const fs = require('node:fs');
-const path = require('node:path');
-const { expect } = require('chai');
-const setupProgrammaticFixture = require('../../utils/setup-programmatic-fixture');
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect } from 'chai';
+import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
 
 describe('test/utils/setup-programmatic-fixture', () => {
   it('sets up a mutable copied fixture with config extensions and serviceName', async () => {
@@ -28,7 +26,7 @@ describe('test/utils/setup-programmatic-fixture', () => {
 
     expect(serviceConfig.custom).to.deep.equal({ first: true, second: true });
     expect(servicePath).to.not.equal(
-      path.resolve(__dirname, '../../fixtures/programmatic/function')
+      path.resolve(import.meta.dirname, '../../fixtures/programmatic/function')
     );
   });
 

@@ -1,17 +1,15 @@
-'use strict';
-
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const expect = require('chai').expect;
-const AwsDeployList = require('../../../../../lib/plugins/aws/deploy-list');
-const ServerlessError = require('../../../../../lib/serverless-error');
-const { S3Client, ListObjectsV2Command } = require('@aws-sdk/client-s3');
-const {
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import { expect } from 'chai';
+import AwsDeployList from '../../../../../lib/plugins/aws/deploy-list.ts';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import {
   LambdaClient,
   GetFunctionCommand,
   ListVersionsByFunctionCommand,
-} = require('@aws-sdk/client-lambda');
-const releasePendingRequestsUntilSettled = require('../../../../utils/release-pending-requests-until-settled');
+} from '@aws-sdk/client-lambda';
+import releasePendingRequestsUntilSettled from '../../../../utils/release-pending-requests-until-settled.ts';
 
 function formatDeploymentDate(dateString) {
   const date = new Date(Date.parse(dateString));

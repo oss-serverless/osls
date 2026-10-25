@@ -1,8 +1,6 @@
-'use strict';
-
-const chai = require('chai');
-const { HttpsProxyAgent } = require('https-proxy-agent');
-const { toCacheKey, canonicalize } = require('../../../../lib/utils/to-cache-key');
+import * as chai from 'chai';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { toCacheKey, canonicalize } from '../../../../lib/utils/to-cache-key.ts';
 
 const expect = chai.expect;
 

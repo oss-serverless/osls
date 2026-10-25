@@ -1,11 +1,7 @@
-'use strict';
-
-const sinon = require('sinon');
-const logEmitter = require('log/lib/emitter');
-
-const runServerless = require('../../../../../utils/run-serverless');
-
-const expect = require('chai').expect;
+import * as sinon from 'sinon';
+import logEmitter from 'log/lib/emitter.js';
+import runServerless from '../../../../../utils/run-serverless.ts';
+import { expect } from 'chai';
 
 describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
   const baseAwsSdkV3StubMap = {

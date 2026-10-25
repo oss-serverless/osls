@@ -1,10 +1,8 @@
-'use strict';
-
-const fsp = require('fs').promises;
-const crypto = require('crypto');
-const path = require('path');
-const { remove } = require('./remove');
-const sleep = require('../sleep');
+import { promises as fsp } from 'node:fs';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import { remove } from './remove.ts';
+import sleep from '../sleep.ts';
 
 const RENAME_MAX_RETRIES = 3;
 const RENAME_RETRY_BASE_DELAY_MS = 100;
@@ -71,4 +69,4 @@ async function safeMoveFile(oldPath, newPath) {
   }
 }
 
-module.exports = safeMoveFile;
+export default safeMoveFile;

@@ -1,5 +1,3 @@
-'use strict';
-
 function createUsagePlanResource(that, name) {
   const template = {
     Type: 'AWS::ApiGateway::UsagePlan',
@@ -76,7 +74,7 @@ function createUsagePlanResource(that, name) {
   return template;
 }
 
-module.exports = {
+export default {
   compileUsagePlan() {
     const apiKeys =
       this.serverless.service.provider.apiGateway &&

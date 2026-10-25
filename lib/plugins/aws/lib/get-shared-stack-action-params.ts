@@ -1,8 +1,6 @@
-'use strict';
+import { safeShallowAssign } from '../../../utils/safe-object.ts';
 
-const { safeShallowAssign } = require('../../../utils/safe-object');
-
-module.exports = {
+export default {
   getSharedStackActionParams({ templateUrl, templateBody }) {
     const stackTags = { STAGE: this.provider.getStage() };
     const stackName = this.provider.naming.getStackName();

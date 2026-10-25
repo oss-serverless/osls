@@ -1,7 +1,5 @@
-'use strict';
-
-const { hasOwn } = require('./safe-object');
-const validateStage = require('./validate-stage');
+import { hasOwn } from './safe-object.ts';
+import validateStage from './validate-stage.ts';
 
 const resolveStage = ({ configuration, options }) => {
   if (hasOwn(options, 'stage')) return validateStage(options.stage);
@@ -11,4 +9,4 @@ const resolveStage = ({ configuration, options }) => {
   return 'dev';
 };
 
-module.exports = resolveStage;
+export default resolveStage;

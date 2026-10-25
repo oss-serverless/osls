@@ -1,8 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const humanizePropertyPathTokens = require('../../../../../lib/configuration/variables/humanize-property-path-keys');
+import { expect } from 'chai';
+import humanizePropertyPathTokens from '../../../../../lib/configuration/variables/humanize-property-path-keys.ts';
 
 describe('test/unit/lib/configuration/variables/humanize-property-path-tokens.test.js', () => {
   it('should resolve human frendly path string', () => {

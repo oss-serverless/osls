@@ -1,14 +1,12 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const logEmitter = require('log/lib/emitter');
-const {
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import logEmitter from 'log/lib/emitter.js';
+import {
   CloudFormationClient,
   DeleteStackCommand,
   DescribeStacksCommand,
-} = require('@aws-sdk/client-cloudformation');
-const removeStack = require('../../../../../../../lib/plugins/aws/remove/lib/stack');
+} from '@aws-sdk/client-cloudformation';
+import removeStack from '../../../../../../../lib/plugins/aws/remove/lib/stack.ts';
 
 describe('removeStack', () => {
   const stackName = 'removeStack-dev';

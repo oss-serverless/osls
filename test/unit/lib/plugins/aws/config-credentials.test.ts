@@ -1,15 +1,13 @@
-'use strict';
-
-const chai = require('chai');
-const sandbox = require('sinon');
-const { constants } = require('fs');
-const fs = require('fs');
-const fsp = require('fs').promises;
-const os = require('os');
-const path = require('path');
-const AwsConfigCredentials = require('../../../../../lib/plugins/aws/config-credentials');
-const runServerless = require('../../../../utils/run-serverless');
-const { outputFile, outputFileSync, remove } = require('../../../../utils/fs');
+import * as chai from 'chai';
+import * as sandbox from 'sinon';
+import { constants } from 'node:fs';
+import fs from 'node:fs';
+import { promises as fsp } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import AwsConfigCredentials from '../../../../../lib/plugins/aws/config-credentials.ts';
+import runServerless from '../../../../utils/run-serverless.ts';
+import { outputFile, outputFileSync, remove } from '../../../../utils/fs.ts';
 
 const { expect } = chai;
 

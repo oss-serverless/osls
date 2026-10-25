@@ -1,9 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const resolveMeta = require('../../../../../lib/configuration/variables/resolve-meta');
-const isPropertyResolved = require('../../../../../lib/configuration/variables/is-property-resolved');
+import { expect } from 'chai';
+import resolveMeta from '../../../../../lib/configuration/variables/resolve-meta.ts';
+import isPropertyResolved from '../../../../../lib/configuration/variables/is-property-resolved.ts';
 
 describe('test/unit/lib/configuration/variables/is-property-resolved.test.js', () => {
   let variablesMeta;

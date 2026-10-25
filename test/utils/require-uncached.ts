@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = (callback) => {
+export default (callback) => {
   const originalCache = { ...require.cache };
 
   const restore = () => {

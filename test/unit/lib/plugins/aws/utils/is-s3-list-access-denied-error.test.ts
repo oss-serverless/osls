@@ -1,8 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-const ServerlessError = require('../../../../../../lib/serverless-error');
-const isS3ListAccessDeniedError = require('../../../../../../lib/plugins/aws/utils/is-s3-list-access-denied-error');
+import { expect } from 'chai';
+import ServerlessError from '../../../../../../lib/serverless-error.ts';
+import isS3ListAccessDeniedError from '../../../../../../lib/plugins/aws/utils/is-s3-list-access-denied-error.ts';
 
 describe('test/unit/lib/plugins/aws/utils/is-s3-list-access-denied-error.test.js', () => {
   it('matches explicit access denied codes', () => {

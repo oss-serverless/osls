@@ -1,14 +1,11 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const AwsMetrics = require('../../../../../lib/plugins/aws/metrics');
-const ServerlessError = require('../../../../../lib/serverless-error');
-const { CloudWatchClient, GetMetricStatisticsCommand } = require('@aws-sdk/client-cloudwatch');
-const releasePendingRequestsUntilSettled = require('../../../../utils/release-pending-requests-until-settled');
-
-const { formatDisplayTime } = require('../../../../../lib/plugins/aws/utils/time');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import AwsMetrics from '../../../../../lib/plugins/aws/metrics.ts';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import { CloudWatchClient, GetMetricStatisticsCommand } from '@aws-sdk/client-cloudwatch';
+import releasePendingRequestsUntilSettled from '../../../../utils/release-pending-requests-until-settled.ts';
+import { formatDisplayTime } from '../../../../../lib/plugins/aws/utils/time.ts';
 
 const toLocalDateString = (date) =>
   `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;

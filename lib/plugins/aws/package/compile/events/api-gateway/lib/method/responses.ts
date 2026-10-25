@@ -1,8 +1,6 @@
-'use strict';
+import { safeShallowAssign } from '../../../../../../../../utils/safe-object.ts';
 
-const { safeShallowAssign } = require('../../../../../../../../utils/safe-object');
-
-module.exports = {
+export default {
   getMethodResponses(http) {
     const methodResponses = [];
 

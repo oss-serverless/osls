@@ -1,34 +1,35 @@
-'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
+import glob from '../../../../utils/glob.ts';
+import getHashForFilePath from '../../../../utils/get-hash-for-file-path.ts';
+import normalizeFiles from '../../lib/normalize-files.ts';
+import parseDeploymentObjectKey from '../../utils/parse-deployment-object-key.ts';
+import ServerlessError from '../../../../serverless-error.ts';
+import { S3Client, HeadObjectCommand, paginateListObjectsV2 } from '@aws-sdk/client-s3';
+import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda';
 
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const { isDeepStrictEqual } = require('node:util');
-const limit = require('ext/promise/limit').bind(Promise);
-const glob = require('../../../../utils/glob');
-const getHashForFilePath = require('../../../../utils/get-hash-for-file-path');
-const normalizeFiles = require('../../lib/normalize-files');
-const parseDeploymentObjectKey = require('../../utils/parse-deployment-object-key');
-const ServerlessError = require('../../../../serverless-error');
-const log = require('../../../../utils/serverless-utils/log').log.get('check-for-changes');
-const { S3Client, HeadObjectCommand, paginateListObjectsV2 } = require('@aws-sdk/client-s3');
-const { LambdaClient, GetFunctionCommand } = require('@aws-sdk/client-lambda');
-const {
+import {
   CloudWatchLogsClient,
   DeleteSubscriptionFilterCommand,
   DescribeSubscriptionFiltersCommand,
-} = require('@aws-sdk/client-cloudwatch-logs');
-const {
-  CloudFormationClient,
-  DescribeStackResourceCommand,
-} = require('@aws-sdk/client-cloudformation');
-const {
+} from '@aws-sdk/client-cloudwatch-logs';
+
+import { CloudFormationClient, DescribeStackResourceCommand } from '@aws-sdk/client-cloudformation';
+
+import {
   isS3ListObjectsNoSuchBucketError,
   isS3HeadObjectForbiddenError,
   isLambdaAccessDeniedError,
   isCloudWatchLogsResourceNotFoundError,
   isCloudFormationMissingResourceError,
-} = require('../../../../aws/aws-sdk-v3-error');
+} from '../../../../aws/aws-sdk-v3-error.ts';
+
+import promiseLimit from 'ext/promise/limit.js';
+import log2 from '../../../../utils/serverless-utils/log.ts';
+const limit = promiseLimit.bind(Promise);
+const log = log2.log.get('check-for-changes');
 
 const fsp = fs.promises;
 
@@ -79,7 +80,7 @@ function getCloudFormationClient(context) {
   return context.cloudFormationClientPromise;
 }
 
-module.exports = {
+export default {
   async checkForChanges() {
     this.serverless.service.provider.shouldNotDeploy = false;
     getAwsRequestLimiters(this);

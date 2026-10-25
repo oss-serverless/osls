@@ -1,14 +1,12 @@
-'use strict';
-
-const path = require('path');
-const fsp = require('fs').promises;
-const sinon = require('sinon');
-const yaml = require('js-yaml');
-const proxyquire = require('proxyquire');
-const setupProgrammaticFixture = require('../../utils/setup-programmatic-fixture');
-const resolveConfigurationPath = require('../../../lib/cli/resolve-configuration-path');
-const cloudformationSchema = require('../../../lib/utils/serverless-utils/cloudformation-schema');
-const { expect } = require('chai');
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import * as sinon from 'sinon';
+import * as yaml from 'js-yaml';
+import proxyquire from 'proxyquire';
+import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
+import resolveConfigurationPath from '../../../lib/cli/resolve-configuration-path.ts';
+import cloudformationSchema from '../../../lib/utils/serverless-utils/cloudformation-schema.ts';
+import { expect } from 'chai';
 
 const pluginName = 'serverless-plugin-1';
 const spawnFake = sinon.fake();

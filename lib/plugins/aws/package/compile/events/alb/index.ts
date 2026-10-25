@@ -1,9 +1,7 @@
-'use strict';
-
-const validate = require('./lib/validate');
-const compileTargetGroups = require('./lib/target-groups');
-const compileListenerRules = require('./lib/listener-rules');
-const compilePermissions = require('./lib/permissions');
+import validate from './lib/validate.ts';
+import compileTargetGroups from './lib/target-groups.ts';
+import compileListenerRules from './lib/listener-rules.ts';
+import compilePermissions from './lib/permissions.ts';
 
 function defineArray(schema, options = {}) {
   return { type: 'array', items: schema, ...options };
@@ -107,4 +105,4 @@ class AwsCompileAlbEvents {
   }
 }
 
-module.exports = AwsCompileAlbEvents;
+export default AwsCompileAlbEvents;

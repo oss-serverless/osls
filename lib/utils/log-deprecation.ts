@@ -1,13 +1,12 @@
-'use strict';
-
-const path = require('path');
-const fsp = require('fs').promises;
-const weakMemoizee = require('memoizee/weak');
-const resolveTmpdir = require('./resolve-process-tmp-dir');
-const ServerlessError = require('../serverless-error');
-const safeMoveFile = require('./fs/safe-move-file');
-const { style, log } = require('./serverless-utils/log');
-const healthStatusFilename = require('./health-status-filename');
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import weakMemoizee from 'memoizee/weak.js';
+import resolveTmpdir from './resolve-process-tmp-dir.ts';
+import ServerlessError from '../serverless-error.ts';
+import safeMoveFile from './fs/safe-move-file.ts';
+import log2 from './serverless-utils/log.ts';
+import healthStatusFilename from './health-status-filename.ts';
+const { style, log } = log2;
 
 const triggeredDeprecations = new Set();
 const bufferedDeprecations = [];
@@ -58,7 +57,7 @@ const isDisabledByEnv = (code) => {
   return disabledDeprecationCodesByEnv.has(code) || disabledDeprecationCodesByEnv.has('*');
 };
 
-module.exports = (code, message, { serviceConfig } = {}) => {
+export default (code, message, { serviceConfig } = {}) => {
   try {
     if (triggeredDeprecations.has(code) || isDisabledByEnv(code)) {
       return;

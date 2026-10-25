@@ -1,8 +1,4 @@
-// Dedicated to join text tokens as passed to `writeText` and `progress.update`
-
-'use strict';
-
-const ensureString = require('type/string/ensure');
+import ensureString from 'type/string/ensure.js';
 
 const flattenDeep = (items) => {
   const result = [];
@@ -16,7 +12,7 @@ const flattenDeep = (items) => {
   return result;
 };
 
-module.exports = (textTokens) =>
+export default (textTokens) =>
   `${flattenDeep(textTokens)
     .map((textToken) => ensureString(textToken, { isOptional: true, name: 'textToken' }) || '')
     .join('\n')}\n`;

@@ -1,12 +1,9 @@
-'use strict';
-
-const fs = require('fs');
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect } from 'chai';
+import ensureFile from '../../../../../lib/utils/fs/ensure-file.ts';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
 const fsp = fs.promises;
-const path = require('path');
-const { expect } = require('chai');
-
-const ensureFile = require('../../../../../lib/utils/fs/ensure-file');
-const { getTmpDirPath } = require('../../../../utils/fs');
 
 describe('test/unit/lib/utils/fs/ensure-file.test.js', () => {
   let tmpDir;

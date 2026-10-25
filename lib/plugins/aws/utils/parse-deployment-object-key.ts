@@ -1,10 +1,8 @@
-'use strict';
-
 const isDeploymentDirToken = RegExp.prototype.test.bind(
   /^[\d]+-\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
 );
 
-module.exports = (key, prefix, service, stage) => {
+export default (key, prefix, service, stage) => {
   if (!key) return null;
 
   const base = `${prefix}/${service}/${stage}/`;

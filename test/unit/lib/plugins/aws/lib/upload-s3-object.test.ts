@@ -1,9 +1,7 @@
-'use strict';
-
-const { expect } = require('chai');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const ServerlessError = require('../../../../../../lib/serverless-error');
+import { expect } from 'chai';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import ServerlessError from '../../../../../../lib/serverless-error.ts';
 
 describe('test/unit/lib/plugins/aws/lib/upload-s3-object.test.js', () => {
   let doneStub;

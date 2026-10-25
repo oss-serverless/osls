@@ -1,10 +1,9 @@
-'use strict';
-
-const chai = require('chai');
-const sinon = require('sinon');
-const pluginUtilsModule = require('../../../../../../lib/plugins/plugin/lib/utils.js');
-const { log } = require('../../../../../../lib/utils/serverless-utils/log');
-const observeOutput = require('../../../../../lib/observe-output');
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import pluginUtilsModule from '../../../../../../lib/plugins/plugin/lib/utils.ts';
+import log2 from '../../../../../../lib/utils/serverless-utils/log.ts';
+import observeOutput from '../../../../../lib/observe-output.ts';
+const { log } = log2;
 
 const expect = chai.expect;
 

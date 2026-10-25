@@ -1,7 +1,5 @@
-'use strict';
-
-const expect = require('chai').expect;
-const Rollback = require('../../../../lib/plugins/rollback');
+import { expect } from 'chai';
+import Rollback from '../../../../lib/plugins/rollback.ts';
 
 describe('Rollback', () => {
   let rollback;

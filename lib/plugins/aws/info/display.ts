@@ -1,10 +1,8 @@
-'use strict';
+import log from '../../../utils/serverless-utils/log.ts';
+import filesize from '../../../utils/filesize.ts';
+const { isVerboseMode, style } = log;
 
-const { isVerboseMode, style } = require('../../../utils/serverless-utils/log');
-
-const filesize = require('../../../utils/filesize');
-
-module.exports = {
+export default {
   async displayServiceInfo() {
     if (this.serverless.processedInput.commands.join(' ') === 'info') {
       this.serverless.serviceOutputs.set('service', this.serverless.service.service);

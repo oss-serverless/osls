@@ -1,5 +1,3 @@
-'use strict';
-
 const maxTimeout = 2 ** 31 - 1;
 
 const normalizeTimeout = (value) => {
@@ -13,7 +11,7 @@ const normalizeTimeout = (value) => {
   return Math.max(0, timeout);
 };
 
-module.exports = (timeout) => {
+export default (timeout) => {
   if (timeout == null) {
     return new Promise((resolve) => process.nextTick(resolve));
   }

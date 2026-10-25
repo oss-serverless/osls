@@ -1,10 +1,8 @@
-'use strict';
-
-const expect = require('chai').expect;
-const AwsCompileApigEvents = require('../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/index');
-const Serverless = require('../../../../../../../../../../lib/serverless');
-const AwsProvider = require('../../../../../../../../../../lib/plugins/aws/provider');
-const runServerless = require('../../../../../../../../../utils/run-serverless');
+import { expect } from 'chai';
+import AwsCompileApigEvents from '../../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/index.ts';
+import Serverless from '../../../../../../../../../../lib/serverless.ts';
+import AwsProvider from '../../../../../../../../../../lib/plugins/aws/provider.ts';
+import runServerless from '../../../../../../../../../utils/run-serverless.ts';
 
 describe('#compileUsagePlan()', () => {
   let serverless;

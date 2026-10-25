@@ -1,13 +1,10 @@
-'use strict';
-
-const path = require('path');
-const fs = require('fs');
+import path from 'node:path';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import * as yaml from 'js-yaml';
+import JSZip from 'jszip';
+import tmpDirCommonPath from '../lib/process-tmp-dir.ts';
 const fsp = fs.promises;
-const crypto = require('crypto');
-const yaml = require('js-yaml');
-const JSZip = require('jszip');
-
-const tmpDirCommonPath = require('../lib/process-tmp-dir');
 
 function getTmpDirPath() {
   return path.join(tmpDirCommonPath, crypto.randomBytes(12).toString('hex'));
@@ -132,7 +129,33 @@ async function listFileProperties(filename) {
   return zip.files;
 }
 
-module.exports = {
+export {
+  tmpDirCommonPath,
+  getTmpDirPath,
+  getTmpFilePath,
+  createTmpDir,
+  createTmpFile,
+  ensureDir,
+  ensureDirSync,
+  ensureFile,
+  ensureFileSync,
+  outputFile,
+  outputFileSync,
+  pathExists,
+  remove,
+  removeSync,
+  copyPath,
+  copyPathSync,
+  readJsonFile,
+  writeJsonFile,
+  replaceTextInFile,
+  readYamlFile,
+  writeYamlFile,
+  listZipFiles,
+  listFileProperties,
+};
+
+export default {
   tmpDirCommonPath,
   getTmpDirPath,
   getTmpFilePath,

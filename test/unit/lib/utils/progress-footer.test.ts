@@ -1,9 +1,6 @@
-'use strict';
-
-const childProcess = require('child_process');
-
-const sinon = require('sinon');
-const { expect } = require('chai');
+import childProcess from 'node:child_process';
+import * as sinon from 'sinon';
+import { expect } from 'chai';
 
 const modulePath = '../../../../lib/utils/progress-footer';
 const moveUp = '\x1b[1A';

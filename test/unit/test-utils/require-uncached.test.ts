@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const requireUncached = require('../../utils/require-uncached');
+import { expect } from 'chai';
+import requireUncached from '../../utils/require-uncached.ts';
 
 describe('test/utils/require-uncached', () => {
   const modulePath = '../../../package.json';

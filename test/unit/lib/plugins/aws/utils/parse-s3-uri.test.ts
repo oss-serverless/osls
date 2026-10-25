@@ -1,6 +1,5 @@
-'use strict';
-const expect = require('chai').expect;
-const parseS3URI = require('../../../../../../lib/plugins/aws/utils/parse-s3-uri');
+import { expect } from 'chai';
+import parseS3URI from '../../../../../../lib/plugins/aws/utils/parse-s3-uri.ts';
 
 describe('test/unit/lib/plugins/aws/utils/parse-s3-uri.test.js', () => {
   it('should parse an S3 URI', () => {

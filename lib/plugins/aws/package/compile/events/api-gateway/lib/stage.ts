@@ -1,11 +1,10 @@
-'use strict';
-
 // NOTE: --> Keep this file in sync with ./hack/updateStage.js
 
-const ensureApiGatewayCloudWatchRole = require('../../lib/ensure-api-gateway-cloud-watch-role');
-const { safeShallowAssign } = require('../../../../../../../utils/safe-object');
+import ensureApiGatewayCloudWatchRole from '../../lib/ensure-api-gateway-cloud-watch-role.ts';
 
-module.exports = {
+import { safeShallowAssign } from '../../../../../../../utils/safe-object.ts';
+
+export default {
   async compileStage() {
     const service = this.serverless.service.service;
     const stage = this.options.stage;

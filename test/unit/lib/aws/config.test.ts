@@ -1,11 +1,9 @@
-'use strict';
-
-const chai = require('chai');
-const net = require('net');
-const proxyquire = require('proxyquire');
-const { NodeHttpHandler } = require('@smithy/node-http-handler');
-const { overrideEnv } = require('../../../utils/process');
-const { buildHttpOptions } = require('../../../../lib/aws/config');
+import * as chai from 'chai';
+import net from 'node:net';
+import proxyquire from 'proxyquire';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { overrideEnv } from '../../../utils/process.ts';
+import { buildHttpOptions } from '../../../../lib/aws/config.ts';
 
 const { expect } = chai;
 

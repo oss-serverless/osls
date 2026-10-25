@@ -1,10 +1,8 @@
-'use strict';
-
-const fsp = require('fs').promises;
-const parse = require('./parse');
+import { promises as fsp } from 'node:fs';
+import parse from './parse.ts';
 
 async function readFile(filePath) {
   return fsp.readFile(filePath, 'utf8').then((contents) => parse(filePath, contents));
 }
 
-module.exports = readFile;
+export default readFile;

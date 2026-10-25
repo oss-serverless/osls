@@ -1,14 +1,12 @@
-'use strict';
-
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const provisionTempDir = require('../../../../lib/provision-tmp-dir');
-const { join } = require('path');
-const { expect } = require('chai');
-const fsp = require('fs').promises;
-const fs = require('fs');
-const safeMoveFile = require('../../../../../lib/utils/fs/safe-move-file');
-const { ensureFileSync, remove } = require('../../../../utils/fs');
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import provisionTempDir from '../../../../lib/provision-tmp-dir.ts';
+import { join } from 'node:path';
+import { expect } from 'chai';
+import { promises as fsp } from 'node:fs';
+import fs from 'node:fs';
+import safeMoveFile from '../../../../../lib/utils/fs/safe-move-file.ts';
+import { ensureFileSync, remove } from '../../../../utils/fs.ts';
 
 /**
  * Returns and Error object that resembles the EXDEV errors that are thrown

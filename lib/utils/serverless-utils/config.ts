@@ -1,15 +1,13 @@
-'use strict';
-
-const p = require('path');
-const os = require('os');
-const fs = require('fs');
-const { randomUUID } = require('node:crypto');
-
-const isObject = require('type/object/is');
-const mergePlainObjects = require('../merge-plain-objects');
-const { getByPath, setByPath, unsetByPath } = require('../object-path');
-const writeFileAtomic = require('write-file-atomic');
-const { log } = require('./log');
+import p from 'node:path';
+import os from 'node:os';
+import fs from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import isObject from 'type/object/is.js';
+import mergePlainObjects from '../merge-plain-objects.ts';
+import { getByPath, setByPath, unsetByPath } from '../object-path.ts';
+import writeFileAtomic from 'write-file-atomic';
+import log2 from './log.ts';
+const { log } = log2;
 
 const logDebug = log.get('config').debug;
 
@@ -187,7 +185,9 @@ function get(path) {
   return getByPath(config, path);
 }
 
-module.exports = {
+export { set, get, deleteValue as delete, getConfig, baseFilename as CONFIG_FILE_NAME };
+
+export default {
   set,
   get,
   delete: deleteValue,

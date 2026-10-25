@@ -1,16 +1,14 @@
-'use strict';
+import { expect } from 'chai';
+import path from 'node:path';
+import spawn from '../../../lib/utils/spawn.ts';
+import { stripVTControlCharacters as stripAnsi } from 'node:util';
+import packageModule from '../../../package.json' with { type: 'json' };
+import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
+const { version } = packageModule;
 
-const { expect } = require('chai');
-
-const path = require('path');
-const spawn = require('../../../lib/utils/spawn');
-const { stripVTControlCharacters: stripAnsi } = require('node:util');
-const { version } = require('../../../package');
-const setupProgrammaticFixture = require('../../utils/setup-programmatic-fixture');
-
-const serverlessPath = path.resolve(__dirname, '../../../scripts/serverless.js');
-const programmaticFixturesPath = path.resolve(__dirname, '../../fixtures/programmatic');
-const cliFixturesPath = path.resolve(__dirname, '../../fixtures/cli');
+const serverlessPath = path.resolve(import.meta.dirname, '../../../scripts/serverless.js');
+const programmaticFixturesPath = path.resolve(import.meta.dirname, '../../fixtures/programmatic');
+const cliFixturesPath = path.resolve(import.meta.dirname, '../../fixtures/cli');
 
 describe('test/unit/scripts/serverless.test.js', () => {
   it('should display version when "--version" option', async () => {

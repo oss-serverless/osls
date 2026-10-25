@@ -1,8 +1,6 @@
-'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const setBucketName = require('../../../../../../lib/plugins/aws/lib/set-bucket-name');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import setBucketName from '../../../../../../lib/plugins/aws/lib/set-bucket-name.ts';
 
 describe('#setBucketName()', () => {
   let context;

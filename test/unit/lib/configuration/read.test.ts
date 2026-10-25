@@ -1,12 +1,9 @@
-'use strict';
-
-const chai = require('chai');
+import * as chai from 'chai';
+import { promises as fsp } from 'node:fs';
+import readConfiguration from '../../../../lib/configuration/read.ts';
+import { ensureDir, ensureFile, outputFile, remove } from '../../../utils/fs.ts';
 
 const { expect } = chai;
-
-const fsp = require('fs').promises;
-const readConfiguration = require('../../../../lib/configuration/read');
-const { ensureDir, ensureFile, outputFile, remove } = require('../../../utils/fs');
 
 describe('test/unit/lib/configuration/read.test.js', () => {
   let configurationPath;

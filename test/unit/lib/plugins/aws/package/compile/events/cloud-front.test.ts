@@ -1,10 +1,8 @@
-'use strict';
-
-const chai = require('chai');
-const sinon = require('sinon');
-const AwsCompileCloudFrontEvents = require('../../../../../../../../lib/plugins/aws/package/compile/events/cloud-front');
-const runServerless = require('../../../../../../../utils/run-serverless');
-const { createAwsEventCompilerContext } = require('./test-utils');
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import AwsCompileCloudFrontEvents from '../../../../../../../../lib/plugins/aws/package/compile/events/cloud-front.ts';
+import runServerless from '../../../../../../../utils/run-serverless.ts';
+import { createAwsEventCompilerContext } from './test-utils.ts';
 
 const { expect } = chai;
 const logModulePath = require.resolve('../../../../../../../../lib/utils/serverless-utils/log');

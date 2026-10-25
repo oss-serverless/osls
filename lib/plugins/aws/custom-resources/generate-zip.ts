@@ -1,15 +1,13 @@
-'use strict';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import getTmpDirPath from '../../../utils/fs/get-tmp-dir-path.ts';
+import createZipFile from '../../../utils/fs/create-zip-file.ts';
+import ensureArtifact from '../../../utils/ensure-artifact.ts';
+import safeMoveFile from '../../../utils/fs/safe-move-file.ts';
+import copy from '../../../utils/fs/copy.ts';
 
-const path = require('path');
-const crypto = require('crypto');
-const fs = require('fs');
-const getTmpDirPath = require('../../../utils/fs/get-tmp-dir-path');
-const createZipFile = require('../../../utils/fs/create-zip-file');
-const ensureArtifact = require('../../../utils/ensure-artifact');
-const safeMoveFile = require('../../../utils/fs/safe-move-file');
-const copy = require('../../../utils/fs/copy');
-
-const srcDirPath = path.join(__dirname, 'resources');
+const srcDirPath = path.join(import.meta.dirname, 'resources');
 
 const artifactName = 'custom-resources.zip';
 
@@ -36,7 +34,7 @@ const resolveSourcesHash = () => {
   return hash.digest('hex');
 };
 
-module.exports = async () => {
+export default async () => {
   const resultPath = await ensureArtifact(
     artifactName,
     async (cachePath) => {

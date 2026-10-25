@@ -1,7 +1,5 @@
-'use strict';
-
-const fs = require('fs');
-const copySync = require('./copy-sync');
+import fs from 'node:fs';
+import copySync from './copy-sync.ts';
 
 const isNotSymbolicLink = (src) => !fs.lstatSync(src).isSymbolicLink();
 
@@ -13,4 +11,4 @@ function copyDirContentsSync(srcDir, destDir, { noLinks = false } = {}) {
   copySync(srcDir, destDir, copySyncOptions);
 }
 
-module.exports = copyDirContentsSync;
+export default copyDirContentsSync;

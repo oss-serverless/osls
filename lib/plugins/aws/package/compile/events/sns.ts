@@ -1,7 +1,5 @@
-'use strict';
-
-const ServerlessError = require('../../../../../serverless-error');
-const resolveLambdaTarget = require('../../../utils/resolve-lambda-target');
+import ServerlessError from '../../../../../serverless-error.ts';
+import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
 
 const mergeDependsOn = (resource, dependency) => {
   if (!dependency) return;
@@ -287,4 +285,4 @@ class AwsCompileSNSEvents {
   }
 }
 
-module.exports = AwsCompileSNSEvents;
+export default AwsCompileSNSEvents;

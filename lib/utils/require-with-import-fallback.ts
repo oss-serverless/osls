@@ -1,8 +1,6 @@
-'use strict';
+import { pathToFileURL } from 'node:url';
 
-const { pathToFileURL } = require('url');
-
-module.exports = async (modPath) => {
+export default async (modPath) => {
   try {
     const mod = require(modPath);
     return mod && mod.default ? mod.default : mod;

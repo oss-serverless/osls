@@ -1,7 +1,5 @@
-'use strict';
-
-const path = require('path');
-const fs = require('fs');
+import path from 'node:path';
+import fs from 'node:fs';
 
 function walkDirSync(dirPath, opts) {
   const options = Object.assign(
@@ -29,4 +27,4 @@ function walkDirSync(dirPath, opts) {
   return filePaths;
 }
 
-module.exports = walkDirSync;
+export default walkDirSync;

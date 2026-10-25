@@ -1,15 +1,13 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const { pathToFileURL } = require('url');
-const { expect } = require('chai');
-const { getTmpDirPath } = require('../../../../utils/fs');
-const skipOnDisabledSymlinksInWindows = require('../../../../lib/skip-on-disabled-symlinks-in-windows');
-const {
+import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { expect } from 'chai';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
+import skipOnDisabledSymlinksInWindows from '../../../../lib/skip-on-disabled-symlinks-in-windows.ts';
+import {
   assertFileRefAllowed,
   normalizeFileRefOptions,
-} = require('../../../../../lib/classes/yaml-parser/file-ref-policy');
+} from '../../../../../lib/classes/yaml-parser/file-ref-policy.ts';
 
 describe('yaml-parser/file-ref-policy', () => {
   const expectAccessDenied = (promise) =>

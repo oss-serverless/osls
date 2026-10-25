@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = Object.freeze({
+export default Object.freeze({
   upstream: Object.freeze({
     packageName: '@serverless/utils',
     version: '6.15.0',

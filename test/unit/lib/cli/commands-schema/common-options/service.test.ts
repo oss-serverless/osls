@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const serviceCommonOptions = require('../../../../../../lib/cli/commands-schema/common-options/service');
+import { expect } from 'chai';
+import serviceCommonOptions from '../../../../../../lib/cli/commands-schema/common-options/service.ts';
 
 describe('test/unit/lib/cli/commands-schema/common-options/service.test.js', () => {
   it('should expose global common options', () =>

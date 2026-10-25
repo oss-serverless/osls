@@ -1,9 +1,7 @@
-'use strict';
-
-const chai = require('chai');
+import * as chai from 'chai';
+import resolveRegion from '../../../../lib/utils/resolve-region.ts';
 
 const expect = chai.expect;
-const resolveRegion = require('../../../../lib/utils/resolve-region');
 
 describe('test/unit/lib/utils/resolve-region.test.js', () => {
   it('should return `region` from options first if it is present', () => {

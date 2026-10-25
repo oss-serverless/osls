@@ -1,8 +1,6 @@
-'use strict';
-
-const { distance: getDistance } = require('fastest-levenshtein');
-const resolveInput = require('./resolve-input');
-const ServerlessError = require('../serverless-error');
+import { distance as getDistance } from 'fastest-levenshtein';
+import resolveInput from './resolve-input.ts';
+import ServerlessError from '../serverless-error.ts';
 
 const getCommandSuggestion = (command, commandsSchema) => {
   let suggestion;
@@ -23,7 +21,7 @@ const getCommandSuggestion = (command, commandsSchema) => {
   return ` Did you mean "${suggestion}"?`;
 };
 
-module.exports = (configuration = null, resolvedInput = resolveInput()) => {
+export default (configuration = null, resolvedInput = resolveInput()) => {
   const { command, options, commandSchema, commandsSchema, isContainerCommand, isHelpRequest } =
     resolvedInput;
 

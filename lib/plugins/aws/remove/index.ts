@@ -1,13 +1,12 @@
-'use strict';
-
-const validate = require('../lib/validate');
-const monitorStack = require('../lib/monitor-stack');
-const checkIfBucketExists = require('../lib/check-if-bucket-exists');
-const emptyS3Bucket = require('./lib/bucket');
-const removeStack = require('./lib/stack');
-const removeEcrRepository = require('./lib/ecr');
-const checkIfEcrRepositoryExists = require('../lib/check-if-ecr-repository-exists');
-const { log, style, progress } = require('../../../utils/serverless-utils/log');
+import validate from '../lib/validate.ts';
+import monitorStack from '../lib/monitor-stack.ts';
+import checkIfBucketExists from '../lib/check-if-bucket-exists.ts';
+import emptyS3Bucket from './lib/bucket.ts';
+import removeStack from './lib/stack.ts';
+import removeEcrRepository from './lib/ecr.ts';
+import checkIfEcrRepositoryExists from '../lib/check-if-ecr-repository-exists.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
+const { log, style, progress } = log2;
 
 const mainProgress = progress.get('main');
 
@@ -87,4 +86,4 @@ class AwsRemove {
   }
 }
 
-module.exports = AwsRemove;
+export default AwsRemove;

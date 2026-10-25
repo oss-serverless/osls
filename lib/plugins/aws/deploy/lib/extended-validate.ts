@@ -1,11 +1,10 @@
-'use strict';
+import path from 'node:path';
+import ServerlessError from '../../../../serverless-error.ts';
+import { safeShallowAssign } from '../../../../utils/safe-object.ts';
+import log2 from '../../../../utils/serverless-utils/log.ts';
+const { log } = log2;
 
-const path = require('path');
-const ServerlessError = require('../../../../serverless-error');
-const { safeShallowAssign } = require('../../../../utils/safe-object');
-const { log } = require('../../../../utils/serverless-utils/log');
-
-module.exports = {
+export default {
   async extendedValidate() {
     // Restore state
     const serviceStateFileName = this.provider.naming.getServiceStateFileName();

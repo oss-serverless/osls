@@ -1,8 +1,6 @@
-'use strict';
+import ServerlessError from '../../../../../../../serverless-error.ts';
 
-const ServerlessError = require('../../../../../../../serverless-error');
-
-module.exports = {
+export default {
   compileRestApi() {
     const apiGateway = this.serverless.service.provider.apiGateway || {};
     const endpoint = apiGateway.endpoint || {};

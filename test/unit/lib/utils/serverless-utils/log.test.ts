@@ -1,13 +1,12 @@
-'use strict';
-
-const { expect } = require('chai');
-const requireUncached = require('../../../../utils/require-uncached');
+import { expect } from 'chai';
+import requireUncached from '../../../../utils/require-uncached.ts';
+import log2 from '../../../../../lib/utils/serverless-utils/log.ts';
 
 describe('serverless-utils/log', () => {
   let logModule;
 
   beforeEach(() => {
-    logModule = requireUncached(() => require('../../../../../lib/utils/serverless-utils/log'));
+    logModule = requireUncached(() => log2);
   });
 
   afterEach(() => {

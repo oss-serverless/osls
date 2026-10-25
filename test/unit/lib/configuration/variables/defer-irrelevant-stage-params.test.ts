@@ -1,8 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const deferIrrelevantStageParams = require('../../../../../lib/configuration/variables/defer-irrelevant-stage-params');
+import { expect } from 'chai';
+import deferIrrelevantStageParams from '../../../../../lib/configuration/variables/defer-irrelevant-stage-params.ts';
 
 const p = (...keys) => keys.join('\0');
 

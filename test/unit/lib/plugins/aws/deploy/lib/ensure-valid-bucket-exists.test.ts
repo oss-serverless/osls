@@ -1,10 +1,8 @@
-'use strict';
-
-const { expect } = require('chai');
-const sinon = require('sinon');
-const { HeadBucketCommand } = require('@aws-sdk/client-s3');
-const { GetTemplateCommand, UpdateStackCommand } = require('@aws-sdk/client-cloudformation');
-const ensureValidBucketExists = require('../../../../../../../lib/plugins/aws/deploy/lib/ensure-valid-bucket-exists');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import { HeadBucketCommand } from '@aws-sdk/client-s3';
+import { GetTemplateCommand, UpdateStackCommand } from '@aws-sdk/client-cloudformation';
+import ensureValidBucketExists from '../../../../../../../lib/plugins/aws/deploy/lib/ensure-valid-bucket-exists.ts';
 
 describe('ensureValidBucketExists', () => {
   it('uses an existing S3 client promise for custom deployment bucket validation', async () => {

@@ -1,10 +1,8 @@
-'use strict';
-
-const ServerlessError = require('../serverless-error');
+import ServerlessError from '../serverless-error.ts';
 
 const FORBIDDEN_LAYER_PATH_CHARS = /[\0\r\n]/;
 
-module.exports = (layerName, layerPath) => {
+export default (layerName, layerPath) => {
   if (typeof layerPath !== 'string') return;
   if (!FORBIDDEN_LAYER_PATH_CHARS.test(layerPath)) return;
 

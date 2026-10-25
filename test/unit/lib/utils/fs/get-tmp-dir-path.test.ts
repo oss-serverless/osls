@@ -1,7 +1,5 @@
-'use strict';
-
-const expect = require('chai').expect;
-const getTmpDirPath = require('../../../../../lib/utils/fs/get-tmp-dir-path');
+import { expect } from 'chai';
+import getTmpDirPath from '../../../../../lib/utils/fs/get-tmp-dir-path.ts';
 
 describe('#getTmpDirPath()', () => {
   it('should return a scoped tmp dir path', () => {

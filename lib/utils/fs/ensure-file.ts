@@ -1,9 +1,7 @@
-'use strict';
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
 
-const fsp = require('fs').promises;
-const path = require('path');
-
-module.exports = async (filePath) => {
+export default async (filePath) => {
   await fsp.mkdir(path.dirname(filePath), { recursive: true });
   const fileHandle = await fsp.open(filePath, 'a');
   try {

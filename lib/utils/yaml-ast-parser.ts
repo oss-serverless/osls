@@ -1,10 +1,8 @@
-'use strict';
-
-const fsp = require('fs').promises;
-const os = require('os');
-const yaml = require('js-yaml');
-const isPlainObject = require('type/plain-object/is');
-const cloudformationSchema = require('./serverless-utils/cloudformation-schema');
+import { promises as fsp } from 'node:fs';
+import os from 'node:os';
+import * as yaml from 'js-yaml';
+import isPlainObject from 'type/plain-object/is.js';
+import cloudformationSchema from './serverless-utils/cloudformation-schema.ts';
 
 const topLevelKeyLineRegex = /^[^\s#][^:]*:(?:\s|$)/;
 const documentMarkerRegex = /^(---|\.\.\.)(?:\s|$)/;
@@ -180,7 +178,7 @@ const removeExistingArrayItem = async (ymlFile, pathInYml, removeValue) => {
     return;
   }
 
-  for (let index = 0; index < arrayProperty.length; ) {
+  for (let index = 0; index < arrayProperty.length;) {
     if (isSameValueZero(arrayProperty[index], removeValue)) {
       arrayProperty.splice(index, 1);
     } else {
@@ -199,7 +197,9 @@ const removeExistingArrayItem = async (ymlFile, pathInYml, removeValue) => {
   );
 };
 
-module.exports = {
+export { addNewArrayItem, removeExistingArrayItem };
+
+export default {
   addNewArrayItem,
   removeExistingArrayItem,
 };

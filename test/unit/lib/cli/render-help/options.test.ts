@@ -1,8 +1,6 @@
-'use strict';
-
-const { expect } = require('chai');
-const renderOptionsHelp = require('../../../../../lib/cli/render-help/options');
-const observeOutput = require('../../../../lib/observe-output');
+import { expect } from 'chai';
+import renderOptionsHelp from '../../../../../lib/cli/render-help/options.ts';
+import observeOutput from '../../../../lib/observe-output.ts';
 
 describe('test/unit/lib/cli/render-help/options.test.js', () => {
   it('should list options', async () => {

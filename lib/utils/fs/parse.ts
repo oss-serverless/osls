@@ -1,8 +1,6 @@
-'use strict';
-
-const jc = require('json-cycle');
-const yaml = require('js-yaml');
-const cloudformationSchema = require('../serverless-utils/cloudformation-schema');
+import jc from 'json-cycle';
+import * as yaml from 'js-yaml';
+import cloudformationSchema from '../serverless-utils/cloudformation-schema.ts';
 
 function parse(filePath, contents) {
   // Auto-parse JSON
@@ -14,4 +12,4 @@ function parse(filePath, contents) {
   return contents.toString().trim();
 }
 
-module.exports = parse;
+export default parse;

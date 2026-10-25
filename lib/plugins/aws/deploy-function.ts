@@ -1,28 +1,29 @@
-'use strict';
+import path from 'node:path';
+import fs from 'node:fs';
+import { isDeepStrictEqual } from 'node:util';
 
-const path = require('path');
-const fs = require('fs');
-const fsp = fs.promises;
-const { isDeepStrictEqual } = require('node:util');
-const {
+import {
   LambdaClient,
   GetFunctionCommand,
   UpdateFunctionCodeCommand,
   UpdateFunctionConfigurationCommand,
-} = require('@aws-sdk/client-lambda');
-const { IAMClient, GetRoleCommand } = require('@aws-sdk/client-iam');
-const wait = require('../../utils/sleep');
-const isObject = require('type/object/is');
-const validate = require('./lib/validate');
-const filesize = require('../../utils/filesize');
-const getHashForFilePath = require('../../utils/get-hash-for-file-path');
-const ServerlessError = require('../../serverless-error');
-const { safeShallowAssign } = require('../../utils/safe-object');
-const { log, style, progress } = require('../../utils/serverless-utils/log');
-const {
+} from '@aws-sdk/client-lambda';
+
+import { IAMClient, GetRoleCommand } from '@aws-sdk/client-iam';
+import wait from '../../utils/sleep.ts';
+import isObject from 'type/object/is.js';
+import validate from './lib/validate.ts';
+import filesize from '../../utils/filesize.ts';
+import getHashForFilePath from '../../utils/get-hash-for-file-path.ts';
+import ServerlessError from '../../serverless-error.ts';
+import { safeShallowAssign } from '../../utils/safe-object.ts';
+import log2 from '../../utils/serverless-utils/log.ts';
+import {
   isLambdaResourceNotFoundError,
   isLambdaResourceConflictError,
-} = require('../../aws/aws-sdk-v3-error');
+} from '../../aws/aws-sdk-v3-error.ts';
+const fsp = fs.promises;
+const { log, style, progress } = log2;
 
 const mainProgress = progress.get('main');
 
@@ -611,4 +612,4 @@ class AwsDeployFunction {
   }
 }
 
-module.exports = AwsDeployFunction;
+export default AwsDeployFunction;

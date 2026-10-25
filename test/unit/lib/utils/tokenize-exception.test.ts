@@ -1,9 +1,6 @@
-'use strict';
-
-const expect = require('chai').expect;
-
-const ServerlessError = require('../../../../lib/serverless-error');
-const tokenizeError = require('../../../../lib/utils/tokenize-exception');
+import { expect } from 'chai';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import tokenizeError from '../../../../lib/utils/tokenize-exception.ts';
 
 describe('test/unit/lib/utils/tokenize-exception.test.js', () => {
   it('Should tokenize user error', () => {

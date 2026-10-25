@@ -1,12 +1,9 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const { overrideArgv } = require('../../../../utils/process');
-const ServerlessError = require('../../../../../lib/serverless-error');
-const resolveCliInput = require('../../../../../lib/cli/resolve-input');
-const resolveMeta = require('../../../../../lib/configuration/variables/resolve-meta');
-const eventuallyReportResolutionErrors = require('../../../../../lib/configuration/variables/eventually-report-resolution-errors');
+import { expect } from 'chai';
+import { overrideArgv } from '../../../../utils/process.ts';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import resolveCliInput from '../../../../../lib/cli/resolve-input.ts';
+import resolveMeta from '../../../../../lib/configuration/variables/resolve-meta.ts';
+import eventuallyReportResolutionErrors from '../../../../../lib/configuration/variables/eventually-report-resolution-errors.ts';
 
 describe('test/unit/lib/configuration/variables/eventually-report-resolution-errors.test.js', () => {
   beforeEach(() => {

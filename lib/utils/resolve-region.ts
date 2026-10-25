@@ -1,5 +1,3 @@
-'use strict';
-
 const resolveRegion = ({ configuration, options }) => {
   return (
     options.region ||
@@ -8,4 +6,4 @@ const resolveRegion = ({ configuration, options }) => {
   );
 };
 
-module.exports = resolveRegion;
+export default resolveRegion;

@@ -1,10 +1,6 @@
-'use strict';
-
-const {
-  CloudFormationClient,
-  ListStackResourcesCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { retryOnThrottlingError } = require('../../../aws/retry');
+import { CloudFormationClient, ListStackResourcesCommand } from '@aws-sdk/client-cloudformation';
+import retry from '../../../aws/retry.ts';
+const { retryOnThrottlingError } = retry;
 
 function getCloudFormationClient(context) {
   context.cloudFormationClientPromise ||= context.provider
@@ -13,7 +9,7 @@ function getCloudFormationClient(context) {
   return context.cloudFormationClientPromise;
 }
 
-module.exports = {
+export default {
   async getResourceCount() {
     const cloudFormation = await getCloudFormationClient(this);
     const stackName = this.provider.naming.getStackName();

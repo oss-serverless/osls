@@ -1,8 +1,8 @@
-'use strict';
-
-const { stdoutColors, stderrColors } = require('../utils/colors');
-const { log } = require('../utils/serverless-utils/log');
-const renderHelp = require('../cli/render-help');
+import colors from '../utils/colors.ts';
+import log2 from '../utils/serverless-utils/log.ts';
+import renderHelp from '../cli/render-help/index.ts';
+const { stdoutColors, stderrColors } = colors;
+const { log } = log2;
 
 const legacyPluginLog = log.get('plugin-legacy');
 
@@ -59,4 +59,4 @@ class CLI {
   }
 }
 
-module.exports = CLI;
+export default CLI;

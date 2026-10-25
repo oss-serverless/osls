@@ -1,7 +1,5 @@
-'use strict';
-
-const expect = require('chai').expect;
-const generateArtifactDirectoryName = require('../../../../../../../lib/plugins/aws/package/lib/generate-artifact-directory-name');
+import { expect } from 'chai';
+import generateArtifactDirectoryName from '../../../../../../../lib/plugins/aws/package/lib/generate-artifact-directory-name.ts';
 
 describe('#generateArtifactDirectoryName()', () => {
   let awsPackage;

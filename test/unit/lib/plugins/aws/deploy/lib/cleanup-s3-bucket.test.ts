@@ -1,11 +1,10 @@
-'use strict';
-
-const sinon = require('sinon');
-const chai = require('chai');
-const proxyquire = require('proxyquire');
-const { S3Client, ListObjectsV2Command, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
-const cleanupS3BucketMixin = require('../../../../../../../lib/plugins/aws/deploy/lib/cleanup-s3-bucket');
-const { retryOnThrottlingError } = require('../../../../../../../lib/aws/retry');
+import * as sinon from 'sinon';
+import * as chai from 'chai';
+import proxyquire from 'proxyquire';
+import { S3Client, ListObjectsV2Command, DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import cleanupS3BucketMixin from '../../../../../../../lib/plugins/aws/deploy/lib/cleanup-s3-bucket.ts';
+import retry from '../../../../../../../lib/aws/retry.ts';
+const { retryOnThrottlingError } = retry;
 
 const fastRetry = {
   retryOnThrottlingError: (task, options) =>

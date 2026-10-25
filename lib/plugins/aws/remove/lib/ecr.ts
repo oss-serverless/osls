@@ -1,6 +1,4 @@
-'use strict';
-
-const { ECRClient, DeleteRepositoryCommand } = require('@aws-sdk/client-ecr');
+import { ECRClient, DeleteRepositoryCommand } from '@aws-sdk/client-ecr';
 
 function getEcrClient(context) {
   context.ecrClientPromise ||= context.provider
@@ -9,7 +7,7 @@ function getEcrClient(context) {
   return context.ecrClientPromise;
 }
 
-module.exports = {
+export default {
   async removeEcrRepository() {
     const registryId = await this.provider.getAccountId();
     const repositoryName = this.provider.naming.getEcrRepositoryName();

@@ -1,10 +1,6 @@
-'use strict';
-
-const sinon = require('sinon');
-
-const getStdin = require('../../../../lib/utils/get-stdin');
-
-const { expect } = require('chai');
+import * as sinon from 'sinon';
+import getStdin from '../../../../lib/utils/get-stdin.ts';
+import { expect } from 'chai';
 
 const createStdin = ({ chunks = [], isTTY = false, setEncoding = sinon.spy() } = {}) => ({
   isTTY,

@@ -1,8 +1,6 @@
-'use strict';
-
-const expect = require('chai').expect;
-const AwsCompileAlbEvents = require('../../../../../../../../../../lib/plugins/aws/package/compile/events/alb/index');
-const { createAwsEventCompilerContext } = require('../../test-utils');
+import { expect } from 'chai';
+import AwsCompileAlbEvents from '../../../../../../../../../../lib/plugins/aws/package/compile/events/alb/index.ts';
+import { createAwsEventCompilerContext } from '../../test-utils.ts';
 
 describe('#compileListenerRules()', () => {
   let awsCompileAlbEvents;

@@ -1,7 +1,5 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
 
 const shouldCopy = (sourcePath, destinationPath, options) => {
   if (typeof options.filter !== 'function') return true;
@@ -39,7 +37,7 @@ const copyDereferencedSync = (sourcePath, destinationPath, options) => {
   copyFileSync(sourcePath, destinationPath, options);
 };
 
-module.exports = (sourcePath, destinationPath, options = {}) => {
+export default (sourcePath, destinationPath, options = {}) => {
   fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
   if (options.dereference) {
     // Native fs.cpSync can preserve nested symlinks despite dereference on supported Node releases.

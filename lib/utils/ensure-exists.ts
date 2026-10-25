@@ -1,9 +1,7 @@
-'use strict';
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
 
-const fsp = require('fs').promises;
-const path = require('path');
-
-module.exports = async (filename, generate) => {
+export default async (filename, generate) => {
   const cacheDir = path.dirname(filename);
   try {
     const stats = await fsp.lstat(filename);

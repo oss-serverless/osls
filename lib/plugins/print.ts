@@ -1,13 +1,12 @@
-'use strict';
-
-const os = require('os');
-const isObject = require('type/object/is');
-const jc = require('json-cycle');
-const yaml = require('js-yaml');
-const ServerlessError = require('../serverless-error');
-const cliCommandsSchema = require('../cli/commands-schema');
-const { getReachableByPath } = require('../utils/safe-object');
-const { writeText } = require('../utils/serverless-utils/log');
+import os from 'node:os';
+import isObject from 'type/object/is.js';
+import jc from 'json-cycle';
+import * as yaml from 'js-yaml';
+import ServerlessError from '../serverless-error.ts';
+import cliCommandsSchema from '../cli/commands-schema/index.ts';
+import { getReachableByPath } from '../utils/safe-object.ts';
+import log from '../utils/serverless-utils/log.ts';
+const { writeText } = log;
 
 class Print {
   constructor(serverless, options) {
@@ -76,4 +75,4 @@ class Print {
   }
 }
 
-module.exports = Print;
+export default Print;

@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = (cfTemplate, token) =>
+export default (cfTemplate, token) =>
   Object.fromEntries(
     Object.entries(cfTemplate.Resources).filter(([resourceKey, resource]) => {
       if (resourceKey === token) return true;

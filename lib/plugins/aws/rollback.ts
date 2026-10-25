@@ -1,23 +1,23 @@
-'use strict';
-
-const validate = require('./lib/validate');
-const setBucketName = require('./lib/set-bucket-name');
-const updateStack = require('./lib/update-stack');
-const monitorStack = require('./lib/monitor-stack');
-const waitForChangeSetCreation = require('./lib/wait-for-change-set-creation');
-const getCreateChangeSetParams = require('./lib/get-create-change-set-params');
-const getExecuteChangeSetParams = require('./lib/get-execute-change-set-params');
-const getSharedStackActionParams = require('./lib/get-shared-stack-action-params');
-const getCreateStackParams = require('./lib/get-create-stack-params');
-const getUpdateStackParams = require('./lib/get-update-stack-params');
-const findAndGroupDeployments = require('./utils/find-and-group-deployments');
-const isS3ListAccessDeniedError = require('./utils/is-s3-list-access-denied-error');
-const s3BodyToString = require('../../aws/s3-body-to-string');
-const ServerlessError = require('../../serverless-error');
-const { style, log, progress } = require('../../utils/serverless-utils/log');
-const { S3Client, GetObjectCommand, paginateListObjectsV2 } = require('@aws-sdk/client-s3');
-const { isS3GetObjectNoSuchKeyError } = require('../../aws/aws-sdk-v3-error');
-const { retryOnTransientNetworkError } = require('../../aws/retry');
+import validate from './lib/validate.ts';
+import setBucketName from './lib/set-bucket-name.ts';
+import updateStack from './lib/update-stack.ts';
+import monitorStack from './lib/monitor-stack.ts';
+import waitForChangeSetCreation from './lib/wait-for-change-set-creation.ts';
+import getCreateChangeSetParams from './lib/get-create-change-set-params.ts';
+import getExecuteChangeSetParams from './lib/get-execute-change-set-params.ts';
+import getSharedStackActionParams from './lib/get-shared-stack-action-params.ts';
+import getCreateStackParams from './lib/get-create-stack-params.ts';
+import getUpdateStackParams from './lib/get-update-stack-params.ts';
+import findAndGroupDeployments from './utils/find-and-group-deployments.ts';
+import isS3ListAccessDeniedError from './utils/is-s3-list-access-denied-error.ts';
+import s3BodyToString from '../../aws/s3-body-to-string.ts';
+import ServerlessError from '../../serverless-error.ts';
+import log2 from '../../utils/serverless-utils/log.ts';
+import { S3Client, GetObjectCommand, paginateListObjectsV2 } from '@aws-sdk/client-s3';
+import { isS3GetObjectNoSuchKeyError } from '../../aws/aws-sdk-v3-error.ts';
+import retry from '../../aws/retry.ts';
+const { style, log, progress } = log2;
+const { retryOnTransientNetworkError } = retry;
 
 const slsConsoleLog = log.get('console');
 
@@ -200,4 +200,4 @@ class AwsRollback {
   }
 }
 
-module.exports = AwsRollback;
+export default AwsRollback;

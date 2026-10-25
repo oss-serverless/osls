@@ -1,7 +1,5 @@
-'use strict';
-
-const expect = require('chai').expect;
-const pickWebsocketsTemplatePart = require('../../../../../../../../../../lib/plugins/aws/package/compile/events/websockets/lib/pick-websockets-template-part');
+import { expect } from 'chai';
+import pickWebsocketsTemplatePart from '../../../../../../../../../../lib/plugins/aws/package/compile/events/websockets/lib/pick-websockets-template-part.ts';
 
 describe('#pickWebsocketsTemplatePart', () => {
   it('picks resources from a CloudFormation template related to WebsocketsApi', () => {

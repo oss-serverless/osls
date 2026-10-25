@@ -1,7 +1,5 @@
-'use strict';
-
-const chai = require('chai');
-const Remove = require('../../../../lib/plugins/remove');
+import * as chai from 'chai';
+import Remove from '../../../../lib/plugins/remove.ts';
 
 const expect = chai.expect;
 

@@ -1,17 +1,17 @@
 #!/usr/bin/env node
+// Setup log writing
+import '../lib/utils/serverless-utils/log-reporters/node.ts';
 
-'use strict';
+import log2 from '../lib/utils/serverless-utils/log.ts';
+import handleError from '../lib/cli/handle-error.ts';
+import logDeprecation from '../lib/utils/log-deprecation.ts';
+import paramRegExp from '../lib/cli/param-reg-exp.ts';
 
 Error.stackTraceLimit = Infinity;
 
-// Setup log writing
-require('../lib/utils/serverless-utils/log-reporters/node');
-const { log, progress } = require('../lib/utils/serverless-utils/log');
+const { log, progress } = log2;
 
 const processLog = log.get('process');
-
-const handleError = require('../lib/cli/handle-error');
-const logDeprecation = require('../lib/utils/log-deprecation');
 
 let command;
 let isHelpRequest;
@@ -55,10 +55,10 @@ process.once('uncaughtException', (error) => {
 
 (async () => {
   try {
-    const wait = require('../lib/utils/sleep');
+    const wait = (await import('../lib/utils/sleep.ts')).default;
     await wait(); // Ensure access to "processSpanPromise"
 
-    const { signals } = require('signal-exit/signals');
+    const { signals } = await import('signal-exit/signals');
 
     signals.forEach((signal) => {
       process.once(signal, () => {
@@ -77,12 +77,14 @@ process.once('uncaughtException', (error) => {
       });
     });
 
-    const humanizePropertyPathKeys = require('../lib/configuration/variables/humanize-property-path-keys');
+    const humanizePropertyPathKeys = (
+      await import('../lib/configuration/variables/humanize-property-path-keys.ts')
+    ).default;
 
     (() => {
       // Rewrite eventual `sls deploy -f` into `sls deploy function -f`
       // Also rewrite `serverless dev` to `serverless --dev``
-      const isParamName = RegExp.prototype.test.bind(require('../lib/cli/param-reg-exp'));
+      const isParamName = RegExp.prototype.test.bind(paramRegExp);
 
       const args = process.argv.slice(2);
       const firstParamIndex = args.findIndex(isParamName);
@@ -98,7 +100,7 @@ process.once('uncaughtException', (error) => {
       process.argv.splice(3, 0, 'function');
     })();
 
-    const resolveInput = require('../lib/cli/resolve-input');
+    const resolveInput = (await import('../lib/cli/resolve-input.ts')).default;
 
     let commands;
     let cliInput;
@@ -112,17 +114,17 @@ process.once('uncaughtException', (error) => {
     };
     processLog.debug('resolve CLI input (no service schema)');
     // Parse args against schemas of commands which do not require to be run in service context
-    setCliInput(resolveInput(require('../lib/cli/commands-schema/no-service')));
+    setCliInput(resolveInput((await import('../lib/cli/commands-schema/no-service.ts')).default));
 
     // If version number request, show it and abort
     if (options.version) {
       processLog.debug('render version');
-      await require('../lib/cli/render-version')();
+      await (await import('../lib/cli/render-version.ts')).default();
       await finalize();
       return;
     }
 
-    const ServerlessError = require('../lib/serverless-error');
+    const ServerlessError = (await import('../lib/serverless-error.ts')).default;
 
     // Abort if command is not supported in this environment
     if (commandSchema && commandSchema.isHidden && commandSchema.noSupportNotice) {
@@ -132,16 +134,22 @@ process.once('uncaughtException', (error) => {
       );
     }
 
-    const path = require('path');
-    const { randomUUID } = require('node:crypto');
-    const clear = require('ext/object/clear');
-    const Serverless = require('../lib/serverless');
-    const { safeShallowAssign } = require('../lib/utils/safe-object');
-    const resolveVariables = require('../lib/configuration/variables/resolve');
-    const deferIrrelevantStageParams = require('../lib/configuration/variables/defer-irrelevant-stage-params');
-    const isPropertyResolved = require('../lib/configuration/variables/is-property-resolved');
-    const eventuallyReportVariableResolutionErrors = require('../lib/configuration/variables/eventually-report-resolution-errors');
-    const filterSupportedOptions = require('../lib/cli/filter-supported-options');
+    const path = (await import('node:path')).default;
+    const { randomUUID } = (await import('node:crypto')).default;
+    const clear = (await import('ext/object/clear.js')).default;
+    const Serverless = (await import('../lib/serverless.ts')).default;
+    const { safeShallowAssign } = (await import('../lib/utils/safe-object.ts')).default;
+    const resolveVariables = (await import('../lib/configuration/variables/resolve.ts')).default;
+    const deferIrrelevantStageParams = (
+      await import('../lib/configuration/variables/defer-irrelevant-stage-params.ts')
+    ).default;
+    const isPropertyResolved = (
+      await import('../lib/configuration/variables/is-property-resolved.ts')
+    ).default;
+    const eventuallyReportVariableResolutionErrors = (
+      await import('../lib/configuration/variables/eventually-report-resolution-errors.ts')
+    ).default;
+    const filterSupportedOptions = (await import('../lib/cli/filter-supported-options.ts')).default;
 
     let configurationPath = null;
     let providerName;
@@ -180,12 +188,14 @@ process.once('uncaughtException', (error) => {
       // as they may influence configuration resolution
       processLog.debug('resolve CLI input (service schema)');
       resolveInput.clear();
-      setCliInput(resolveInput(require('../lib/cli/commands-schema/service')));
+      setCliInput(resolveInput((await import('../lib/cli/commands-schema/service.ts')).default));
 
       processLog.debug('resolve eventual service configuration');
-      const resolveConfigurationPath = require('../lib/cli/resolve-configuration-path');
-      const readConfiguration = require('../lib/configuration/read');
-      const resolveProviderName = require('../lib/configuration/resolve-provider-name');
+      const resolveConfigurationPath = (await import('../lib/cli/resolve-configuration-path.ts'))
+        .default;
+      const readConfiguration = (await import('../lib/configuration/read.ts')).default;
+      const resolveProviderName = (await import('../lib/configuration/resolve-provider-name.ts'))
+        .default;
       const resolveProviderNameForCliInput = (serviceConfiguration) =>
         resolveProviderName(serviceConfiguration, { isHelpRequest });
 
@@ -217,7 +227,9 @@ process.once('uncaughtException', (error) => {
         // IIFE for maintenance convenience
         await (async () => {
           processLog.debug('resolve variables meta');
-          const resolveVariablesMeta = require('../lib/configuration/variables/resolve-meta');
+          const resolveVariablesMeta = (
+            await import('../lib/configuration/variables/resolve-meta.ts')
+          ).default;
 
           variablesMeta = resolveVariablesMeta(configuration);
 
@@ -248,7 +260,9 @@ process.once('uncaughtException', (error) => {
             // parse args again also against schemas commands which require AWS service context
             processLog.debug('resolve CLI input (AWS service schema)');
             resolveInput.clear();
-            setCliInput(resolveInput(require('../lib/cli/commands-schema/aws-service')));
+            setCliInput(
+              resolveInput((await import('../lib/cli/commands-schema/aws-service.ts')).default)
+            );
           }
 
           let envVarNamesNeededForDotenvResolution;
@@ -263,12 +277,15 @@ process.once('uncaughtException', (error) => {
               configuration,
               variablesMeta,
               sources: {
-                env: require('../lib/configuration/variables/sources/env'),
-                file: require('../lib/configuration/variables/sources/file'),
-                opt: require('../lib/configuration/variables/sources/opt'),
-                self: require('../lib/configuration/variables/sources/self'),
-                strToBool: require('../lib/configuration/variables/sources/str-to-bool'),
-                sls: require('../lib/configuration/variables/sources/instance-dependent/get-sls')(),
+                env: (await import('../lib/configuration/variables/sources/env.ts')).default,
+                file: (await import('../lib/configuration/variables/sources/file.ts')).default,
+                opt: (await import('../lib/configuration/variables/sources/opt.ts')).default,
+                self: (await import('../lib/configuration/variables/sources/self.ts')).default,
+                strToBool: (await import('../lib/configuration/variables/sources/str-to-bool.ts'))
+                  .default,
+                sls: (
+                  await import('../lib/configuration/variables/sources/instance-dependent/get-sls.ts')
+                ).default(),
               },
               options: filterSupportedOptions(options, { commandSchema, providerName }),
               fulfilledSources: new Set(['file', 'self', 'strToBool']),
@@ -306,7 +323,9 @@ process.once('uncaughtException', (error) => {
                 // service
                 processLog.debug('resolve CLI input (AWS service schema)');
                 resolveInput.clear();
-                setCliInput(resolveInput(require('../lib/cli/commands-schema/aws-service')));
+                setCliInput(
+                  resolveInput((await import('../lib/cli/commands-schema/aws-service.ts')).default)
+                );
 
                 if (commandSchema) {
                   processLog.debug('resolve variables in core properties #2');
@@ -338,7 +357,8 @@ process.once('uncaughtException', (error) => {
               // To pick eventual resolution conflict, track what env variables were reported
               // missing when applying this resolution
               processLog.debug('resolve variables in stage related properties');
-              const envSource = require('../lib/configuration/variables/sources/env');
+              const envSource = (await import('../lib/configuration/variables/sources/env.ts'))
+                .default;
               envSource.missingEnvVariables.clear();
               await resolveVariables({
                 ...resolverConfiguration,
@@ -371,7 +391,11 @@ process.once('uncaughtException', (error) => {
           }
 
           // Load eventual environment variables from .env files
-          if (await require('../lib/cli/conditionally-load-dotenv')(options, configuration)) {
+          if (
+            await (
+              await import('../lib/cli/conditionally-load-dotenv.ts')
+            ).default(options, configuration)
+          ) {
             if (envVarNamesNeededForDotenvResolution) {
               for (const envVarName of envVarNamesNeededForDotenvResolution) {
                 if (process.env[envVarName]) {
@@ -412,7 +436,9 @@ process.once('uncaughtException', (error) => {
             if (!commandSchema && providerName === 'aws') {
               processLog.debug('resolve CLI input (AWS service schema)');
               resolveInput.clear();
-              setCliInput(resolveInput(require('../lib/cli/commands-schema/aws-service')));
+              setCliInput(
+                resolveInput((await import('../lib/cli/commands-schema/aws-service.ts')).default)
+              );
               if (commandSchema) {
                 resolverConfiguration.options = filterSupportedOptions(options, {
                   commandSchema,
@@ -464,20 +490,24 @@ process.once('uncaughtException', (error) => {
         if (configuration && resolveProviderNameForCliInput(configuration) === 'aws') {
           processLog.debug('resolve CLI input (AWS service schema)');
           resolveInput.clear();
-          setCliInput(resolveInput(require('../lib/cli/commands-schema/aws-service')));
+          setCliInput(
+            resolveInput((await import('../lib/cli/commands-schema/aws-service.ts')).default)
+          );
         }
       } else {
         // In non-service context we recognize all AWS service commands
         processLog.debug('parsing of configuration file failed');
         processLog.debug('resolve CLI input (AWS service schema)');
         resolveInput.clear();
-        setCliInput(resolveInput(require('../lib/cli/commands-schema/aws-service')));
+        setCliInput(
+          resolveInput((await import('../lib/cli/commands-schema/aws-service.ts')).default)
+        );
 
         // Validate result command and options
-        require('../lib/cli/ensure-supported-command')(null, cliInput);
+        (await import('../lib/cli/ensure-supported-command.ts')).default(null, cliInput);
       }
     } else {
-      require('../lib/cli/ensure-supported-command')(null, cliInput);
+      (await import('../lib/cli/ensure-supported-command.ts')).default(null, cliInput);
     }
 
     const configurationFilename = configuration && configurationPath.slice(serviceDir.length + 1);
@@ -490,7 +520,8 @@ process.once('uncaughtException', (error) => {
     if (!isHelpRequest) {
       if (isStandaloneCommand) {
         processLog.debug('run standalone command');
-        if (configuration) require('../lib/cli/ensure-supported-command')(configuration, cliInput);
+        if (configuration)
+          (await import('../lib/cli/ensure-supported-command.ts')).default(configuration, cliInput);
         await require(`../commands/${commands.join('-')}`)({
           configuration,
           serviceDir,
@@ -527,10 +558,12 @@ process.once('uncaughtException', (error) => {
 
           if (serverless.pluginManager.externalPlugins.size) {
             processLog.debug('resolve CLI input (+ plugins schema)');
-            const commandsSchema = require('../lib/cli/commands-schema/resolve-final')(
-              serverless.pluginManager.externalPlugins,
-              { providerName: providerName || 'aws', configuration }
-            );
+            const commandsSchema = (
+              await import('../lib/cli/commands-schema/resolve-final.ts')
+            ).default(serverless.pluginManager.externalPlugins, {
+              providerName: providerName || 'aws',
+              configuration,
+            });
             resolveInput.clear();
             setCliInput(resolveInput(commandsSchema));
             hasFinalCommandSchema = true;
@@ -540,7 +573,9 @@ process.once('uncaughtException', (error) => {
           // Invalid configuration, ensure to recognize all AWS commands
           processLog.debug('resolve CLI input (AWS service schema)');
           resolveInput.clear();
-          setCliInput(resolveInput(require('../lib/cli/commands-schema/aws-service')));
+          setCliInput(
+            resolveInput((await import('../lib/cli/commands-schema/aws-service.ts')).default)
+          );
         }
         hasFinalCommandSchema = true;
 
@@ -550,7 +585,7 @@ process.once('uncaughtException', (error) => {
 
         // Validate result command and options
         if (hasFinalCommandSchema)
-          require('../lib/cli/ensure-supported-command')(configuration, cliInput);
+          (await import('../lib/cli/ensure-supported-command.ts')).default(configuration, cliInput);
         if (isHelpRequest) return;
         if (!(variablesMeta && variablesMeta.size)) return;
         if (!resolverConfiguration) {
@@ -562,13 +597,18 @@ process.once('uncaughtException', (error) => {
             configuration,
             variablesMeta,
             sources: {
-              env: require('../lib/configuration/variables/sources/env'),
-              file: require('../lib/configuration/variables/sources/file'),
-              opt: require('../lib/configuration/variables/sources/opt'),
-              self: require('../lib/configuration/variables/sources/self'),
-              strToBool: require('../lib/configuration/variables/sources/str-to-bool'),
-              sls: require('../lib/configuration/variables/sources/instance-dependent/get-sls')(),
-              param: require('../lib/configuration/variables/sources/instance-dependent/param')(),
+              env: (await import('../lib/configuration/variables/sources/env.ts')).default,
+              file: (await import('../lib/configuration/variables/sources/file.ts')).default,
+              opt: (await import('../lib/configuration/variables/sources/opt.ts')).default,
+              self: (await import('../lib/configuration/variables/sources/self.ts')).default,
+              strToBool: (await import('../lib/configuration/variables/sources/str-to-bool.ts'))
+                .default,
+              sls: (
+                await import('../lib/configuration/variables/sources/instance-dependent/get-sls.ts')
+              ).default(),
+              param: (
+                await import('../lib/configuration/variables/sources/instance-dependent/param.ts')
+              ).default(),
             },
             options: filterSupportedOptions(options, { commandSchema, providerName }),
             fulfilledSources: new Set(['env', 'file', 'self', 'strToBool']),
@@ -594,12 +634,14 @@ process.once('uncaughtException', (error) => {
         resolverConfiguration.fulfilledSources.add('opt');
 
         // Register serverless instance specific variable sources
-        resolverConfiguration.sources.sls =
-          require('../lib/configuration/variables/sources/instance-dependent/get-sls')(serverless);
+        resolverConfiguration.sources.sls = (
+          await import('../lib/configuration/variables/sources/instance-dependent/get-sls.ts')
+        ).default(serverless);
         resolverConfiguration.fulfilledSources.add('sls');
 
-        resolverConfiguration.sources.param =
-          require('../lib/configuration/variables/sources/instance-dependent/param')(serverless);
+        resolverConfiguration.sources.param = (
+          await import('../lib/configuration/variables/sources/instance-dependent/param.ts')
+        ).default(serverless);
         resolverConfiguration.fulfilledSources.add('param');
 
         // Register AWS provider specific variable sources
@@ -629,24 +671,26 @@ process.once('uncaughtException', (error) => {
             return;
           }
           Object.assign(resolverConfiguration.sources, {
-            cf: require('../lib/configuration/variables/sources/instance-dependent/get-cf')(
-              serverless
-            ),
-            s3: require('../lib/configuration/variables/sources/instance-dependent/get-s3')(
-              serverless
-            ),
-            ssm: require('../lib/configuration/variables/sources/instance-dependent/get-ssm')(
-              serverless
-            ),
-            aws: require('../lib/configuration/variables/sources/instance-dependent/get-aws')(
-              serverless
-            ),
+            cf: (
+              await import('../lib/configuration/variables/sources/instance-dependent/get-cf.ts')
+            ).default(serverless),
+            s3: (
+              await import('../lib/configuration/variables/sources/instance-dependent/get-s3.ts')
+            ).default(serverless),
+            ssm: (
+              await import('../lib/configuration/variables/sources/instance-dependent/get-ssm.ts')
+            ).default(serverless),
+            aws: (
+              await import('../lib/configuration/variables/sources/instance-dependent/get-aws.ts')
+            ).default(serverless),
           });
           resolverConfiguration.fulfilledSources.add('cf').add('s3').add('ssm').add('aws');
         }
 
         // Register variable source resolvers provided by external plugins
-        const resolverExternalPluginSources = require('../lib/configuration/variables/sources/resolve-external-plugin-sources');
+        const resolverExternalPluginSources = (
+          await import('../lib/configuration/variables/sources/resolve-external-plugin-sources.ts')
+        ).default;
         resolverExternalPluginSources(
           configuration,
           resolverConfiguration,
@@ -683,8 +727,9 @@ process.once('uncaughtException', (error) => {
 
         processLog.debug('uresolved variables meta: %o', variablesMeta);
         // Report unrecognized variable sources found in variables configured in service config
-        const unresolvedSources =
-          require('../lib/configuration/variables/resolve-unresolved-source-types')(variablesMeta);
+        const unresolvedSources = (
+          await import('../lib/configuration/variables/resolve-unresolved-source-types.ts')
+        ).default(variablesMeta);
         const recognizedSourceNames = new Set(Object.keys(resolverConfiguration.sources));
 
         const unrecognizedSourceNames = Array.from(unresolvedSources.keys()).filter(
@@ -700,7 +745,10 @@ process.once('uncaughtException', (error) => {
       if (isHelpRequest && serverless.pluginManager.externalPlugins) {
         // Show help
         processLog.debug('render help');
-        require('../lib/cli/render-help')(serverless.pluginManager.externalPlugins, cliInput);
+        (await import('../lib/cli/render-help/index.ts')).default(
+          serverless.pluginManager.externalPlugins,
+          cliInput
+        );
       } else {
         processLog.debug('run Serverless instance');
         // Run command

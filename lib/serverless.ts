@@ -1,11 +1,34 @@
-'use strict';
-
-const Module = require('module');
-const path = require('path');
+import Module from 'node:module';
+import path from 'node:path';
+import os from 'node:os';
+import isObject from 'type/object/is.js';
+import ensureString from 'type/string/ensure.js';
+import ensureValue from 'type/value/ensure.js';
+import ensureArray from 'type/array/ensure.js';
+import ensureIterable from 'type/iterable/ensure.js';
+import isPlainObject from 'type/plain-object/is.js';
+import ensurePlainObject from 'type/plain-object/ensure.js';
+import CLI from './classes/cli.ts';
+import Config from './classes/config.ts';
+import YamlParser from './classes/yaml-parser.ts';
+import PluginManager from './classes/plugin-manager.ts';
+import Utils from './classes/utils.ts';
+import Service from './classes/service.ts';
+import ConfigSchemaHandler from './classes/config-schema-handler/index.ts';
+import ServerlessError from './serverless-error.ts';
+import packageModule from '../package.json' with { type: 'json' };
+import isStandaloneExecutable from './utils/is-standalone-executable.ts';
+import { setByPath } from './utils/object-path.ts';
+import { hasOwn } from './utils/safe-object.ts';
+import logDeprecation from './utils/log-deprecation.ts';
+import commmandsSchema from './cli/commands-schema/index.ts';
+import resolveMeta from './configuration/variables/resolve-meta.ts';
+import validateStage from './utils/validate-stage.ts';
+import colors2 from './utils/colors.ts';
 
 // Compatibility aliases: third-party plugins (e.g. Bref) require `@serverless/utils`
 // entry points, which osls vendors under `lib/utils/serverless-utils`
-const vendoredServerlessUtilsPath = path.resolve(__dirname, 'utils/serverless-utils');
+const vendoredServerlessUtilsPath = path.resolve(import.meta.dirname, 'utils/serverless-utils');
 const compatibilityAliases = new Map(
   Object.entries({
     '@serverless/utils/config': 'config.js',
@@ -20,30 +43,8 @@ Module._resolveFilename = function (request, ...args) {
   return originalResolveFilename.call(this, compatibilityAliases.get(request) || request, ...args);
 };
 
-const os = require('os');
-const isObject = require('type/object/is');
-const ensureString = require('type/string/ensure');
-const ensureValue = require('type/value/ensure');
-const ensureArray = require('type/array/ensure');
-const ensureIterable = require('type/iterable/ensure');
-const isPlainObject = require('type/plain-object/is');
-const ensurePlainObject = require('type/plain-object/ensure');
-const CLI = require('./classes/cli');
-const Config = require('./classes/config');
-const YamlParser = require('./classes/yaml-parser');
-const PluginManager = require('./classes/plugin-manager');
-const Utils = require('./classes/utils');
-const Service = require('./classes/service');
-const ConfigSchemaHandler = require('./classes/config-schema-handler');
-const ServerlessError = require('./serverless-error');
-const version = require('./../package.json').version;
-const isStandaloneExecutable = require('./utils/is-standalone-executable');
-const { setByPath } = require('./utils/object-path');
-const { hasOwn } = require('./utils/safe-object');
-const logDeprecation = require('./utils/log-deprecation');
-const commmandsSchema = require('./cli/commands-schema');
-const parseEntries = require('./configuration/variables/resolve-meta').parseEntries;
-const validateStage = require('./utils/validate-stage');
+const version = packageModule.version;
+const parseEntries = resolveMeta.parseEntries;
 
 // Old local fallback is triggered in older versions by Serverless constructor directly
 const isStackFromOldLocalFallback = RegExp.prototype.test.bind(
@@ -56,7 +57,7 @@ class Serverless {
 
     if (isStackFromOldLocalFallback(new Error().stack)) {
       // Prevent old local fallback, as it's not compatible with this version of the CLI
-      const colors = require('./utils/colors');
+      const colors = colors2;
       throw new ServerlessError(
         [
           'Cannot run a local osls installation with an outdated global version.',
@@ -283,4 +284,4 @@ class Serverless {
   }
 }
 
-module.exports = Serverless;
+export default Serverless;

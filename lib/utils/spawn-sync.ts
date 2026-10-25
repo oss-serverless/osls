@@ -1,9 +1,7 @@
-'use strict';
+import spawn from 'cross-spawn';
+import { validateSpawnInput } from './spawn-policy.ts';
 
-const spawn = require('cross-spawn');
-const { validateSpawnInput } = require('./spawn-policy');
-
-module.exports = (command, args = [], options = {}) => {
+export default (command, args = [], options = {}) => {
   if (args == null) args = [];
   options = options || {};
   validateSpawnInput(command, args, options);

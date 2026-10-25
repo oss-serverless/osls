@@ -1,6 +1,6 @@
-'use strict';
+import global from './global.ts';
 
-module.exports = {
+export default {
   config: {
     usage: 'Path to serverless config file',
     shortcut: 'c',
@@ -13,7 +13,7 @@ module.exports = {
     usage: 'Pass custom parameter values for "param" variable source (usage: --param="key=value")',
     type: 'multiple',
   },
-  ...require('./global'),
+  ...global,
 };
 
 for (const optionSchema of Object.values(module.exports)) {

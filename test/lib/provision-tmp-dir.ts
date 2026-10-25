@@ -1,11 +1,10 @@
-'use strict';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import processTmpDir from './process-tmp-dir.ts';
+const { mkdir } = fs.promises;
 
-const path = require('path');
-const crypto = require('crypto');
-const { mkdir } = require('fs').promises;
-const processTmpDir = require('./process-tmp-dir');
-
-module.exports = () =>
+export default () =>
   new Promise((resolve) => {
     const tmpDirName = path.join(processTmpDir, crypto.randomBytes(12).toString('hex'));
     resolve(

@@ -1,8 +1,6 @@
-'use strict';
-
-const chai = require('chai');
-const sinon = require('sinon');
-const extendedValidate = require('../../../../../../../lib/plugins/aws/deploy/lib/extended-validate');
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import extendedValidate from '../../../../../../../lib/plugins/aws/deploy/lib/extended-validate.ts';
 
 const expect = chai.expect;
 

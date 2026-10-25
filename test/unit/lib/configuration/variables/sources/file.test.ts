@@ -1,14 +1,11 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const path = require('path');
-const resolveMeta = require('../../../../../../lib/configuration/variables/resolve-meta');
-const resolve = require('../../../../../../lib/configuration/variables/resolve');
-const fileSource = require('../../../../../../lib/configuration/variables/sources/file');
+import { expect } from 'chai';
+import path from 'node:path';
+import resolveMeta from '../../../../../../lib/configuration/variables/resolve-meta.ts';
+import resolve from '../../../../../../lib/configuration/variables/resolve.ts';
+import fileSource from '../../../../../../lib/configuration/variables/sources/file.ts';
 
 describe('test/unit/lib/configuration/variables/sources/file.test.js', () => {
-  const serviceDir = path.resolve(__dirname, 'fixture');
+  const serviceDir = path.resolve(import.meta.dirname, 'fixture');
   let configuration;
   let variablesMeta;
   before(async () => {

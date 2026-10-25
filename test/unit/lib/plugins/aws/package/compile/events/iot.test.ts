@@ -1,9 +1,7 @@
-'use strict';
-
-const expect = require('chai').expect;
-const AwsProvider = require('../../../../../../../../lib/plugins/aws/provider');
-const AwsCompileIoTEvents = require('../../../../../../../../lib/plugins/aws/package/compile/events/iot');
-const { createAwsEventCompilerContext } = require('./test-utils');
+import { expect } from 'chai';
+import AwsProvider from '../../../../../../../../lib/plugins/aws/provider.ts';
+import AwsCompileIoTEvents from '../../../../../../../../lib/plugins/aws/package/compile/events/iot.ts';
+import { createAwsEventCompilerContext } from './test-utils.ts';
 
 describe('AwsCompileIoTEvents', () => {
   let awsCompileIoTEvents;

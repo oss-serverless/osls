@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const filesize = require('../../../../lib/utils/filesize');
+import { expect } from 'chai';
+import filesize from '../../../../lib/utils/filesize.ts';
 
 describe('test/unit/lib/utils/filesize.test.js', () => {
   it('should display zero bytes', () => {

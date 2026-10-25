@@ -1,12 +1,9 @@
-'use strict';
-
-const fs = require('node:fs').promises;
-const os = require('node:os');
-const path = require('node:path');
-const { expect } = require('chai');
-
-const glob = require('../../../../lib/utils/glob');
-const { outputFile, remove } = require('../../../utils/fs');
+import { promises as fs } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { expect } from 'chai';
+import glob from '../../../../lib/utils/glob.ts';
+import { outputFile, remove } from '../../../utils/fs.ts';
 
 describe('test/unit/lib/utils/glob.test.js', () => {
   let tmpDir;

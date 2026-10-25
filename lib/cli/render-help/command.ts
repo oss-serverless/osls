@@ -1,12 +1,10 @@
-'use strict';
+import log from '../../utils/serverless-utils/log.ts';
+import resolveInput from '../resolve-input.ts';
+import renderOptionsHelp from './options.ts';
+import generateCommandUsage from './generate-command-usage.ts';
+const { writeText } = log;
 
-const { writeText } = require('../../utils/serverless-utils/log');
-const resolveInput = require('../resolve-input');
-const renderOptionsHelp = require('./options');
-
-const generateCommandUsage = require('./generate-command-usage');
-
-module.exports = (commandName, resolvedInput = resolveInput()) => {
+export default (commandName, resolvedInput = resolveInput()) => {
   const { commandsSchema } = resolvedInput;
   const commandSchema = commandsSchema.get(commandName);
 

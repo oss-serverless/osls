@@ -1,5 +1,3 @@
-'use strict';
-
 const isEventTypeInstancePath = RegExp.prototype.test.bind(/^\/functions\/[^/]+\/events\/\d+$/);
 const oneOfPathPattern = /\/(?:anyOf|oneOf)(?:\/\d+\/|$)/;
 const isAnyOfPathTypePostfix = RegExp.prototype.test.bind(/^\/\d+\/type$/);
@@ -278,7 +276,7 @@ const filterDuplicateErrors = (resultErrorsSet) => {
 /*
  * For error object structure, see https://github.com/ajv-validator/ajv/#error-objects
  */
-module.exports = (ajvErrors) => {
+export default (ajvErrors) => {
   const resultErrorsSet = new Set(ajvErrors);
 
   // 1. Filter eventual irrelevant errors for faulty event type configurations

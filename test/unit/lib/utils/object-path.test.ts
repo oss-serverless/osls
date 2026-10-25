@@ -1,14 +1,11 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const {
+import { expect } from 'chai';
+import {
   getByPath,
   hasUnsafePathSegment,
   setByPath,
   tokenizePath,
   unsetByPath,
-} = require('../../../../lib/utils/object-path');
+} from '../../../../lib/utils/object-path.ts';
 
 describe('object-path', () => {
   afterEach(() => {

@@ -1,10 +1,8 @@
-'use strict';
-
-const Package = require('../../../../../lib/plugins/package/package');
-const sinon = require('sinon');
+import Package from '../../../../../lib/plugins/package/package.ts';
+import * as sinon from 'sinon';
 
 // Configure chai
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 describe('Package', () => {
   let serverless;

@@ -1,11 +1,8 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const { expect } = require('chai');
-
-const dirExistsSync = require('../../../../../lib/utils/fs/dir-exists-sync');
-const { getTmpDirPath } = require('../../../../utils/fs');
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect } from 'chai';
+import dirExistsSync from '../../../../../lib/utils/fs/dir-exists-sync.ts';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
 
 describe('test/unit/lib/utils/fs/dir-exists-sync.test.js', () => {
   let tmpDir;

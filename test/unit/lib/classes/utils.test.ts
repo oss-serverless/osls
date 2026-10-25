@@ -1,12 +1,10 @@
-'use strict';
-
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
-const Utils = require('../../../../lib/classes/utils');
-const YamlParser = require('../../../../lib/classes/yaml-parser');
-const { expect } = require('chai');
-const { getTmpFilePath, getTmpDirPath, removeSync } = require('../../../utils/fs');
+import path from 'node:path';
+import os from 'node:os';
+import fs from 'node:fs';
+import Utils from '../../../../lib/classes/utils.ts';
+import YamlParser from '../../../../lib/classes/yaml-parser.ts';
+import { expect } from 'chai';
+import { getTmpFilePath, getTmpDirPath, removeSync } from '../../../utils/fs.ts';
 
 const createHarness = () => {
   const serverlessLike = {};
@@ -36,17 +34,17 @@ describe('Utils', () => {
   describe('#dirExistsSync()', () => {
     describe('When reading a directory', () => {
       it('should detect if a directory exists', () => {
-        const dir = serverless.utils.dirExistsSync(__dirname);
+        const dir = serverless.utils.dirExistsSync(import.meta.dirname);
         expect(dir).to.equal(true);
       });
 
       it("should detect if a directory doesn't exist", () => {
-        const noDir = serverless.utils.dirExistsSync(path.join(__dirname, '..', 'XYZ'));
+        const noDir = serverless.utils.dirExistsSync(path.join(import.meta.dirname, '..', 'XYZ'));
         expect(noDir).to.equal(false);
       });
 
       it('should return false for a file', () => {
-        expect(serverless.utils.dirExistsSync(__filename)).to.equal(false);
+        expect(serverless.utils.dirExistsSync(import.meta.filename)).to.equal(false);
       });
     });
   });
@@ -54,12 +52,12 @@ describe('Utils', () => {
   describe('#fileExistsSync()', () => {
     describe('When reading a file', () => {
       it('should detect if a file exists', () => {
-        const file = serverless.utils.fileExistsSync(__filename);
+        const file = serverless.utils.fileExistsSync(import.meta.filename);
         expect(file).to.equal(true);
       });
 
       it("should detect if a file doesn't exist", () => {
-        const noFile = serverless.utils.fileExistsSync(path.join(__dirname, 'XYZ.json'));
+        const noFile = serverless.utils.fileExistsSync(path.join(import.meta.dirname, 'XYZ.json'));
         expect(noFile).to.equal(false);
       });
     });

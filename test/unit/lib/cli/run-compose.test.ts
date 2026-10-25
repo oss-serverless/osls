@@ -1,14 +1,11 @@
-'use strict';
-
-const path = require('path');
-const fsp = require('fs').promises;
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const { overrideEnv, overrideCwd, overrideStdoutWrite } = require('../../../utils/process');
-const { expect } = require('chai');
-
-const provisionTmpDir = require('../../../lib/provision-tmp-dir');
-const { outputFile, remove, writeJsonFile } = require('../../../utils/fs');
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import { overrideEnv, overrideCwd, overrideStdoutWrite } from '../../../utils/process.ts';
+import { expect } from 'chai';
+import provisionTmpDir from '../../../lib/provision-tmp-dir.ts';
+import { outputFile, remove, writeJsonFile } from '../../../utils/fs.ts';
 
 const createProgressFooter = () => ({
   shouldAddProgressAnimationPrefix: false,

@@ -1,6 +1,4 @@
-'use strict';
-
-const naming = require('../lib/naming');
+import naming from '../lib/naming.ts';
 
 const resolveLambdaTarget = (functionName, functionObject) => {
   const lambdaLogicalId = naming.getLambdaLogicalId(functionName);
@@ -9,4 +7,4 @@ const resolveLambdaTarget = (functionName, functionObject) => {
   return { 'Fn::Join': [':', [functionArnGetter, functionObject.targetAlias.name]] };
 };
 
-module.exports = resolveLambdaTarget;
+export default resolveLambdaTarget;

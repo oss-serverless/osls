@@ -1,13 +1,10 @@
-'use strict';
-
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const logEmitter = require('log/lib/emitter');
-const { S3Client, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
-const emptyS3Bucket = require('../../../../../../lib/plugins/aws/remove/lib/bucket');
-const runServerless = require('../../../../../utils/run-serverless');
-
-const expect = require('chai').expect;
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import logEmitter from 'log/lib/emitter.js';
+import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import emptyS3Bucket from '../../../../../../lib/plugins/aws/remove/lib/bucket.ts';
+import runServerless from '../../../../../utils/run-serverless.ts';
+import { expect } from 'chai';
 
 describe('test/unit/lib/plugins/aws/remove/index.test.js', () => {
   const deleteObjectsStub = sinon.stub().resolves();

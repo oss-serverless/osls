@@ -1,8 +1,6 @@
-'use strict';
-
-const runServerless = require('../../../../../../../utils/run-serverless');
-const ServerlessError = require('../../../../../../../../lib/serverless-error');
-const { expect } = require('chai');
+import runServerless from '../../../../../../../utils/run-serverless.ts';
+import ServerlessError from '../../../../../../../../lib/serverless-error.ts';
+import { expect } from 'chai';
 
 const METHOD_SCHEDULER = 'scheduler';
 const METHOD_EVENT_BUS = 'eventBus';

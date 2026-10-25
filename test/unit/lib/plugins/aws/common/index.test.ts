@@ -1,8 +1,6 @@
-'use strict';
-
-const AwsCommon = require('../../../../../../lib/plugins/aws/common/index');
-const expect = require('chai').expect;
-const sinon = require('sinon');
+import AwsCommon from '../../../../../../lib/plugins/aws/common/index.ts';
+import { expect } from 'chai';
+import * as sinon from 'sinon';
 
 describe('AwsCommon', () => {
   let awsCommon;

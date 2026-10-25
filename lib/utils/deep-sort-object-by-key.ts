@@ -1,6 +1,4 @@
-'use strict';
-
-const isPlainObject = require('type/plain-object/is');
+import isPlainObject from 'type/plain-object/is.js';
 
 const deepSortObjectByKey = (obj) => {
   if (Array.isArray(obj)) {
@@ -18,4 +16,4 @@ const deepSortObjectByKey = (obj) => {
   return obj;
 };
 
-module.exports = deepSortObjectByKey;
+export default deepSortObjectByKey;

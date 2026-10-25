@@ -1,8 +1,6 @@
-'use strict';
+import { createRegistry, hasOwn, safeSet } from '../../../../../../../utils/safe-object.ts';
 
-const { createRegistry, hasOwn, safeSet } = require('../../../../../../../utils/safe-object');
-
-module.exports = {
+export default {
   compileResources() {
     this.apiGatewayResources = this.getResourcePaths();
 

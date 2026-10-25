@@ -1,9 +1,7 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const yazl = require('yazl');
-const walkDirSync = require('./walk-dir-sync');
+import fs from 'node:fs';
+import path from 'node:path';
+import yazl from 'yazl';
+import walkDirSync from './walk-dir-sync.ts';
 
 async function createZipFile(srcDirPath, outputFilePath) {
   const files = walkDirSync(srcDirPath).map((file) => ({
@@ -34,4 +32,4 @@ async function createZipFile(srcDirPath, outputFilePath) {
   });
 }
 
-module.exports = createZipFile;
+export default createZipFile;

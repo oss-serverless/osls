@@ -2,6 +2,7 @@
   "name": "osls",
   "version": "4.0.0-dev",
   "description": "osls CLI for deploying serverless applications",
+  "type": "module",
   "preferGlobal": true,
   "homepage": "https://github.com/oss-serverless/osls",
   "repository": {
@@ -68,7 +69,6 @@
     "signal-exit": "^4.1.0",
     "tsx": "^4.23.15",
     "type": "^2.7.2",
-    "typescript": "^7.0.2",
     "undici": "^7.25.0",
     "write-file-atomic": "^7.0.1",
     "yauzl": "^3.3.0",
@@ -76,6 +76,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "adm-zip": "^0.5.10",
     "chai": "^6.2.2",
     "chai-as-promised": "^8.0.2",
@@ -83,6 +85,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import-x": "^4.16.2",
     "eslint-plugin-n": "^18.1.0",
+    "esmock": "^2.8.0",
     "git-list-updated": "^1.2.1",
     "globals": "^17.5.0",
     "jszip": "^3.10.1",
@@ -90,7 +93,9 @@
     "prettier": "^3.8.3",
     "proxyquire": "^2.1.3",
     "sinon": "^22.0.0",
-    "sinon-chai": "^4.0.1"
+    "sinon-chai": "^4.0.1",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript-eslint": "^8.72.0"
   },
   "scripts": {
     "docs-check": "node scripts/check-docs-coverage.js",
@@ -106,7 +111,7 @@
     "test:isolated": "mocha --config test/mocha/unit.cjs --parallel \"test/unit/**/*.test.js\""
   },
   "engines": {
-    "node": "^20.19.0 || ^22.13.0 || >=24"
+    "node": "^22.18.0 || ^24.0.0"
   },
   "license": "MIT"
 }

@@ -1,7 +1,5 @@
-'use strict';
-
-const ServerlessError = require('../../../../../serverless-error');
-const resolveLambdaTarget = require('../../../utils/resolve-lambda-target');
+import ServerlessError from '../../../../../serverless-error.ts';
+import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
 
 class AwsCompileIotFleetProvisioningEvents {
   constructor(serverless) {
@@ -99,4 +97,4 @@ class AwsCompileIotFleetProvisioningEvents {
     });
   }
 }
-module.exports = AwsCompileIotFleetProvisioningEvents;
+export default AwsCompileIotFleetProvisioningEvents;

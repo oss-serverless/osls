@@ -1,9 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const {
-  getEventBusTargetId,
-} = require('../../../../../../../lib/plugins/aws/custom-resources/resources/event-bridge/lib/utils');
+import { expect } from 'chai';
+import { getEventBusTargetId } from '../../../../../../../lib/plugins/aws/custom-resources/resources/event-bridge/lib/utils.ts';
 
 describe('#getEventBusTargetId()', () => {
   const assertions = [

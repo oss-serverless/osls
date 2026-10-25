@@ -1,8 +1,6 @@
-'use strict';
-
-const runServerless = require('../../../../../../../../utils/run-serverless');
-const ServerlessError = require('../../../../../../../../../lib/serverless-error');
-const { expect } = require('chai');
+import runServerless from '../../../../../../../../utils/run-serverless.ts';
+import ServerlessError from '../../../../../../../../../lib/serverless-error.ts';
+import { expect } from 'chai';
 
 describe('test/unit/lib/plugins/aws/package/compile/events/alb/index.test.js', () => {
   let cfResources;

@@ -1,9 +1,7 @@
-'use strict';
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
 
-const fs = require('fs').promises;
-const path = require('path');
-
-module.exports = {
+export default {
   async saveCompiledTemplate() {
     const compiledTemplateFileName = this.provider.naming.getCompiledTemplateFileName();
 

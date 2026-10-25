@@ -1,9 +1,7 @@
-'use strict';
-
-const { Readable } = require('stream');
-const zlib = require('zlib');
-const { expect } = require('chai');
-const s3BodyToString = require('../../../../lib/aws/s3-body-to-string');
+import { Readable } from 'node:stream';
+import zlib from 'node:zlib';
+import { expect } from 'chai';
+import s3BodyToString from '../../../../lib/aws/s3-body-to-string.ts';
 
 describe('test/unit/lib/aws/s3-body-to-string.test.js', () => {
   it('returns string bodies unchanged', async () => {

@@ -1,12 +1,11 @@
-'use strict';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import log2 from '../serverless-utils/log.ts';
+const { log } = log2;
 
-const path = require('path');
-const fsp = require('fs').promises;
-const { log } = require('../serverless-utils/log');
+const npmPackageRoot = path.resolve(import.meta.dirname, '../../../');
 
-const npmPackageRoot = path.resolve(__dirname, '../../../');
-
-module.exports = async () => {
+export default async () => {
   const stats = await fsp.stat(npmPackageRoot);
   try {
     await fsp.utimes(npmPackageRoot, String(stats.atimeMs / 1000), String(stats.mtimeMs / 1000));

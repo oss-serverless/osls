@@ -1,8 +1,6 @@
-'use strict';
-
-const { EventEmitter } = require('events');
-const globalState = require('../global-state');
-const memoizee = require('memoizee');
+import { EventEmitter } from 'node:events';
+import globalState from '../global-state.ts';
+import memoizee from 'memoizee';
 
 const outputEmitter = (() => {
   if (!globalState.outputEmitter) {
@@ -12,7 +10,7 @@ const outputEmitter = (() => {
   return globalState.outputEmitter;
 })();
 
-module.exports = memoizee(
+export default memoizee(
   (namespace) => {
     return {
       get: memoizee(

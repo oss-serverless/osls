@@ -1,8 +1,7 @@
-'use strict';
+import { MAX_AWS_REQUEST_TRY } from '../../utils.ts';
+import { getEventBusName, getEventBusTargetId } from './utils.ts';
 
-const { MAX_AWS_REQUEST_TRY } = require('../../utils');
-const { getEventBusName, getEventBusTargetId } = require('./utils');
-const {
+import {
   EventBridgeClient,
   CreateEventBusCommand,
   DeleteEventBusCommand,
@@ -10,7 +9,7 @@ const {
   DeleteRuleCommand,
   PutTargetsCommand,
   RemoveTargetsCommand,
-} = require('@aws-sdk/client-eventbridge');
+} from '@aws-sdk/client-eventbridge';
 
 const eventBridge = new EventBridgeClient({ maxAttempts: MAX_AWS_REQUEST_TRY });
 
@@ -131,7 +130,16 @@ async function removeTargetConfiguration(config) {
   );
 }
 
-module.exports = {
+export {
+  createEventBus,
+  deleteEventBus,
+  updateRuleConfiguration,
+  removeRuleConfiguration,
+  updateTargetConfiguration,
+  removeTargetConfiguration,
+};
+
+export default {
   createEventBus,
   deleteEventBus,
   updateRuleConfiguration,

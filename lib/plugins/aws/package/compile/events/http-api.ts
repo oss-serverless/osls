@@ -1,13 +1,12 @@
-'use strict';
-
-const memoizee = require('memoizee');
-const memoizeeMethods = require('memoizee/methods');
-const { log } = require('../../../../../utils/serverless-utils/log');
-const ServerlessError = require('../../../../../serverless-error');
-const resolveLambdaTarget = require('../../../utils/resolve-lambda-target');
-const { methodDescriptor } = require('../../../../../utils/property-descriptors');
-const { safeShallowAssign } = require('../../../../../utils/safe-object');
-const isObject = require('type/object/is');
+import memoizee from 'memoizee';
+import memoizeeMethods from 'memoizee/methods.js';
+import log2 from '../../../../../utils/serverless-utils/log.ts';
+import ServerlessError from '../../../../../serverless-error.ts';
+import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
+import { methodDescriptor } from '../../../../../utils/property-descriptors.ts';
+import { safeShallowAssign } from '../../../../../utils/safe-object.ts';
+import isObject from 'type/object/is.js';
+const { log } = log2;
 
 const allowedMethods = new Set(['ANY', 'GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'HEAD', 'DELETE']);
 const methodPattern = new RegExp(`^(?:\\*|${Array.from(allowedMethods).join('|')})$`, 'i');
@@ -680,4 +679,4 @@ Object.defineProperties(
   })
 );
 
-module.exports = HttpApiEvents;
+export default HttpApiEvents;

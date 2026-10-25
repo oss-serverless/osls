@@ -1,12 +1,12 @@
-'use strict';
+import createProgressFooter from '../../../../progress-footer.ts';
+import getProgressReporter from '../../log/get-progress-reporter.ts';
+import log2 from '../../../log.ts';
+import joinTextTokens from '../../log/join-text-tokens.ts';
+import style from './style.ts';
+const { emitter } = getProgressReporter;
+const { progress, log } = log2;
 
-const createProgressFooter = require('../../../../progress-footer');
-const { emitter } = require('../../log/get-progress-reporter');
-const { progress, log } = require('../../../log');
-const joinTextTokens = require('../../log/join-text-tokens');
-const style = require('./style');
-
-module.exports = ({ logLevelIndex }) => {
+export default ({ logLevelIndex }) => {
   const cliProgressFooter = createProgressFooter();
   cliProgressFooter.shouldAddProgressAnimationPrefix = true;
   cliProgressFooter.progressAnimationPrefixFrames =

@@ -1,11 +1,10 @@
-'use strict';
-
-const sinon = require('sinon');
-const chai = require('chai');
-const proxyquire = require('proxyquire').noCallThru();
-const AwsProvider = require('../../../../../../../../lib/plugins/aws/provider');
-const Serverless = require('../../../../../../../../lib/serverless');
-const runServerless = require('../../../../../../../utils/run-serverless');
+import * as sinon from 'sinon';
+import * as chai from 'chai';
+import AwsProvider from '../../../../../../../../lib/plugins/aws/provider.ts';
+import Serverless from '../../../../../../../../lib/serverless.ts';
+import runServerless from '../../../../../../../utils/run-serverless.ts';
+import proxyquire2 from 'proxyquire';
+const proxyquire = proxyquire2.noCallThru();
 
 const { expect } = chai;
 

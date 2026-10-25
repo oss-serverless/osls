@@ -1,18 +1,17 @@
-'use strict';
+import path from 'node:path';
+import * as chai from 'chai';
+import fs from 'node:fs';
+import { promises as fsp } from 'node:fs';
+import * as sinon from 'sinon';
+import { load as yamlParse } from 'js-yaml';
+import createFromLocalTemplate from '../../../../lib/utils/create-from-local-template.ts';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import { ensureDir, getTmpDirPath, outputFile, pathExists, remove } from '../../../utils/fs.ts';
+import skipOnDisabledSymlinksInWindows from '../../../lib/skip-on-disabled-symlinks-in-windows.ts';
+import proxyquire2 from 'proxyquire';
+const proxyquire = proxyquire2.noCallThru().noPreserveCache();
 
-const path = require('path');
-const chai = require('chai');
-const fs = require('fs');
-const fsp = require('fs').promises;
-const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
-const sinon = require('sinon');
-const { load: yamlParse } = require('js-yaml');
-const createFromLocalTemplate = require('../../../../lib/utils/create-from-local-template');
-const ServerlessError = require('../../../../lib/serverless-error');
-const { ensureDir, getTmpDirPath, outputFile, pathExists, remove } = require('../../../utils/fs');
-const skipOnDisabledSymlinksInWindows = require('../../../lib/skip-on-disabled-symlinks-in-windows');
-
-const fixturesPath = path.resolve(__dirname, '../../../fixtures/programmatic');
+const fixturesPath = path.resolve(import.meta.dirname, '../../../fixtures/programmatic');
 
 const expect = chai.expect;
 

@@ -1,12 +1,10 @@
-'use strict';
+import ensureString from 'type/string/ensure.js';
+import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
+import ServerlessError from '../../../../serverless-error.ts';
+import createCachedAwsVariableSourceCommandSender from './create-cached-aws-variable-source-command-sender.ts';
+import { isSsmParameterNotFoundError } from '../../../../aws/aws-sdk-v3-error.ts';
 
-const ensureString = require('type/string/ensure');
-const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm');
-const ServerlessError = require('../../../../serverless-error');
-const createCachedAwsVariableSourceCommandSender = require('./create-cached-aws-variable-source-command-sender');
-const { isSsmParameterNotFoundError } = require('../../../../aws/aws-sdk-v3-error');
-
-module.exports = (serverlessInstance) => {
+export default (serverlessInstance) => {
   const sender = createCachedAwsVariableSourceCommandSender({
     getProvider: () => serverlessInstance.getProvider('aws'),
     Client: SSMClient,

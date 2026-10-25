@@ -1,24 +1,24 @@
-'use strict';
-
 /**
  * IMPORTANT: This file is cached, so when you test changes made to this file,
  * make sure you delete the .serverless directory, and un-memoize the packaging code.
  * For more info search for the "utils/ensure-artifact.js" file in the codebase.
  */
 
-const { wait, MAX_AWS_REQUEST_TRY } = require('../utils');
-const { getEnvironment, handlerWrapper } = require('../utils');
-const {
+import { wait, MAX_AWS_REQUEST_TRY } from '../utils.ts';
+
+import { getEnvironment, handlerWrapper } from '../utils.ts';
+import {
   APIGatewayClient,
   GetAccountCommand,
   UpdateAccountCommand,
-} = require('@aws-sdk/client-api-gateway');
-const {
+} from '@aws-sdk/client-api-gateway';
+
+import {
   IAMClient,
   ListAttachedRolePoliciesCommand,
   CreateRoleCommand,
   AttachRolePolicyCommand,
-} = require('@aws-sdk/client-iam');
+} from '@aws-sdk/client-iam';
 
 const apiGateway = new APIGatewayClient({ maxAttempts: MAX_AWS_REQUEST_TRY });
 const iam = new IAMClient({ maxAttempts: MAX_AWS_REQUEST_TRY });
@@ -137,6 +137,6 @@ function remove() {
   // No actions
 }
 
-module.exports = {
+export default {
   handler: handlerWrapper(handler, 'CustomResourceApiGatewayAccountCloudWatchRole'),
 };

@@ -1,12 +1,10 @@
-'use strict';
-
-const expect = require('chai').expect;
-const fs = require('fs').promises;
-const os = require('os');
-const path = require('path');
-const { outputFile, remove } = require('../../../../../utils/fs');
-const { overrideEnv } = require('../../../../../utils/process');
-const credentials = require('../../../../../../lib/plugins/aws/utils/credentials');
+import { expect } from 'chai';
+import { promises as fs } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { outputFile, remove } from '../../../../../utils/fs.ts';
+import { overrideEnv } from '../../../../../utils/process.ts';
+import credentials from '../../../../../../lib/plugins/aws/utils/credentials.ts';
 
 describe('#credentials', () => {
   const credentialsDirPath = path.join(os.homedir(), '.aws');

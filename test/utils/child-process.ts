@@ -1,6 +1,4 @@
-'use strict';
-
-const { execSync: originalExecSync } = require('child_process');
+import { execSync as originalExecSync } from 'node:child_process';
 
 function execSync(command, options = null) {
   // Same as native but outputs std in case of error
@@ -13,4 +11,5 @@ function execSync(command, options = null) {
   }
 }
 
-module.exports = { execSync };
+export { execSync };
+export default { execSync };

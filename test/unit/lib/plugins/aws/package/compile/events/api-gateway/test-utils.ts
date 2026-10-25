@@ -1,7 +1,5 @@
-'use strict';
-
-const AwsProvider = require('../../../../../../../../../lib/plugins/aws/provider');
-const AwsCompileApigEvents = require('../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/index');
+import AwsProvider from '../../../../../../../../../lib/plugins/aws/provider.ts';
+import AwsCompileApigEvents from '../../../../../../../../../lib/plugins/aws/package/compile/events/api-gateway/index.ts';
 
 function createApiGatewayCompilerContext(config = {}) {
   const options = { stage: 'dev', region: 'us-east-1', ...config.options };
@@ -46,4 +44,5 @@ function createApiGatewayCompilerContext(config = {}) {
   return { serverless, provider, awsCompileApigEvents, options };
 }
 
-module.exports = { createApiGatewayCompilerContext };
+export { createApiGatewayCompilerContext };
+export default { createApiGatewayCompilerContext };

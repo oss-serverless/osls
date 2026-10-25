@@ -1,16 +1,14 @@
-'use strict';
-
-const path = require('path');
-const { expect } = require('chai');
-const fs = require('fs').promises;
-const spawn = require('../../lib/utils/spawn');
-const serverlessExec = require('../serverless-binary');
-const { copyPath, getTmpDirPath, listZipFiles } = require('../utils/fs');
+import path from 'node:path';
+import { expect } from 'chai';
+import { promises as fs } from 'node:fs';
+import spawn from '../../lib/utils/spawn.ts';
+import serverlessExec from '../serverless-binary.ts';
+import { copyPath, getTmpDirPath, listZipFiles } from '../utils/fs.ts';
 
 const fixturePaths = {
-  regular: path.join(__dirname, 'fixtures/regular'),
-  individually: path.join(__dirname, 'fixtures/individually'),
-  individuallyFunction: path.join(__dirname, 'fixtures/individually-function'),
+  regular: path.join(import.meta.dirname, 'fixtures/regular'),
+  individually: path.join(import.meta.dirname, 'fixtures/individually'),
+  individuallyFunction: path.join(import.meta.dirname, 'fixtures/individually-function'),
 };
 
 describe('Integration test - Packaging - Lambda Files', () => {

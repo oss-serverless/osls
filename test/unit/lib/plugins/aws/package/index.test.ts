@@ -1,9 +1,7 @@
-'use strict';
-
-const AwsPackage = require('../../../../../../lib/plugins/aws/package/index');
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const path = require('path');
+import AwsPackage from '../../../../../../lib/plugins/aws/package/index.ts';
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import path from 'node:path';
 
 describe('AwsPackage', () => {
   let awsPackage;

@@ -1,15 +1,14 @@
-'use strict';
-
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const readline = require('readline');
-const { fromIni, fromNodeProviderChain } = require('@aws-sdk/credential-providers');
-const { NodeHttpHandler } = require('@smithy/node-http-handler');
-const { buildHttpOptions } = require('./config');
-const { withInteractiveSsoLogin } = require('./sso-login');
-const ServerlessError = require('../serverless-error');
-const { log } = require('../utils/serverless-utils/log');
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import readline from 'node:readline';
+import { fromIni, fromNodeProviderChain } from '@aws-sdk/credential-providers';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { buildHttpOptions } from './config.ts';
+import { withInteractiveSsoLogin } from './sso-login.ts';
+import ServerlessError from '../serverless-error.ts';
+import log2 from '../utils/serverless-utils/log.ts';
+const { log } = log2;
 
 // Inner SSO/OIDC/STS clients created during credential resolution inherit the same
 // proxy, CA, and timeout configuration as regular clients
@@ -289,7 +288,15 @@ function getAwsSdkV3CredentialsProvider({ provider, profile } = {}) {
   return fromImplicitDefaultProfileWithFallback();
 }
 
-module.exports = {
+export {
+  doesImplicitDefaultProfileExist,
+  fromPrefixedEnv,
+  getAwsSdkV3CredentialsProviderCacheKey,
+  getAwsSdkV3CredentialsProvider,
+  hasEnvironmentCredentials,
+};
+
+export default {
   doesImplicitDefaultProfileExist,
   fromPrefixedEnv,
   getAwsSdkV3CredentialsProviderCacheKey,

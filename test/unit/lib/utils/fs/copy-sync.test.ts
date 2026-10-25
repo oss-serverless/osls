@@ -1,12 +1,9 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const { expect } = require('chai');
-
-const copySync = require('../../../../../lib/utils/fs/copy-sync');
-const { getTmpDirPath } = require('../../../../utils/fs');
-const skipOnDisabledSymlinksInWindows = require('../../../../lib/skip-on-disabled-symlinks-in-windows');
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect } from 'chai';
+import copySync from '../../../../../lib/utils/fs/copy-sync.ts';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
+import skipOnDisabledSymlinksInWindows from '../../../../lib/skip-on-disabled-symlinks-in-windows.ts';
 
 describe('test/unit/lib/utils/fs/copy-sync.test.js', () => {
   let tmpDir;

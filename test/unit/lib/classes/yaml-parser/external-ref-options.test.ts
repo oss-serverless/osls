@@ -1,13 +1,11 @@
-'use strict';
-
-const path = require('path');
-const { pathToFileURL } = require('url');
-const { expect } = require('chai');
-const { getTmpDirPath } = require('../../../../utils/fs');
-const {
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { expect } from 'chai';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
+import {
   normalizeExternalRefOptions,
   normalizeHttpRefOptions,
-} = require('../../../../../lib/classes/yaml-parser/external-ref-options');
+} from '../../../../../lib/classes/yaml-parser/external-ref-options.ts';
 
 describe('yaml-parser/external-ref-options', () => {
   const expectOptionsError = (error) => {

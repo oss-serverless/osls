@@ -1,6 +1,5 @@
-'use strict';
-
-const { cfValue } = require('../../../../../../utils/aws-schema-get-cf-value');
+import awsSchemaGetCfValue from '../../../../../../utils/aws-schema-get-cf-value.ts';
+const { cfValue } = awsSchemaGetCfValue;
 
 const destination = {
   type: 'object',
@@ -93,7 +92,7 @@ const replicationTimeValue = {
   additionalProperties: false,
 };
 
-module.exports = {
+export default {
   type: 'object',
   properties: {
     accelerateConfiguration: {

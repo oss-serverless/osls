@@ -1,8 +1,6 @@
-'use strict';
-
-const ServerlessError = require('../serverless-error');
-const cliCommandsSchema = require('../cli/commands-schema');
-const renderCommandHelp = require('../cli/render-help/command');
+import ServerlessError from '../serverless-error.ts';
+import cliCommandsSchema from '../cli/commands-schema/index.ts';
+import renderCommandHelp from '../cli/render-help/command.ts';
 
 // class wide constants
 const validProviders = new Set(['aws']);
@@ -54,4 +52,4 @@ class Config {
   }
 }
 
-module.exports = Config;
+export default Config;

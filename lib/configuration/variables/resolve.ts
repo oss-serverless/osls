@@ -1,27 +1,24 @@
-// Having variables meta, configuration, and sources setup, attempt to resolve all variables
-
-'use strict';
-
-const ensureArray = require('type/array/ensure');
-const ensureSet = require('type/set/ensure');
-const ensureMap = require('type/map/ensure');
-const ensureString = require('type/string/ensure');
-const coerceString = require('type/string/coerce');
-const isError = require('type/error/is');
-const isObject = require('type/object/is');
-const isPlainObject = require('type/plain-object/is');
-const ensurePlainObject = require('type/plain-object/ensure');
-const ensurePlainFunction = require('type/plain-function/ensure');
-const memoizeMethods = require('memoizee/methods');
-const path = require('path');
-const util = require('util');
-const ServerlessError = require('../../serverless-error');
-const { methodDescriptor } = require('../../utils/property-descriptors');
-const { canFollowProperty, hasOwn, safeSet } = require('../../utils/safe-object');
-const humanizePropertyPath = require('./humanize-property-path-keys');
-const parse = require('./parse');
-const { parseEntries } = require('./resolve-meta');
-const VariableSourceResolutionError = require('./source-resolution-error');
+import ensureArray from 'type/array/ensure.js';
+import ensureSet from 'type/set/ensure.js';
+import ensureMap from 'type/map/ensure.js';
+import ensureString from 'type/string/ensure.js';
+import coerceString from 'type/string/coerce.js';
+import isError from 'type/error/is.js';
+import isObject from 'type/object/is.js';
+import isPlainObject from 'type/plain-object/is.js';
+import ensurePlainObject from 'type/plain-object/ensure.js';
+import ensurePlainFunction from 'type/plain-function/ensure.js';
+import memoizeMethods from 'memoizee/methods.js';
+import path from 'node:path';
+import util from 'node:util';
+import ServerlessError from '../../serverless-error.ts';
+import { methodDescriptor } from '../../utils/property-descriptors.ts';
+import { canFollowProperty, hasOwn, safeSet } from '../../utils/safe-object.ts';
+import humanizePropertyPath from './humanize-property-path-keys.ts';
+import parse from './parse.ts';
+import resolveMeta from './resolve-meta.ts';
+import VariableSourceResolutionError from './source-resolution-error.ts';
+const { parseEntries } = resolveMeta;
 
 const objPropertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 const variableProcessingErrorNames = new Set(['ServerlessError', 'VariableSourceResolutionError']);
@@ -695,7 +692,7 @@ Object.defineProperties(
   })
 );
 
-module.exports = async (data) => {
+export default async (data) => {
   // Input sanity check
   // Note: this function is considered private, if there's a crash here, it signals an internal bug
   data = { ...ensurePlainObject(data) };

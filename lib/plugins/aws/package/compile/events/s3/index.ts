@@ -1,10 +1,9 @@
-'use strict';
-
-const { addCustomResourceToService } = require('../../../../custom-resources');
-const ServerlessError = require('../../../../../../serverless-error');
-const resolveLambdaTarget = require('../../../../utils/resolve-lambda-target');
-const { hasOwn, safeSet, safeShallowAssign } = require('../../../../../../utils/safe-object');
-const isObject = require('type/object/is');
+import customResources from '../../../../custom-resources/index.ts';
+import ServerlessError from '../../../../../../serverless-error.ts';
+import resolveLambdaTarget from '../../../../utils/resolve-lambda-target.ts';
+import { hasOwn, safeSet, safeShallowAssign } from '../../../../../../utils/safe-object.ts';
+import isObject from 'type/object/is.js';
+const { addCustomResourceToService } = customResources;
 
 class AwsCompileS3Events {
   constructor(serverless, options) {
@@ -424,4 +423,4 @@ class AwsCompileS3Events {
   }
 }
 
-module.exports = AwsCompileS3Events;
+export default AwsCompileS3Events;

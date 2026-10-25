@@ -1,6 +1,4 @@
-'use strict';
-
-const resolveLambdaTarget = require('../../../utils/resolve-lambda-target');
+import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
 
 class AwsCompileActiveMQEvents {
   constructor(serverless) {
@@ -168,4 +166,4 @@ class AwsCompileActiveMQEvents {
   }
 }
 
-module.exports = AwsCompileActiveMQEvents;
+export default AwsCompileActiveMQEvents;

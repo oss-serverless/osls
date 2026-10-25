@@ -1,10 +1,8 @@
-'use strict';
-
-const os = require('os');
-const path = require('path');
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const resolveCacheDir = require('../../../../lib/utils/resolve-cache-dir');
+import os from 'node:os';
+import path from 'node:path';
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import resolveCacheDir from '../../../../lib/utils/resolve-cache-dir.ts';
 
 describe('#resolveCacheDir()', () => {
   let originalLocalAppData;

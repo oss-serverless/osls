@@ -1,11 +1,9 @@
-'use strict';
+import path from 'node:path';
+import spawn from '../../../lib/utils/spawn.ts';
+import { expect } from 'chai';
+import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
 
-const path = require('path');
-const spawn = require('../../../lib/utils/spawn');
-const { expect } = require('chai');
-const setupProgrammaticFixture = require('../../utils/setup-programmatic-fixture');
-
-const serverlessPath = path.resolve(__dirname, '../../../scripts/serverless.js');
+const serverlessPath = path.resolve(import.meta.dirname, '../../../scripts/serverless.js');
 
 describe('test/unit/commands/doctor.test.js', async () => {
   before(() => {

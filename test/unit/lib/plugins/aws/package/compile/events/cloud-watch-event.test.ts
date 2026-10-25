@@ -1,9 +1,7 @@
-'use strict';
-
-const expect = require('chai').expect;
-const AwsProvider = require('../../../../../../../../lib/plugins/aws/provider');
-const AwsCompileCloudWatchEventEvents = require('../../../../../../../../lib/plugins/aws/package/compile/events/cloud-watch-event');
-const { createAwsEventCompilerContext } = require('./test-utils');
+import { expect } from 'chai';
+import AwsProvider from '../../../../../../../../lib/plugins/aws/provider.ts';
+import AwsCompileCloudWatchEventEvents from '../../../../../../../../lib/plugins/aws/package/compile/events/cloud-watch-event.ts';
+import { createAwsEventCompilerContext } from './test-utils.ts';
 
 describe('awsCompileCloudWatchEventEvents', () => {
   let awsCompileCloudWatchEventEvents;

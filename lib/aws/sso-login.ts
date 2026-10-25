@@ -1,20 +1,21 @@
-'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import writeFileAtomic from 'write-file-atomic';
+import { getSSOTokenFilepath, loadSsoSessionData, parseKnownFiles } from '@smithy/core/config';
 
-const fs = require('fs');
-const path = require('path');
-const writeFileAtomic = require('write-file-atomic');
-const { getSSOTokenFilepath, loadSsoSessionData, parseKnownFiles } = require('@smithy/core/config');
-const {
+import {
   CreateTokenCommand,
   RegisterClientCommand,
   SSOOIDCClient,
   StartDeviceAuthorizationCommand,
-} = require('@aws-sdk/client-sso-oidc');
-const ServerlessError = require('../serverless-error');
-const { isAwsCredentialProviderError } = require('./aws-sdk-v3-error');
-const isInteractive = require('../utils/is-interactive');
-const wait = require('../utils/sleep');
-const { writeText } = require('../utils/serverless-utils/log');
+} from '@aws-sdk/client-sso-oidc';
+
+import ServerlessError from '../serverless-error.ts';
+import { isAwsCredentialProviderError } from './aws-sdk-v3-error.ts';
+import isInteractive from '../utils/is-interactive.ts';
+import wait from '../utils/sleep.ts';
+import log from '../utils/serverless-utils/log.ts';
+const { writeText } = log;
 
 const DEFAULT_SSO_REGISTRATION_SCOPES = ['sso:account:access'];
 const DEVICE_CODE_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:device_code';
@@ -286,7 +287,9 @@ function runSingleFlightLogin(ssoConfig, login) {
   return LOGIN_ATTEMPTS.get(cachePath).promise;
 }
 
-module.exports = {
+export { resolveSsoProfileConfig, withInteractiveSsoLogin };
+
+export default {
   resolveSsoProfileConfig,
   withInteractiveSsoLogin,
 };

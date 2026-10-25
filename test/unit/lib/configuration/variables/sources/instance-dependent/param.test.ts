@@ -1,11 +1,8 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const resolveMeta = require('../../../../../../../lib/configuration/variables/resolve-meta');
-const resolve = require('../../../../../../../lib/configuration/variables/resolve');
-const selfSource = require('../../../../../../../lib/configuration/variables/sources/self');
-const getParamSource = require('../../../../../../../lib/configuration/variables/sources/instance-dependent/param');
+import { expect } from 'chai';
+import resolveMeta from '../../../../../../../lib/configuration/variables/resolve-meta.ts';
+import resolve from '../../../../../../../lib/configuration/variables/resolve.ts';
+import selfSource from '../../../../../../../lib/configuration/variables/sources/self.ts';
+import getParamSource from '../../../../../../../lib/configuration/variables/sources/instance-dependent/param.ts';
 
 describe('test/unit/lib/configuration/variables/sources/instance-dependent/param.test.js', () => {
   const createServerlessInstance = ({ configuration, cliParameters }) => ({

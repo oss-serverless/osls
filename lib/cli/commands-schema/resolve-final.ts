@@ -1,15 +1,11 @@
-// Resolves final schema of commands for given service configuration
+import mergePlainObjects from '../../utils/merge-plain-objects.ts';
+import serviceCommands from './service.ts';
+import awsServiceCommands from './aws-service.ts';
+import serviceOptions from './common-options/service.ts';
+import awsServiceOptions from './common-options/aws-service.ts';
+import ServerlessError from '../../serverless-error.ts';
 
-'use strict';
-
-const mergePlainObjects = require('../../utils/merge-plain-objects');
-const serviceCommands = require('./service');
-const awsServiceCommands = require('./aws-service');
-const serviceOptions = require('./common-options/service');
-const awsServiceOptions = require('./common-options/aws-service');
-const ServerlessError = require('../../serverless-error');
-
-module.exports = (loadedPlugins, { providerName }) => {
+export default (loadedPlugins, { providerName }) => {
   const commands = new Map(providerName === 'aws' ? awsServiceCommands : serviceCommands);
 
   if (providerName !== 'aws') {

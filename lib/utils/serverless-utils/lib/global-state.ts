@@ -1,5 +1,3 @@
-'use strict';
-
 const globalStateSymbol = Symbol.for('serverless/serverless/202110');
 
 if (!Object.prototype.hasOwnProperty.call(globalThis, globalStateSymbol)) {
@@ -8,4 +6,4 @@ if (!Object.prototype.hasOwnProperty.call(globalThis, globalStateSymbol)) {
   });
 }
 
-module.exports = globalThis[globalStateSymbol];
+export default globalThis[globalStateSymbol];

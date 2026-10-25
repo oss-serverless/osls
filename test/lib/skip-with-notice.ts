@@ -1,8 +1,6 @@
-'use strict';
+import colors from '../../lib/utils/colors.ts';
 
-const colors = require('../../lib/utils/colors');
-
-module.exports = (context, reason, afterCallback) => {
+export default (context, reason, afterCallback) => {
   if (!context || typeof context.skip !== 'function') {
     throw new TypeError('Passed context is not a valid mocha suite');
   }

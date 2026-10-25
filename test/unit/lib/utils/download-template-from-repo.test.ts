@@ -1,18 +1,15 @@
-'use strict';
-
-const sinon = require('sinon');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const proxyquire = require('proxyquire');
-const chai = require('chai');
-const ServerlessError = require('../../../../lib/serverless-error');
+import * as sinon from 'sinon';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import proxyquire from 'proxyquire';
+import * as chai from 'chai';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import { getTmpDirPath } from '../../../utils/fs.ts';
+import writeFileSync from '../../../../lib/utils/fs/write-file-sync.ts';
+import readFileSync from '../../../../lib/utils/fs/read-file-sync.ts';
 
 const { expect } = chai;
-const { getTmpDirPath } = require('../../../utils/fs');
-
-const writeFileSync = require('../../../../lib/utils/fs/write-file-sync');
-const readFileSync = require('../../../../lib/utils/fs/read-file-sync');
 
 const loadUntildifyWithHome = (homeDirectory) =>
   proxyquire('../../../../lib/utils/untildify', {

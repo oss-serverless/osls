@@ -1,8 +1,6 @@
-'use strict';
-
-const ServerlessError = require('../../../../../serverless-error');
-const resolveLambdaTarget = require('../../../utils/resolve-lambda-target');
-const { createRegistry } = require('../../../../../utils/safe-object');
+import ServerlessError from '../../../../../serverless-error.ts';
+import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
+import { createRegistry } from '../../../../../utils/safe-object.ts';
 
 class AwsCompileCloudWatchLogEvents {
   constructor(serverless) {
@@ -183,4 +181,4 @@ class AwsCompileCloudWatchLogEvents {
   }
 }
 
-module.exports = AwsCompileCloudWatchLogEvents;
+export default AwsCompileCloudWatchLogEvents;

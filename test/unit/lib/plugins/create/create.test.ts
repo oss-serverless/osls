@@ -1,19 +1,16 @@
-'use strict';
+import http from 'node:http';
+import { promises as fsp } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import AdmZip from 'adm-zip';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import ServerlessError from '../../../../../lib/serverless-error.ts';
+import { ensureDir, getTmpDirPath, remove } from '../../../../utils/fs.ts';
+import runServerless from '../../../../utils/run-serverless.ts';
+import { expect } from 'chai';
 
-const http = require('http');
-const fsp = require('fs').promises;
-const os = require('os');
-const path = require('path');
-const AdmZip = require('adm-zip');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const ServerlessError = require('../../../../../lib/serverless-error');
-const { ensureDir, getTmpDirPath, remove } = require('../../../../utils/fs');
-const runServerless = require('../../../../utils/run-serverless');
-
-const { expect } = require('chai');
-
-const fixturesPath = path.resolve(__dirname, '../../../../fixtures/programmatic');
+const fixturesPath = path.resolve(import.meta.dirname, '../../../../fixtures/programmatic');
 
 const loadCreate = ({ downloadTemplateFromRepoStub, dirExistsSyncStub, untildifyStub } = {}) => {
   const noticeStub = sinon.stub();

@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-
-'use strict';
-
 /**
  * Drift guard for the osls docs:
  *   (a) every command in lib/cli/commands-schema has a docs/cli-reference page linked from the CLI index;
@@ -9,10 +6,11 @@
  * Node built-ins only. Exits 1 (with diffs) on drift, 0 when clean.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
 
-const REPO_ROOT = path.resolve(__dirname, '..');
+import path from 'node:path';
+
+const REPO_ROOT = path.resolve(import.meta.dirname, '..');
 const CLI_DIR = path.join(REPO_ROOT, 'docs', 'cli-reference');
 const GUIDES_DIR = path.join(REPO_ROOT, 'docs', 'guides');
 const CLI_NAV = path.join(CLI_DIR, 'README.md');

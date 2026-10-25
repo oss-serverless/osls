@@ -1,8 +1,6 @@
-'use strict';
-
-const { finished } = require('node:stream/promises');
-const ensurePlainObject = require('type/plain-object/ensure');
-const { hasOwn } = require('../../lib/utils/safe-object');
+import { finished } from 'node:stream/promises';
+import ensurePlainObject from 'type/plain-object/ensure.js';
+import { hasOwn } from '../../lib/utils/safe-object.ts';
 
 const serviceDefinitions = {
   APIGateway: {
@@ -327,7 +325,7 @@ function createModuleStub({ service, definition, stubMap, state, passContextToCa
   return exports;
 }
 
-module.exports = (
+export default (
   stubMap,
   { ignoreUnsupportedServices = false, passContextToCallbacks = true } = {}
 ) => {

@@ -1,15 +1,14 @@
-'use strict';
-
-const path = require('path');
-const untildify = require('../../utils/untildify');
-
-const ServerlessError = require('../../serverless-error');
-const cliCommandsSchema = require('../../cli/commands-schema');
-const download = require('../../utils/download-template-from-repo');
-const renameService = require('../../utils/rename-service').renameService;
-const copyDirContentsSync = require('../../utils/fs/copy-dir-contents-sync');
-const dirExistsSync = require('../../utils/fs/dir-exists-sync');
-const { progress, log, style } = require('../../utils/serverless-utils/log');
+import path from 'node:path';
+import untildify from '../../utils/untildify.ts';
+import ServerlessError from '../../serverless-error.ts';
+import cliCommandsSchema from '../../cli/commands-schema/index.ts';
+import download from '../../utils/download-template-from-repo.ts';
+import renameService2 from '../../utils/rename-service.ts';
+import copyDirContentsSync from '../../utils/fs/copy-dir-contents-sync.ts';
+import dirExistsSync from '../../utils/fs/dir-exists-sync.ts';
+import log2 from '../../utils/serverless-utils/log.ts';
+const renameService = renameService2.renameService;
+const { progress, log, style } = log2;
 
 const mainProgress = progress.get('main');
 
@@ -91,4 +90,4 @@ class Create {
   }
 }
 
-module.exports = Create;
+export default Create;

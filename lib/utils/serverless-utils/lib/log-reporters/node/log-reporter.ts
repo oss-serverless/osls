@@ -1,10 +1,9 @@
-'use strict';
-
-const NodeLogReporter = require('log-node/lib/writer');
-const logLevels = require('log/levels');
-const logEmitter = require('log/lib/emitter');
-const { stderrColors } = require('../../../../colors');
-const style = require('./style');
+import NodeLogReporter from 'log-node/lib/writer.js';
+import logLevels from 'log/levels.json' with { type: 'json' };
+import logEmitter from 'log/lib/emitter.js';
+import colors from '../../../../colors.ts';
+import style from './style.ts';
+const { stderrColors } = colors;
 
 const WARNING_LEVEL_INDEX = logLevels.indexOf('warning');
 const ERROR_LEVEL_INDEX = logLevels.indexOf('error');
@@ -68,4 +67,4 @@ ServerlessLogReporter.resolveNamespaceMessagePrefix = function (logger) {
   return `${logger.namespaceTokens.slice(1).join(':')}:`;
 };
 
-module.exports = (config) => new ServerlessLogReporter(config);
+export default (config) => new ServerlessLogReporter(config);

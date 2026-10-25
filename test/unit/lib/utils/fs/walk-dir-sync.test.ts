@@ -1,12 +1,10 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const writeFileSync = require('../../../../../lib/utils/fs/write-file-sync');
-const walkDirSync = require('../../../../../lib/utils/fs/walk-dir-sync');
-const { expect } = require('chai');
-const { getTmpDirPath } = require('../../../../utils/fs');
-const skipOnDisabledSymlinksInWindows = require('../../../../lib/skip-on-disabled-symlinks-in-windows');
+import fs from 'node:fs';
+import path from 'node:path';
+import writeFileSync from '../../../../../lib/utils/fs/write-file-sync.ts';
+import walkDirSync from '../../../../../lib/utils/fs/walk-dir-sync.ts';
+import { expect } from 'chai';
+import { getTmpDirPath } from '../../../../utils/fs.ts';
+import skipOnDisabledSymlinksInWindows from '../../../../lib/skip-on-disabled-symlinks-in-windows.ts';
 
 describe('#walkDirSync()', () => {
   it('should return an array with corresponding paths to the found files', () => {

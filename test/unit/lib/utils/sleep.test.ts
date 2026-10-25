@@ -1,8 +1,6 @@
-'use strict';
-
-const sinon = require('sinon');
-const { expect } = require('chai');
-const sleep = require('../../../../lib/utils/sleep');
+import * as sinon from 'sinon';
+import { expect } from 'chai';
+import sleep from '../../../../lib/utils/sleep.ts';
 
 describe('sleep', () => {
   it('resolves on next tick when no timeout is provided', async () => {

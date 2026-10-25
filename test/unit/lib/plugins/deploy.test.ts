@@ -1,8 +1,6 @@
-'use strict';
-
-const Deploy = require('../../../../lib/plugins/deploy');
-const sinon = require('sinon');
-const chai = require('chai');
+import Deploy from '../../../../lib/plugins/deploy.ts';
+import * as sinon from 'sinon';
+import * as chai from 'chai';
 
 const expect = chai.expect;
 

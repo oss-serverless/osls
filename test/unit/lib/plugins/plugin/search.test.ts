@@ -1,8 +1,6 @@
-'use strict';
-
-const sinon = require('sinon');
-const PluginSearch = require('../../../../../lib/plugins/plugin/search');
-const expect = require('chai').expect;
+import * as sinon from 'sinon';
+import PluginSearch from '../../../../../lib/plugins/plugin/search.ts';
+import { expect } from 'chai';
 
 describe('PluginSearch', () => {
   let pluginSearch;

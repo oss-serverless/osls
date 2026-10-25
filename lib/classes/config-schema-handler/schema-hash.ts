@@ -1,9 +1,7 @@
-'use strict';
+import crypto from 'node:crypto';
+import deepSortObjectByKey from '../../utils/deep-sort-object-by-key.ts';
 
-const crypto = require('crypto');
-const deepSortObjectByKey = require('../../utils/deep-sort-object-by-key');
-
-module.exports = (schema) =>
+export default (schema) =>
   crypto
     .createHash('sha256')
     .update(JSON.stringify(deepSortObjectByKey(schema)))

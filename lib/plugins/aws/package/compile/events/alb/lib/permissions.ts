@@ -1,8 +1,6 @@
-'use strict';
+import resolveLambdaTarget from '../../../../../utils/resolve-lambda-target.ts';
 
-const resolveLambdaTarget = require('../../../../../utils/resolve-lambda-target');
-
-module.exports = {
+export default {
   compilePermissions() {
     this.validated.events.forEach((event) => {
       const { functionName, albId, multiValueHeaders } = event;

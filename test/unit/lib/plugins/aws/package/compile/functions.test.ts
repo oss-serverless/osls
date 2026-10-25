@@ -1,21 +1,18 @@
-'use strict';
-
-const fs = require('fs');
-const fsp = require('fs').promises;
-const path = require('path');
-const { Readable, Writable } = require('node:stream');
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const chai = require('chai');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const AwsProvider = require('../../../../../../../lib/plugins/aws/provider');
-const AwsCompileFunctions = require('../../../../../../../lib/plugins/aws/package/compile/functions');
-const Serverless = require('../../../../../../../lib/serverless');
-const runServerless = require('../../../../../../utils/run-serverless');
-const setupProgrammaticFixture = require('../../../../../../utils/setup-programmatic-fixture');
-const { createDeployAwsStubMap } = require('../../../../../../utils/aws-stub-maps');
-
-const { getTmpDirPath, createTmpFile } = require('../../../../../../utils/fs');
+import fs from 'node:fs';
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
+import { Readable, Writable } from 'node:stream';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import * as chai from 'chai';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import AwsProvider from '../../../../../../../lib/plugins/aws/provider.ts';
+import AwsCompileFunctions from '../../../../../../../lib/plugins/aws/package/compile/functions.ts';
+import Serverless from '../../../../../../../lib/serverless.ts';
+import runServerless from '../../../../../../utils/run-serverless.ts';
+import setupProgrammaticFixture from '../../../../../../utils/setup-programmatic-fixture.ts';
+import { createDeployAwsStubMap } from '../../../../../../utils/aws-stub-maps.ts';
+import { getTmpDirPath, createTmpFile } from '../../../../../../utils/fs.ts';
 
 const expect = chai.expect;
 

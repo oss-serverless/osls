@@ -1,17 +1,18 @@
-'use strict';
+import log2 from '../../../../utils/serverless-utils/log.ts';
+import ServerlessError from '../../../../serverless-error.ts';
+import isChangeSetWithoutChanges from '../../utils/is-change-set-without-changes.ts';
 
-const { progress, log } = require('../../../../utils/serverless-utils/log');
-const ServerlessError = require('../../../../serverless-error');
-const isChangeSetWithoutChanges = require('../../utils/is-change-set-without-changes');
-const {
+import {
   CloudFormationClient,
   CreateStackCommand,
   CreateChangeSetCommand,
   DeleteChangeSetCommand,
   ExecuteChangeSetCommand,
   DescribeStacksCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { isCloudFormationMissingStackError } = require('../../../../aws/aws-sdk-v3-error');
+} from '@aws-sdk/client-cloudformation';
+
+import { isCloudFormationMissingStackError } from '../../../../aws/aws-sdk-v3-error.ts';
+const { progress, log } = log2;
 
 const inactiveStateNames = new Set(['REVIEW_IN_PROGRESS']);
 
@@ -22,7 +23,7 @@ function getCloudFormationClient(context) {
   return context.cloudFormationClientPromise;
 }
 
-module.exports = {
+export default {
   async create() {
     // Note: using three dots instead of ellipsis to support non uni-code consoles.
     progress.get('main').notice('Creating CloudFormation stack', { isMainEvent: true });

@@ -1,16 +1,13 @@
-'use strict';
-
-const { expect } = require('chai');
-const requireUncached = require('../../../../utils/require-uncached');
+import { expect } from 'chai';
+import requireUncached from '../../../../utils/require-uncached.ts';
+import getProgressReporter2 from '../../../../../lib/utils/serverless-utils/lib/log/get-progress-reporter.ts';
 
 describe('serverless-utils/get-progress-reporter', () => {
   let getProgressReporter;
   let events;
 
   beforeEach(() => {
-    getProgressReporter = requireUncached(() =>
-      require('../../../../../lib/utils/serverless-utils/lib/log/get-progress-reporter')
-    );
+    getProgressReporter = requireUncached(() => getProgressReporter2);
     events = [];
     getProgressReporter.emitter.on('update', (event) => events.push(event));
   });

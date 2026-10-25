@@ -1,10 +1,9 @@
-'use strict';
-
-const { expect } = require('chai');
-const { overrideArgv } = require('../../../utils/process');
-const resolveInput = require('../../../../lib/cli/resolve-input');
-const commandsSchema = require('../../../../lib/cli/commands-schema');
-const resolveFinalCommandsSchema = require('../../../../lib/cli/commands-schema/resolve-final');
+import { expect } from 'chai';
+import { overrideArgv } from '../../../utils/process.ts';
+import resolveInput from '../../../../lib/cli/resolve-input.ts';
+import commandsSchema from '../../../../lib/cli/commands-schema/index.ts';
+import resolveFinalCommandsSchema from '../../../../lib/cli/commands-schema/resolve-final.ts';
+import noService from '../../../../lib/cli/commands-schema/no-service.ts';
 
 describe('test/unit/lib/cli/resolve-input.test.js', () => {
   afterEach(() => {
@@ -263,7 +262,7 @@ describe('test/unit/lib/cli/resolve-input.test.js', () => {
     });
 
     it('should let final plugin schema overwrite an earlier non-plugin parse', () => {
-      const noServiceCommandsSchema = require('../../../../lib/cli/commands-schema/no-service');
+      const noServiceCommandsSchema = noService;
       const finalCommandsSchema = resolveFinalCommandsSchema(
         new Set([
           {

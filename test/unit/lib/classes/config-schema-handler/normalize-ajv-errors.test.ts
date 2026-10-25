@@ -1,10 +1,8 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const Ajv = require('ajv').default;
-const memoize = require('memoizee');
-const normalizeAjvErrors = require('../../../../../lib/classes/config-schema-handler/normalize-ajv-errors');
+import { expect } from 'chai';
+import ajv from 'ajv';
+import memoize from 'memoizee';
+import normalizeAjvErrors from '../../../../../lib/classes/config-schema-handler/normalize-ajv-errors.ts';
+const Ajv = ajv.default;
 
 describe('#normalizeAjvErrors', () => {
   const resolveAjv = memoize(

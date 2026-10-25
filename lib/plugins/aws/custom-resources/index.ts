@@ -1,13 +1,12 @@
-'use strict';
-
-const path = require('path');
-const crypto = require('crypto');
-const fsp = require('fs').promises;
-const memoizee = require('memoizee');
-const { log } = require('../../../utils/serverless-utils/log');
-const generateZip = require('./generate-zip');
-const ensureArtifact = require('../../../utils/ensure-artifact');
-const ServerlessError = require('../../../serverless-error');
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { promises as fsp } from 'node:fs';
+import memoizee from 'memoizee';
+import log2 from '../../../utils/serverless-utils/log.ts';
+import generateZip from './generate-zip.ts';
+import ensureArtifact from '../../../utils/ensure-artifact.ts';
+import ServerlessError from '../../../serverless-error.ts';
+const { log } = log2;
 
 const copyCustomResourcesZip = async (zipFilePath) => {
   const [cachedZipFilePath] = await Promise.all([
@@ -234,7 +233,7 @@ async function addCustomResourceToService(awsProvider, resourceName, iamRoleStat
   }
 }
 
-module.exports = {
+export default {
   addCustomResourceToService,
   clearArtifactCopyCache: prepareCustomResourcePackage.clear,
 };

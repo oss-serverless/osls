@@ -1,11 +1,9 @@
-'use strict';
+import ensureString from 'type/string/ensure.js';
+import isObject from 'type/object/is.js';
+import ServerlessError from '../serverless-error.ts';
+import resolveCliInput from '../cli/resolve-input.ts';
 
-const ensureString = require('type/string/ensure');
-const isObject = require('type/object/is');
-const ServerlessError = require('../serverless-error');
-const resolveCliInput = require('../cli/resolve-input');
-
-module.exports = (configuration, options = {}) => {
+export default (configuration, options = {}) => {
   if (!options) options = {};
   const isHelpRequest =
     options.isHelpRequest == null ? resolveCliInput().isHelpRequest : options.isHelpRequest;

@@ -1,15 +1,13 @@
-'use strict';
-
-const path = require('path');
-const { pathToFileURL } = require('url');
-const yaml = require('js-yaml');
-const cloudformationSchema = require('../utils/serverless-utils/cloudformation-schema');
-const isPlainObject = require('type/plain-object/is');
-const ServerlessError = require('../serverless-error');
-const { isExternalRefAccessDeniedError } = require('./yaml-parser/external-ref-errors');
-const { normalizeExternalRefOptions } = require('./yaml-parser/external-ref-options');
-const { readExternalDocument } = require('./yaml-parser/external-ref-reader');
-const { safeSet } = require('../utils/safe-object');
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import * as yaml from 'js-yaml';
+import cloudformationSchema from '../utils/serverless-utils/cloudformation-schema.ts';
+import isPlainObject from 'type/plain-object/is.js';
+import ServerlessError from '../serverless-error.ts';
+import { isExternalRefAccessDeniedError } from './yaml-parser/external-ref-errors.ts';
+import { normalizeExternalRefOptions } from './yaml-parser/external-ref-options.ts';
+import { readExternalDocument } from './yaml-parser/external-ref-reader.ts';
+import { safeSet } from '../utils/safe-object.ts';
 
 const getDocumentUrl = (yamlFilePath) => pathToFileURL(path.resolve(yamlFilePath)).href;
 
@@ -294,4 +292,4 @@ class YamlParser {
   }
 }
 
-module.exports = YamlParser;
+export default YamlParser;

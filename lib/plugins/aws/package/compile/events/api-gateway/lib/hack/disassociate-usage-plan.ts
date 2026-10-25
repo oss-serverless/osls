@@ -1,16 +1,14 @@
-'use strict';
-
-const promiseLimit = require('ext/promise/limit').bind(Promise);
-const {
+import {
   APIGatewayClient,
   GetUsagePlansCommand,
   UpdateUsagePlanCommand,
-} = require('@aws-sdk/client-api-gateway');
-const {
-  CloudFormationClient,
-  DescribeStackResourceCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { log } = require('../../../../../../../../utils/serverless-utils/log');
+} from '@aws-sdk/client-api-gateway';
+import { CloudFormationClient, DescribeStackResourceCommand } from '@aws-sdk/client-cloudformation';
+import log2 from '../../../../../../../../utils/serverless-utils/log.ts';
+import promiseLimit2 from 'ext/promise/limit.js';
+
+const promiseLimit = promiseLimit2.bind(Promise);
+const { log } = log2;
 
 function getApiGatewayRequestLimiter(context) {
   if (!context.limitApiGatewayRequests) {
@@ -47,7 +45,7 @@ async function getAllUsagePlans(apiGateway) {
   return items;
 }
 
-module.exports = {
+export default {
   async disassociateUsagePlan() {
     const apiKeys =
       this.serverless.service.provider.apiGateway &&

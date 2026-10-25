@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = (error, context, afterCallback) => {
+export default (error, context, afterCallback) => {
   if (error.code !== 'EPERM' || process.platform !== 'win32') return;
 
   if (!context || typeof context.skip !== 'function') {

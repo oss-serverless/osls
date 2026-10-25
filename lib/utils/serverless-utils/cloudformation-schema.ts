@@ -1,6 +1,4 @@
-'use strict';
-
-const yaml = require('js-yaml');
+import * as yaml from 'js-yaml';
 
 const functionNames = [
   'And',
@@ -56,4 +54,4 @@ const createSchema = () => {
   }).extend(types);
 };
 
-module.exports = createSchema();
+export default createSchema();

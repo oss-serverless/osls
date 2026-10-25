@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = function getS3EndpointForRegion(region) {
+export default function getS3EndpointForRegion(region) {
   const strRegion = region.toLowerCase();
   // look for govcloud - currently s3-us-gov-west-1.amazonaws.com
   if (strRegion.match(/us-gov/)) return `s3-${strRegion}.amazonaws.com`;
@@ -12,4 +10,4 @@ module.exports = function getS3EndpointForRegion(region) {
   if (strRegion.match(/isob-/)) return `s3.${strRegion}.sc2s.sgov.gov`;
   // default s3 endpoint for other regions
   return 's3.amazonaws.com';
-};
+}

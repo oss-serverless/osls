@@ -1,15 +1,12 @@
-'use strict';
-
-const wait = require('../../../utils/sleep');
-const ServerlessError = require('../../../serverless-error');
-const isChangeSetWithoutChanges = require('../utils/is-change-set-without-changes');
-const { log } = require('../../../utils/serverless-utils/log');
-const getMonitoringFrequency = require('../utils/get-monitoring-frequency');
-const {
-  CloudFormationClient,
-  DescribeChangeSetCommand,
-} = require('@aws-sdk/client-cloudformation');
-const { retryOnThrottlingError } = require('../../../aws/retry');
+import wait from '../../../utils/sleep.ts';
+import ServerlessError from '../../../serverless-error.ts';
+import isChangeSetWithoutChanges from '../utils/is-change-set-without-changes.ts';
+import log2 from '../../../utils/serverless-utils/log.ts';
+import getMonitoringFrequency from '../utils/get-monitoring-frequency.ts';
+import { CloudFormationClient, DescribeChangeSetCommand } from '@aws-sdk/client-cloudformation';
+import retry from '../../../aws/retry.ts';
+const { log } = log2;
+const { retryOnThrottlingError } = retry;
 
 function getCloudFormationClient(context) {
   context.cloudFormationClientPromise ||= context.provider
@@ -18,7 +15,7 @@ function getCloudFormationClient(context) {
   return context.cloudFormationClientPromise;
 }
 
-module.exports = {
+export default {
   async waitForChangeSetCreation(changeSetName, stackName) {
     const params = {
       ChangeSetName: changeSetName,

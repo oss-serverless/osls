@@ -1,11 +1,9 @@
-'use strict';
-
-const sinon = require('sinon');
-const validateTemplate = require('../../../../../../../lib/plugins/aws/deploy/lib/validate-template');
-const { CloudFormationClient, ValidateTemplateCommand } = require('@aws-sdk/client-cloudformation');
+import * as sinon from 'sinon';
+import validateTemplate from '../../../../../../../lib/plugins/aws/deploy/lib/validate-template.ts';
+import { CloudFormationClient, ValidateTemplateCommand } from '@aws-sdk/client-cloudformation';
 
 // Configure chai
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 describe('validateTemplate', () => {
   let awsDeploy;

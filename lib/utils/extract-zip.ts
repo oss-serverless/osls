@@ -1,10 +1,8 @@
-'use strict';
-
-const fs = require('fs');
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import yauzl from 'yauzl';
 const fsp = fs.promises;
-const crypto = require('crypto');
-const path = require('path');
-const yauzl = require('yauzl');
 
 const pathPosix = path.posix;
 
@@ -365,7 +363,9 @@ const extractZip = async (input, output, options = {}) => {
   return extractedFiles;
 };
 
-module.exports = {
+export { extractZip, isZipBuffer };
+
+export default {
   extractZip,
   isZipBuffer,
 };

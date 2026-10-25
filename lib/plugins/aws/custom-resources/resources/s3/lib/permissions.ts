@@ -1,11 +1,9 @@
-'use strict';
-
-const { MAX_AWS_REQUEST_TRY } = require('../../utils');
-const {
+import { MAX_AWS_REQUEST_TRY } from '../../utils.ts';
+import {
   LambdaClient,
   AddPermissionCommand,
   RemovePermissionCommand,
-} = require('@aws-sdk/client-lambda');
+} from '@aws-sdk/client-lambda';
 
 const lambda = new LambdaClient({ maxAttempts: MAX_AWS_REQUEST_TRY });
 
@@ -49,7 +47,9 @@ async function removePermission(config) {
   return lambda.send(new RemovePermissionCommand(payload));
 }
 
-module.exports = {
+export { getStatementId, addPermission, removePermission };
+
+export default {
   getStatementId,
   addPermission,
   removePermission,

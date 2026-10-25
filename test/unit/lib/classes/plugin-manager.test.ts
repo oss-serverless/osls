@@ -1,23 +1,21 @@
-'use strict';
-
-const chai = require('chai');
-const { overrideEnv, overrideArgv } = require('../../../utils/process');
-const runServerless = require('../../../utils/run-serverless');
-const setupProgrammaticFixture = require('../../../utils/setup-programmatic-fixture');
-const Serverless = require('../../../../lib/serverless');
-const CLI = require('../../../../lib/classes/cli');
-const resolveInput = require('../../../../lib/cli/resolve-input');
-const Create = require('../../../../lib/plugins/create/create');
-const ServerlessError = require('../../../../lib/serverless-error');
-const getRequire = require('../../../../lib/utils/get-require');
-const importModule = require('../../../../lib/utils/require-with-import-fallback');
-
-const path = require('path');
-const fsp = require('fs').promises;
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const { installPlugin } = require('../../../utils/plugins');
-const { ensureDirSync, getTmpDirPath, removeSync } = require('../../../utils/fs');
+import * as chai from 'chai';
+import { overrideEnv, overrideArgv } from '../../../utils/process.ts';
+import runServerless from '../../../utils/run-serverless.ts';
+import setupProgrammaticFixture from '../../../utils/setup-programmatic-fixture.ts';
+import Serverless from '../../../../lib/serverless.ts';
+import CLI from '../../../../lib/classes/cli.ts';
+import resolveInput from '../../../../lib/cli/resolve-input.ts';
+import Create from '../../../../lib/plugins/create/create.ts';
+import ServerlessError from '../../../../lib/serverless-error.ts';
+import getRequire from '../../../../lib/utils/get-require.ts';
+import importModule from '../../../../lib/utils/require-with-import-fallback.ts';
+import path from 'node:path';
+import { promises as fsp } from 'node:fs';
+import * as sinon from 'sinon';
+import proxyquire from 'proxyquire';
+import { installPlugin } from '../../../utils/plugins.ts';
+import { ensureDirSync, getTmpDirPath, removeSync } from '../../../utils/fs.ts';
+import module from 'node:module';
 
 const expect = chai.expect;
 
@@ -406,7 +404,7 @@ describe('PluginManager', () => {
   const servicePluginMocks = new Map();
   const PluginManager = proxyquire('../../../../lib/classes/plugin-manager', {
     '../utils/get-require': (directory) => {
-      const resultRequire = require('module').createRequire(path.resolve(directory, 'req'));
+      const resultRequire = module.createRequire(path.resolve(directory, 'req'));
       resultRequire.resolve = (pluginPath) => resolveStub(directory, pluginPath);
       return resultRequire;
     },

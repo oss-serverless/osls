@@ -1,28 +1,12 @@
-// This module is mostly adapted from https://github.com/kevva/download repository
-
-// License of the original module - https://github.com/kevva/download/blob/master/license
-
-// MIT License
-
-// Copyright (c) Kevin Mårtensson <kevinmartensson@gmail.com> (github.com/kevva)
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-const fsp = require('fs').promises;
-const path = require('path');
-const { URL } = require('url');
-const { Agent } = require('undici');
-const buildFetchDispatcher = require('../build-fetch-dispatcher');
-const { parse: parseContentDisposition } = require('content-disposition');
-const { default: filenamify } = require('filenamify');
-const mime = require('mime-types');
-const { extractZip, isZipBuffer } = require('../extract-zip');
+import { promises as fsp } from 'node:fs';
+import path from 'node:path';
+import { URL } from 'node:url';
+import { Agent } from 'undici';
+import buildFetchDispatcher from '../build-fetch-dispatcher.ts';
+import { parse as parseContentDisposition } from 'content-disposition';
+import filenamify from 'filenamify';
+import mime from 'mime-types';
+import { extractZip, isZipBuffer } from '../extract-zip.ts';
 
 const redirectStatusCodes = new Set([301, 302, 303, 307, 308]);
 const genericMimeTypes = new Set(['application/octet-stream', 'binary/octet-stream']);
@@ -127,7 +111,7 @@ const fetchWithRedirects = async (
   throw new Error('Too many redirects');
 };
 
-module.exports = (uri, output, opts) => {
+export default (uri, output, opts) => {
   return (async () => {
     if (typeof output === 'object') {
       opts = output;

@@ -1,12 +1,7 @@
-'use strict';
-
-const { expect } = require('chai');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const {
-  CloudFormationClient,
-  DescribeChangeSetCommand,
-} = require('@aws-sdk/client-cloudformation');
+import { expect } from 'chai';
+import proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import { CloudFormationClient, DescribeChangeSetCommand } from '@aws-sdk/client-cloudformation';
 
 describe('waitForChangeSetCreation', () => {
   let awsPlugin;

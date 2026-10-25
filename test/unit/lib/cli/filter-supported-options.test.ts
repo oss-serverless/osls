@@ -1,8 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const filterSupportedOptions = require('../../../../lib/cli/filter-supported-options');
+import { expect } from 'chai';
+import filterSupportedOptions from '../../../../lib/cli/filter-supported-options.ts';
 
 describe('test/unit/lib/cli/filter-supported-options.test.js', () => {
   it('should recognize just command schema options if passsed', () => {

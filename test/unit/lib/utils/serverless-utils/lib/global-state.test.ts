@@ -1,7 +1,5 @@
-'use strict';
-
-const { expect } = require('chai');
-const requireUncached = require('../../../../../utils/require-uncached');
+import { expect } from 'chai';
+import requireUncached from '../../../../../utils/require-uncached.ts';
 
 describe('serverless-utils/global-state', () => {
   it('shares state across uncached module loads', () => {

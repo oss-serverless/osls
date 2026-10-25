@@ -1,9 +1,8 @@
-'use strict';
-
-const { expect } = require('chai');
-const proxyquire = require('proxyquire').noCallThru();
-const sinon = require('sinon');
-const utils = require('../../../../../../../lib/plugins/aws/custom-resources/resources/utils');
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import utils from '../../../../../../../lib/plugins/aws/custom-resources/resources/utils.ts';
+import proxyquire2 from 'proxyquire';
+const proxyquire = proxyquire2.noCallThru();
 
 describe('Custom resource Cognito user pool permissions', () => {
   let sentCommands;

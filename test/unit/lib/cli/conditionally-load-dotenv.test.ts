@@ -1,11 +1,8 @@
-'use strict';
-
-const path = require('path');
-const { overrideEnv } = require('../../../utils/process');
-const fsp = require('fs').promises;
-const conditionallyLoadDotenv = require('../../../../lib/cli/conditionally-load-dotenv');
-
-const expect = require('chai').expect;
+import path from 'node:path';
+import { overrideEnv } from '../../../utils/process.ts';
+import { promises as fsp } from 'node:fs';
+import conditionallyLoadDotenv from '../../../../lib/cli/conditionally-load-dotenv.ts';
+import { expect } from 'chai';
 
 describe('test/unit/lib/cli/conditionally-load-dotenv.test.js', () => {
   let restoreEnv;

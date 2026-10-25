@@ -1,9 +1,7 @@
-'use strict';
+import resolveLambdaTarget from '../../../../../utils/resolve-lambda-target.ts';
+import isObject from 'type/object/is.js';
 
-const resolveLambdaTarget = require('../../../../../utils/resolve-lambda-target');
-const isObject = require('type/object/is');
-
-module.exports = {
+export default {
   compilePermissions() {
     this.validated.events.forEach((event) => {
       const websocketApiId = this.provider.getApiGatewayWebsocketApiId();

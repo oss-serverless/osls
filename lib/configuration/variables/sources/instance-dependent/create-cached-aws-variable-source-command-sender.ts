@@ -1,7 +1,7 @@
-'use strict';
+import deepSortObjectByKey from '../../../../utils/deep-sort-object-by-key.ts';
+import promiseLimit2 from 'ext/promise/limit.js';
 
-const promiseLimit = require('ext/promise/limit').bind(Promise);
-const deepSortObjectByKey = require('../../../../utils/deep-sort-object-by-key');
+const promiseLimit = promiseLimit2.bind(Promise);
 
 const maxConcurrentVariableSourceCommands = 2;
 
@@ -103,4 +103,4 @@ function createCachedAwsVariableSourceCommandSender({
   return { send };
 }
 
-module.exports = createCachedAwsVariableSourceCommandSender;
+export default createCachedAwsVariableSourceCommandSender;

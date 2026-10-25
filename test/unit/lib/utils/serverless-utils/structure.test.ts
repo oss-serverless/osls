@@ -1,10 +1,7 @@
-'use strict';
-
-const fs = require('fs').promises;
-const path = require('path');
-const { expect } = require('chai');
-
-const policy = require('../../../../../lib/utils/serverless-utils/policy');
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
+import { expect } from 'chai';
+import policy from '../../../../../lib/utils/serverless-utils/policy.ts';
 
 const collectFiles = async (rootDir, prefix = '') => {
   const entries = await fs.readdir(path.join(rootDir, prefix), { withFileTypes: true });
@@ -24,7 +21,7 @@ const collectFiles = async (rootDir, prefix = '') => {
 
 describe('serverless-utils vendored structure', () => {
   it('matches the allowlisted vendored tree exactly', async () => {
-    const rootDir = path.resolve(__dirname, '../../../../../lib/utils/serverless-utils');
+    const rootDir = path.resolve(import.meta.dirname, '../../../../../lib/utils/serverless-utils');
     const actual = await collectFiles(rootDir);
 
     expect(actual).to.deep.equal([...policy.vendoredPaths, ...policy.maintainerPaths].sort());

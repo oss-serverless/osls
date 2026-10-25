@@ -1,12 +1,9 @@
-'use strict';
-
-const { expect } = require('chai');
-
-const resolveMeta = require('../../../../../../../lib/configuration/variables/resolve-meta');
-const resolve = require('../../../../../../../lib/configuration/variables/resolve');
-const selfSource = require('../../../../../../../lib/configuration/variables/sources/self');
-const getSlsSource = require('../../../../../../../lib/configuration/variables/sources/instance-dependent/get-sls');
-const mergePlainObjects = require('../../../../../../../lib/utils/merge-plain-objects');
+import { expect } from 'chai';
+import resolveMeta from '../../../../../../../lib/configuration/variables/resolve-meta.ts';
+import resolve from '../../../../../../../lib/configuration/variables/resolve.ts';
+import selfSource from '../../../../../../../lib/configuration/variables/sources/self.ts';
+import getSlsSource from '../../../../../../../lib/configuration/variables/sources/instance-dependent/get-sls.ts';
+import mergePlainObjects from '../../../../../../../lib/utils/merge-plain-objects.ts';
 
 describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-sls.test.js', () => {
   let configuration;

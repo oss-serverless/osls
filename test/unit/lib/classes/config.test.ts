@@ -1,8 +1,6 @@
-'use strict';
-
-const expect = require('chai').expect;
-const Config = require('../../../../lib/classes/config');
-const Serverless = require('../../../../lib/serverless');
+import { expect } from 'chai';
+import Config from '../../../../lib/classes/config.ts';
+import Serverless from '../../../../lib/serverless.ts';
 
 const serverless = new Serverless({ commands: [], options: {} });
 

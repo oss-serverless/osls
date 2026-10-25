@@ -1,8 +1,6 @@
-'use strict';
-
-const getMskClusterNameToken = require('./get-msk-cluster-name-token');
-const resolveLambdaTarget = require('../../../../utils/resolve-lambda-target');
-const ServerlessError = require('../../../../../../serverless-error');
+import getMskClusterNameToken from './get-msk-cluster-name-token.ts';
+import resolveLambdaTarget from '../../../../utils/resolve-lambda-target.ts';
+import ServerlessError from '../../../../../../serverless-error.ts';
 
 class AwsCompileMSKEvents {
   constructor(serverless) {
@@ -197,4 +195,4 @@ class AwsCompileMSKEvents {
   }
 }
 
-module.exports = AwsCompileMSKEvents;
+export default AwsCompileMSKEvents;

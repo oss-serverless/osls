@@ -1,12 +1,11 @@
-'use strict';
+import crypto from 'node:crypto';
+import { MAX_AWS_REQUEST_TRY } from '../../utils.ts';
 
-const crypto = require('crypto');
-const { MAX_AWS_REQUEST_TRY } = require('../../utils');
-const {
+import {
   S3Client,
   GetBucketNotificationConfigurationCommand,
   PutBucketNotificationConfigurationCommand,
-} = require('@aws-sdk/client-s3');
+} from '@aws-sdk/client-s3';
 
 const s3 = new S3Client({ maxAttempts: MAX_AWS_REQUEST_TRY });
 
@@ -138,7 +137,9 @@ async function removeConfiguration(config) {
   });
 }
 
-module.exports = {
+export { updateConfiguration, removeConfiguration };
+
+export default {
   updateConfiguration,
   removeConfiguration,
 };
