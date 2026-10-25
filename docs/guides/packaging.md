@@ -81,7 +81,7 @@ package:
 
 ### Size limit
 
-AWS Lambda limits a function's code and layers to 250 MB once unzipped. When a package built by osls is larger than that, `osls package` and `osls deploy` fail before anything is uploaded, and list the largest files and directories of the package. Use `patterns` to exclude files that are not needed at runtime.
+AWS Lambda limits a function's code and layers to 250 MiB once unzipped. When a package built by osls is larger than that, `osls package` and `osls deploy` fail before anything is uploaded, and list the largest files and directories of the package. Use `patterns` to exclude files that are not needed at runtime.
 
 ### Artifact
 

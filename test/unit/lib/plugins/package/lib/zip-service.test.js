@@ -1406,7 +1406,7 @@ describe('zipService', () => {
 
         serverless.utils.writeFileDir(largeFilePath);
         await fs.promises.writeFile(largeFilePath, '');
-        // Just below the 250 MB AWS Lambda limit, larger packages are rejected
+        // Just below the 250 MiB AWS Lambda limit, larger packages are rejected
         await fs.promises.truncate(largeFilePath, 240 * 1024 * 1024);
 
         await packagePlugin.zipFiles(['event.json'], getTestArtifactFileName('warmup'));
@@ -1468,11 +1468,11 @@ describe('zipService', () => {
       expect(error).to.have.property('code', 'PACKAGE_TOO_LARGE');
       expect(error.message).to.equal(
         [
-          'The "too-large.zip" package is 260.0 MB unzipped, above the 250 MB AWS Lambda limit (function code and layers combined).',
+          'The "too-large.zip" package is 260.0 MiB unzipped, above the 250 MiB AWS Lambda limit (function code and layers combined).',
           'Largest files and directories in the package:',
-          '  vendor/         200.0 MB',
-          '  node_modules/    60.0 MB',
-          '  handler.js        0.0 MB',
+          '  vendor/         200.0 MiB',
+          '  node_modules/    60.0 MiB',
+          '  handler.js        0.0 MiB',
           'Exclude files that are not needed at runtime with "package.patterns": https://github.com/oss-serverless/osls/blob/4.x/docs/guides/packaging.md#patterns',
         ].join('\n')
       );
