@@ -1729,7 +1729,7 @@ describe('AwsInvokeLocal', () => {
           },
         },
       });
-      const { invokeLocal, localServerless } = createRemoteLayerTestContext({
+      const { invokeLocal, localServerless } = await createRemoteLayerTestContext({
         awsSdkV3Stub,
         cacheDirPath,
         copyStub,
@@ -1781,7 +1781,7 @@ describe('AwsInvokeLocal', () => {
           },
         },
       });
-      const { invokeLocal } = createRemoteLayerTestContext({
+      const { invokeLocal } = await createRemoteLayerTestContext({
         awsSdkV3Stub,
         cacheDirPath,
         copyStub,
@@ -1818,7 +1818,7 @@ describe('AwsInvokeLocal', () => {
           },
         },
       });
-      const { invokeLocal } = createRemoteLayerTestContext({
+      const { invokeLocal } = await createRemoteLayerTestContext({
         awsSdkV3Stub,
         cacheDirPath,
         copyStub,

@@ -121,7 +121,7 @@ describe('Custom resource S3 handler', () => {
   }
 
   it('should not churn Lambda permission on same-target ForceDeploy updates', async () => {
-    const { handler, addPermission, updateConfiguration, removePermission } = makeHandler();
+    const { handler, addPermission, updateConfiguration, removePermission } = await makeHandler();
 
     await handler(
       {
@@ -165,7 +165,7 @@ describe('Custom resource S3 handler', () => {
     const removePermission = sinon.stub().callsFake(async (input) => {
       calls.push(['removePermission', input]);
     });
-    const { handler } = makeHandler({ addPermission, updateConfiguration, removePermission });
+    const { handler } = await makeHandler({ addPermission, updateConfiguration, removePermission });
 
     await handler(
       {
@@ -199,7 +199,7 @@ describe('Custom resource S3 handler', () => {
     const addPermission = sinon
       .stub()
       .rejects(Object.assign(new Error('denied'), { name: 'AccessDeniedException' }));
-    const { handler, updateConfiguration, removePermission } = makeHandler({ addPermission });
+    const { handler, updateConfiguration, removePermission } = await makeHandler({ addPermission });
 
     await expect(
       handler(
@@ -302,7 +302,7 @@ describe('Custom resource S3 handler', () => {
   it('should remove old same-bucket function notifications in the update put', async () => {
     const updateConfiguration = sinon.stub().resolves();
     const removeConfiguration = sinon.stub().resolves();
-    const { handler } = makeHandler({ updateConfiguration, removeConfiguration });
+    const { handler } = await makeHandler({ updateConfiguration, removeConfiguration });
 
     await handler(
       {
@@ -332,7 +332,7 @@ describe('Custom resource S3 handler', () => {
   it('should remove old function notifications from the new bucket during rename and bucket migration', async () => {
     const updateConfiguration = sinon.stub().resolves();
     const removeConfiguration = sinon.stub().resolves();
-    const { handler } = makeHandler({ updateConfiguration, removeConfiguration });
+    const { handler } = await makeHandler({ updateConfiguration, removeConfiguration });
 
     await handler(
       {
@@ -365,7 +365,7 @@ describe('Custom resource S3 handler', () => {
 
   it('should clean up old notification target only when the bucket changes', async () => {
     const removeConfiguration = sinon.stub().resolves();
-    const { handler, updateConfiguration, removePermission } = makeHandler({
+    const { handler, updateConfiguration, removePermission } = await makeHandler({
       removeConfiguration,
     });
 
@@ -402,7 +402,7 @@ describe('Custom resource S3 handler', () => {
 
   it('should not remove old permission when migrated buckets share a statement ID', async () => {
     const removeConfiguration = sinon.stub().resolves();
-    const { handler, removePermission } = makeHandler({ removeConfiguration });
+    const { handler, removePermission } = await makeHandler({ removeConfiguration });
 
     await handler(
       {
@@ -431,7 +431,7 @@ describe('Custom resource S3 handler', () => {
 
   it('should tolerate missing old bucket while cleaning up migrated notification target', async () => {
     const removeConfiguration = sinon.stub().rejects({ name: 'NoSuchBucket' });
-    const { handler } = makeHandler({ removeConfiguration });
+    const { handler } = await makeHandler({ removeConfiguration });
 
     await handler(
       {
@@ -458,7 +458,7 @@ describe('Custom resource S3 handler', () => {
       .stub()
       .rejects(Object.assign(new Error('denied'), { name: 'AccessDenied' }));
     const log = sinon.stub(console, 'log');
-    const { handler } = makeHandler({ removeConfiguration });
+    const { handler } = await makeHandler({ removeConfiguration });
 
     try {
       await handler(
@@ -492,7 +492,7 @@ describe('Custom resource S3 handler', () => {
       .stub()
       .rejects(Object.assign(new Error('denied new bucket'), { name: 'AccessDenied' }));
     const removeConfiguration = sinon.stub().resolves();
-    const { handler } = makeHandler({ updateConfiguration, removeConfiguration });
+    const { handler } = await makeHandler({ updateConfiguration, removeConfiguration });
 
     await expect(
       handler(
@@ -520,7 +520,7 @@ describe('Custom resource S3 handler', () => {
     const removePermission = sinon
       .stub()
       .rejects(Object.assign(new Error('denied permission'), { name: 'AccessDeniedException' }));
-    const { handler } = makeHandler({ removePermission });
+    const { handler } = await makeHandler({ removePermission });
 
     await expect(
       handler(

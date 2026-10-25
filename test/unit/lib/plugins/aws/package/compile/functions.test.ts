@@ -198,7 +198,7 @@ describe('AwsCompileFunctions', () => {
 
     it('reuses S3 clients across repeated remote package artifact downloads in the same region', async () => {
       const { AwsCompileFunctionsWithClientStub, s3Clients } =
-        createAwsCompileFunctionsWithS3ClientStub({
+        await createAwsCompileFunctionsWithS3ClientStub({
           onSend: async ({ command, FakeGetObjectCommand }) => {
             expect(command).to.be.instanceOf(FakeGetObjectCommand);
             return { Body: fs.createReadStream(testFilePath) };
@@ -230,7 +230,7 @@ describe('AwsCompileFunctions', () => {
 
     it('uses distinct S3 clients for distinct explicit remote artifact regions', async () => {
       const { AwsCompileFunctionsWithClientStub, s3Clients } =
-        createAwsCompileFunctionsWithS3ClientStub();
+        await createAwsCompileFunctionsWithS3ClientStub();
       const compileFunctions = new AwsCompileFunctionsWithClientStub(serverless, {
         stage: 'dev',
         region: 'eu-west-1',

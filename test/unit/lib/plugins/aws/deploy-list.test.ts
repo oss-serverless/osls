@@ -127,7 +127,7 @@ describe('AwsDeployList', () => {
     });
 
     it('should print no deployments in case paginated listings contain no deployments', async () => {
-      const deployList = getAwsDeployListWithLogStubs();
+      const deployList = await getAwsDeployListWithLogStubs();
       sinon.stub(S3Client.prototype, 'send').resolves({
         Contents: [{ Key: `${s3Key}/not-a-deploy-dir/artifact.zip` }],
       });
@@ -165,7 +165,7 @@ describe('AwsDeployList', () => {
     });
 
     it('should print a deployment directory split across paginated object listings as one group', async () => {
-      const deployList = getAwsDeployListWithLogStubs();
+      const deployList = await getAwsDeployListWithLogStubs();
       sinon
         .stub(S3Client.prototype, 'send')
         .onFirstCall()
@@ -200,7 +200,7 @@ describe('AwsDeployList', () => {
     });
 
     it('should ignore unrelated paginated keys while printing deployments', async () => {
-      const deployList = getAwsDeployListWithLogStubs();
+      const deployList = await getAwsDeployListWithLogStubs();
       sinon.stub(S3Client.prototype, 'send').resolves({
         Contents: [
           { Key: `${s3Key}/not-a-deploy-dir/artifact.zip` },
@@ -219,7 +219,7 @@ describe('AwsDeployList', () => {
     });
 
     it('should emit completed deployment output before fetching later pages', async () => {
-      const deployList = getAwsDeployListWithLogStubs();
+      const deployList = await getAwsDeployListWithLogStubs();
       sinon
         .stub(S3Client.prototype, 'send')
         .onFirstCall()

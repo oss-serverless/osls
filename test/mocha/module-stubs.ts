@@ -122,6 +122,17 @@ const createProxySource = (realUrl: string): string => {
   ].join('\n');
 };
 
+// esmock loads its target from a URL with `?esmk=<id>` (definitions in `global.mockKeys`, its
+// hooks run in this thread) or with the definitions in the URL itself. Each mocked module
+// appears in them as `<url>?esmkTreeId=<n>`
+const isMockedByEsmock = (parentURL: string | undefined, url: string): boolean => {
+  if (!parentURL || !parentURL.includes('esmk')) return false;
+  const id = /[?&]esmk=(\d+)/.exec(parentURL)?.[1];
+  const definitions =
+    (id && (globalThis as { mockKeys?: Record<string, string> }).mockKeys?.[id]) || parentURL;
+  return typeof definitions === 'string' && definitions.includes(`${url}?esmkTreeId=`);
+};
+
 registerHooks({
   resolve(specifier, context, nextResolve) {
     if (specifier.startsWith(proxyScheme)) {
@@ -134,6 +145,13 @@ registerHooks({
     if (context.parentURL && context.parentURL.startsWith(proxyScheme)) return result;
     if (context.parentURL === import.meta.url) return result;
     if (!stubbableUrls.has(result.url)) return result;
+    // CommonJS `require()` (eg. @aws-sdk/lib-storage requiring @aws-sdk/client-s3, also when
+    // reading export names below) cannot load the proxy as the same module instance: a second
+    // proxy instance would take over the stub listener from the one ES modules import
+    if (context.conditions && context.conditions.includes('require')) return result;
+    // esmock mocks this import of its target: hand esmock the real URL, which its mock
+    // definitions are keyed by (a proxy URL would leave the import unmocked)
+    if (isMockedByEsmock(context.parentURL, result.url)) return result;
     moduleFormats.set(result.url, result.format);
     return { url: `${proxyScheme}${result.url}`, format: 'module', shortCircuit: true };
   },

@@ -133,7 +133,7 @@ describe('Custom resource Cognito user pool handler', () => {
   }
 
   it('should not churn Lambda permission on same-target ForceDeploy updates', async () => {
-    const { handler, addPermission, updateConfiguration, removePermission } = makeHandler();
+    const { handler, addPermission, updateConfiguration, removePermission } = await makeHandler();
 
     await handler(
       {
@@ -177,7 +177,7 @@ describe('Custom resource Cognito user pool handler', () => {
     const removePermission = sinon.stub().callsFake(async (input) => {
       calls.push(['removePermission', input]);
     });
-    const { handler } = makeHandler({ addPermission, updateConfiguration, removePermission });
+    const { handler } = await makeHandler({ addPermission, updateConfiguration, removePermission });
 
     await handler(
       {
@@ -211,7 +211,7 @@ describe('Custom resource Cognito user pool handler', () => {
     const addPermission = sinon
       .stub()
       .rejects(Object.assign(new Error('denied'), { name: 'AccessDeniedException' }));
-    const { handler, updateConfiguration, removePermission } = makeHandler({ addPermission });
+    const { handler, updateConfiguration, removePermission } = await makeHandler({ addPermission });
 
     await expect(
       handler(
@@ -571,7 +571,7 @@ describe('Custom resource Cognito user pool handler', () => {
 
   it('should not remove old permission when migrated user pools share a statement ID', async () => {
     const removeConfiguration = sinon.stub().resolves();
-    const { handler, removePermission } = makeHandler({ removeConfiguration });
+    const { handler, removePermission } = await makeHandler({ removeConfiguration });
 
     await handler(
       {
@@ -819,7 +819,7 @@ describe('Custom resource Cognito user pool configuration', () => {
   };
 
   it('should reject update with a descriptive missing-pool error', async () => {
-    const { lib } = makeUserPoolLib([{ UserPools: [] }]);
+    const { lib } = await makeUserPoolLib([{ UserPools: [] }]);
 
     await expect(
       lib.updateConfiguration({
@@ -832,7 +832,7 @@ describe('Custom resource Cognito user pool configuration', () => {
   });
 
   it('should no-op delete when the target user pool no longer exists', async () => {
-    const { sentCommands, lib } = makeUserPoolLib([{ UserPools: [] }]);
+    const { sentCommands, lib } = await makeUserPoolLib([{ UserPools: [] }]);
 
     await lib.removeConfiguration({
       lambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:orders:provisioned',

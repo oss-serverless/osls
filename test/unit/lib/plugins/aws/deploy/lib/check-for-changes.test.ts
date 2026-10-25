@@ -706,7 +706,7 @@ describe('checkForChanges', () => {
       const checkForChanges = (
         await esmock('../../../../../../../lib/plugins/aws/deploy/lib/check-for-changes.ts', {
           'crypto': cryptoStub,
-          'ext/promise/limit': fakeLimit,
+          'ext/promise/limit.js': fakeLimit,
           '../../../../../../../lib/utils/get-hash-for-file-path.ts': hashStub,
         })
       ).default;
