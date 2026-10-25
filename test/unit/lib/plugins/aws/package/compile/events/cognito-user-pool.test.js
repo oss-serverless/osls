@@ -159,7 +159,6 @@ const serverlessConfigurationExtension = {
 };
 
 const preTokenGenerationConfigurationExtension = {
-  configValidationMode: 'off',
   functions: {
     preTokenGenerationV2: {
       handler: 'index.js',
