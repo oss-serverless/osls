@@ -16,7 +16,8 @@ const getExpectedCachePath = (schemaHash) => {
     `.serverless/artifacts/ajv-validate-ajv-${packageModule.version}-ajv-formats-${
       packageModule2.version
     }`,
-    `${schemaHash}.js`
+    // Validators are cached as ES modules
+    `${schemaHash}.mjs`
   );
 };
 
@@ -55,11 +56,11 @@ describe('test/unit/lib/classes/ConfigSchemaHandler/resolveAjvValidate.test.ts',
   });
 
   it('regenerates the cached validator module if removed externally', async () => {
-    const realFsp = (await import('node:fs')).default.promises;
+    const realFsp = fsp;
     let injectedRemoval = false;
     const resolveAjvValidateFresh = (
       await esmock('../../../../../lib/classes/config-schema-handler/resolve-ajv-validate.ts', {
-        fs: {
+        'node:fs': {
           promises: {
             ...realFsp,
             readFile: async (filePath, ...args) => {

@@ -2,13 +2,15 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { expect } from 'chai';
-import requireUncached from '../../../../utils/require-uncached.ts';
 import * as sinon from 'sinon';
 import { overrideEnv, overrideCwd } from '../../../../utils/process.ts';
 import { ensureDir, pathExists, remove } from '../../../../utils/fs.ts';
-import config2 from '../../../../../lib/utils/serverless-utils/config.ts';
+import esmock from 'esmock';
+import configModule from '../../../../../lib/utils/serverless-utils/config.ts';
 
-const loadConfigModule = () => requireUncached(() => config2);
+// A fresh module instance, so it reads the environment (platform stage) set up by the test
+const loadConfigModule = async () =>
+  (await esmock('../../../../../lib/utils/serverless-utils/config.ts')).default;
 
 const withIsolatedHome = async (name, callback) => {
   const homeDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), `${name}-home-`));
@@ -44,7 +46,8 @@ describe('serverless-utils/config', () => {
   });
 
   it('exports the generic config helpers only', () => {
-    const config = loadConfigModule();
+    // The shared instance: esmock adds its own properties to the default export of a fresh one
+    const config = configModule;
 
     expect(config).to.have.keys(['CONFIG_FILE_NAME', 'delete', 'get', 'getConfig', 'set']);
     expect(config).to.not.have.property('getLoggedInUser');
@@ -52,7 +55,7 @@ describe('serverless-utils/config', () => {
 
   it('prefers the default global config when both global locations exist', async () => {
     await withIsolatedHome('config-both-globals', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
       const homeConfigDir = path.join(homeDir, '.config');
       const homeConfigPath = path.join(homeConfigDir, config.CONFIG_FILE_NAME);
       const defaultGlobalPath = path.join(homeDir, config.CONFIG_FILE_NAME);
@@ -77,7 +80,7 @@ describe('serverless-utils/config', () => {
 
   it('merges local and global config and updates only the local config on set/delete', async () => {
     await withIsolatedHome('config-local-and-global', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async (localDir) => {
         const localConfigPath = path.join(localDir, config.CONFIG_FILE_NAME);
@@ -117,7 +120,7 @@ describe('serverless-utils/config', () => {
 
   it('creates a Bref-compatible default global config when no config files exist', async () => {
     await withIsolatedHome('config-create-default', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         const globalConfigPath = path.join(homeDir, config.CONFIG_FILE_NAME);
@@ -140,7 +143,7 @@ describe('serverless-utils/config', () => {
 
   it('preserves an existing frameworkId when updating config', async () => {
     await withIsolatedHome('config-preserve-framework-id', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         const globalConfigPath = path.join(homeDir, config.CONFIG_FILE_NAME);
@@ -173,7 +176,7 @@ describe('serverless-utils/config', () => {
 
   it('uses the ~/.config global config when it exists alone', async () => {
     await withIsolatedHome('config-home-config-only', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         const homeConfigDir = path.join(homeDir, '.config');
@@ -197,7 +200,7 @@ describe('serverless-utils/config', () => {
 
   it('backs up malformed local config files and treats them as empty', async () => {
     await withIsolatedHome('config-malformed-local', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async (localDir) => {
         const localConfigPath = path.join(localDir, config.CONFIG_FILE_NAME);
@@ -214,7 +217,7 @@ describe('serverless-utils/config', () => {
 
   it('backs up malformed ~/.config global files and recreates the default global config', async () => {
     await withIsolatedHome('config-malformed-global', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         const homeConfigDir = path.join(homeDir, '.config');
@@ -235,7 +238,7 @@ describe('serverless-utils/config', () => {
 
   it('supports deleting nested property paths', async () => {
     await withIsolatedHome('config-nested-delete', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         const globalConfigPath = path.join(homeDir, config.CONFIG_FILE_NAME);
@@ -274,7 +277,7 @@ describe('serverless-utils/config', () => {
 
   it('supports dot and bracket paths with array indices', async () => {
     await withIsolatedHome('config-array-paths', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         const globalConfigPath = path.join(homeDir, config.CONFIG_FILE_NAME);
@@ -297,7 +300,7 @@ describe('serverless-utils/config', () => {
 
   it('returns undefined for an undefined path', async () => {
     await withIsolatedHome('config-undefined-path', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         expect(config.get(undefined)).to.equal(undefined);
@@ -307,7 +310,7 @@ describe('serverless-utils/config', () => {
 
   it('preserves existing legacy keys when updating config', async () => {
     await withIsolatedHome('config-preserve-legacy', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         const globalConfigPath = path.join(homeDir, config.CONFIG_FILE_NAME);
@@ -351,7 +354,7 @@ describe('serverless-utils/config', () => {
     await overrideEnv({ asCopy: true }, async () => {
       process.env.SERVERLESS_PLATFORM_STAGE = 'staging';
 
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       expect(config.CONFIG_FILE_NAME).to.equal('.serverlessstagingrc');
     });
@@ -361,7 +364,7 @@ describe('serverless-utils/config', () => {
     await overrideEnv({ asCopy: true }, async () => {
       process.env.SERVERLESS_PLATFORM_STAGE = 'prod';
 
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       expect(config.CONFIG_FILE_NAME).to.equal('.serverlessrc');
     });
@@ -369,7 +372,7 @@ describe('serverless-utils/config', () => {
 
   it('supports quoted bracket keys containing dots', async () => {
     await withIsolatedHome('config-quoted-dot-key', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         config.set('users["jane.doe"].dashboard.username', 'jdoe');
@@ -390,7 +393,7 @@ describe('serverless-utils/config', () => {
 
   it('does not allow prototype pollution through string paths', async () => {
     await withIsolatedHome('config-unsafe-set', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         config.set('__proto__.polluted', 'yes');
@@ -403,7 +406,7 @@ describe('serverless-utils/config', () => {
 
   it('does not allow constructor.prototype pollution through string paths', async () => {
     await withIsolatedHome('config-unsafe-constructor-set', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async () => {
         config.set('constructor.prototype.polluted', 'yes');
@@ -415,7 +418,7 @@ describe('serverless-utils/config', () => {
 
   it('drops unsafe keys when merging config files', async () => {
     await withIsolatedHome('config-unsafe-merge', async (homeDir) => {
-      const config = loadConfigModule();
+      const config = await loadConfigModule();
 
       await withLocalDir(homeDir, 'service', async (localDir) => {
         const localConfigPath = path.join(localDir, config.CONFIG_FILE_NAME);

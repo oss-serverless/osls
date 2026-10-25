@@ -76,24 +76,19 @@ const style = (() => {
   return globalState.logStyle;
 })();
 
+const logApi = { log, writeText, progress, getPluginWriters, style };
+
 // The log level and interactivity are set up by the log reporter after this module loads,
-// so they are exposed as getters on the default export
-const logApi = {
-  log,
-  writeText,
-  progress,
-  getPluginWriters,
-  style,
-  get logLevelIndex(): number {
-    return globalState.logLevelIndex == null ? defaultLogLevelIndex : globalState.logLevelIndex;
-  },
-  get isVerboseMode(): boolean {
-    return logApi.logLevelIndex > defaultLogLevelIndex;
-  },
-  get isInteractive(): boolean {
-    return globalState.logIsInteractive == null ? false : globalState.logIsInteractive;
-  },
-};
+// so they are exposed as (non-enumerable) getters on the default export
+Object.defineProperties(logApi, {
+  logLevelIndex: getterDescriptor(() =>
+    globalState.logLevelIndex == null ? defaultLogLevelIndex : globalState.logLevelIndex
+  ),
+  isVerboseMode: getterDescriptor(() => logApi.logLevelIndex > defaultLogLevelIndex),
+  isInteractive: getterDescriptor(() =>
+    globalState.logIsInteractive == null ? false : globalState.logIsInteractive
+  ),
+});
 
 export { log, writeText, progress, getPluginWriters, style };
 export default logApi;

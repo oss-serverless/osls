@@ -2,10 +2,10 @@ import * as chai from 'chai';
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
 import { overrideArgv, overrideEnv } from '../../../utils/process.ts';
-import requireUncached from '../../../utils/require-uncached.ts';
 import { ensureDir, ensureFile } from '../../../utils/fs.ts';
 import resolveServerlessConfigPath from '../../../../lib/cli/resolve-configuration-path.ts';
 import resolveInput from '../../../../lib/cli/resolve-input.ts';
+import esmock from 'esmock';
 
 const { expect } = chai;
 
@@ -91,9 +91,11 @@ describe('test/unit/lib/cli/resolve-configuration-path.test.ts', () => {
     it('should temporarily support nested path', async () => {
       await overrideEnv(async () => {
         process.env.SLS_DEPRECATION_NOTIFICATION_MODE = 'warn';
-        const uncached = requireUncached(() => ({
-          resolveServerlessConfigPath: resolveServerlessConfigPath,
-        }));
+        const uncached = {
+          resolveServerlessConfigPath: (
+            await esmock('../../../../lib/cli/resolve-configuration-path.ts')
+          ).default,
+        };
         await overrideArgv(
           {
             args: ['serverless', '--config', 'nested/custom.yml'],

@@ -1,6 +1,5 @@
 import path from 'node:path';
 import glob from '../../../../../../lib/utils/glob.ts';
-import requireUncached from '../../../../../utils/require-uncached.ts';
 import { listZipFiles } from '../../../../../utils/fs.ts';
 import { expect } from 'chai';
 import esmock from 'esmock';
@@ -10,27 +9,30 @@ const resourcesDir = path.resolve(
   import.meta.dirname,
   '../../../../../../lib/plugins/aws/custom-resources/resources/'
 );
-const generateZipPath = '../../../../../../lib/plugins/aws/custom-resources/generate-zip';
+const generateZipPath = '../../../../../../lib/plugins/aws/custom-resources/generate-zip.ts';
 const escapedPathSep = path.sep.replace(/\\/g, '\\\\');
+
+// A fresh module instance, as the module computes its state on first use
+const loadGenerateZip = async () => (await esmock(generateZipPath)).default;
 
 describe('test/unit/lib/plugins/aws/customResources/generateZip.test.ts', () => {
   describe('when generating a zip file', () => {
     it('should generate a zip file with the contents of the resources directory', async () => {
-      const zipFilePath = await requireUncached(async () =>
-        (
-          await import('../../../../../../lib/plugins/aws/custom-resources/generate-zip.ts')
-        ).default()
-      );
+      const zipFilePath = await (await loadGenerateZip())();
 
       // List the files in the zip to make sure it is valid
       const filesInZip = await listZipFiles(zipFilePath);
 
-      const filesInResourceDir = await glob('**', { cwd: resourcesDir });
-      expect(filesInZip).to.have.all.members(filesInResourceDir);
+      // TypeScript sources are zipped as JavaScript (types stripped), declaration and map files
+      // are left out, and a package.json marks the files as ES modules
+      const filesInResourceDir = (await glob('**', { cwd: resourcesDir }))
+        .filter((filePath) => !filePath.endsWith('.d.ts') && !filePath.endsWith('.map'))
+        .map((filePath) => filePath.replace(/\.ts$/, '.js'));
+      expect(filesInZip).to.have.all.members([...filesInResourceDir, 'package.json']);
     });
 
     it('should store the zip in a content-addressed cache directory', async () => {
-      const zipFilePath = await requireUncached(async () => require(generateZipPath)());
+      const zipFilePath = await (await loadGenerateZip())();
 
       expect(zipFilePath).to.match(
         new RegExp(
@@ -41,10 +43,9 @@ describe('test/unit/lib/plugins/aws/customResources/generateZip.test.ts', () => 
     });
 
     it('should return the same content-addressed path on repeated calls', async () => {
-      const [firstPath, secondPath] = await requireUncached(async () => {
-        const generateZip = require(generateZipPath);
-        return [await generateZip(), await generateZip()];
-      });
+      const generateZip = await loadGenerateZip();
+      const firstPath = await generateZip();
+      const secondPath = await generateZip();
 
       expect(secondPath).to.equal(firstPath);
     });
@@ -54,7 +55,7 @@ describe('test/unit/lib/plugins/aws/customResources/generateZip.test.ts', () => 
       const makeGenerateZip = async (content) =>
         (
           await esmock(generateZipPath, {
-            'fs': {
+            'node:fs': {
               readdirSync: () => [
                 {
                   name: 'handler.js',
@@ -63,15 +64,23 @@ describe('test/unit/lib/plugins/aws/customResources/generateZip.test.ts', () => 
               ],
               readFileSync: () => Buffer.from(content),
             },
-            '../../../utils/ensure-artifact': async (artifactName, generate, options) => {
+            '../../../../../../lib/utils/ensure-artifact.ts': async (
+              artifactName,
+              generate,
+              options
+            ) => {
               artifactVersions.push(options.artifactVersion);
               return path.resolve('/tmp/cache', options.artifactVersion);
             },
           })
         ).default;
 
-      await makeGenerateZip('first')();
-      await makeGenerateZip('second')();
+      await (
+        await makeGenerateZip('first')
+      )();
+      await (
+        await makeGenerateZip('second')
+      )();
 
       expect(artifactVersions[0]).to.match(/^custom-resources-[a-f0-9]{32}$/);
       expect(artifactVersions[1]).to.match(/^custom-resources-[a-f0-9]{32}$/);

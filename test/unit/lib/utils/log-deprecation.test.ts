@@ -5,15 +5,17 @@ import { expect } from 'chai';
 import { overrideEnv } from '../../../utils/process.ts';
 import { getTmpDirPath, pathExists } from '../../../utils/fs.ts';
 import ServerlessError from '../../../../lib/serverless-error.ts';
-import logDeprecation2 from '../../../../lib/utils/log-deprecation.ts';
+import healthStatusFilename from '../../../../lib/utils/health-status-filename.ts';
 import esmock from 'esmock';
+
+// A fresh module instance, so no deprecation is reported as triggered or buffered already
+const loadLogDeprecation = async () =>
+  (await esmock('../../../../lib/utils/log-deprecation.ts')).default;
 
 describe('test/unit/lib/utils/logDeprecation.test.ts', () => {
   let restoreEnv;
 
   beforeEach(() => {
-    delete require.cache[require.resolve('../../../../lib/utils/log-deprecation')];
-    delete require.cache[require.resolve('../../../../lib/utils/health-status-filename')];
     ({ restoreEnv } = overrideEnv({
       whitelist: ['APPDATA', 'HOME', 'PATH', 'TEMP', 'TMP', 'TMPDIR', 'USERPROFILE'],
     }));
@@ -21,14 +23,12 @@ describe('test/unit/lib/utils/logDeprecation.test.ts', () => {
 
   afterEach(async () => {
     sandbox.restore();
-    const healthStatusFilename = (await import('../../../../lib/utils/health-status-filename.ts'))
-      .default;
     await fsp.unlink(healthStatusFilename).catch(() => null);
     restoreEnv();
   });
 
-  it('should throw on deprecation if error notifications mode set in service config', () => {
-    const logDeprecation = logDeprecation2;
+  it('should throw on deprecation if error notifications mode set in service config', async () => {
+    const logDeprecation = await loadLogDeprecation();
     let error;
 
     try {
@@ -47,8 +47,8 @@ describe('test/unit/lib/utils/logDeprecation.test.ts', () => {
     );
   });
 
-  it('should honor env notification mode set after module load', () => {
-    const logDeprecation = logDeprecation2;
+  it('should honor env notification mode set after module load', async () => {
+    const logDeprecation = await loadLogDeprecation();
     let error;
 
     process.env.SLS_DEPRECATION_NOTIFICATION_MODE = 'error';
@@ -64,8 +64,8 @@ describe('test/unit/lib/utils/logDeprecation.test.ts', () => {
     expect(error.message).to.include('Dynamic env mode');
   });
 
-  it('should honor env disabled deprecations set after module load', () => {
-    const logDeprecation = logDeprecation2;
+  it('should honor env disabled deprecations set after module load', async () => {
+    const logDeprecation = await loadLogDeprecation();
 
     process.env.SLS_DEPRECATION_DISABLE = 'CODE_DYNAMIC_ENV_DISABLE';
 
@@ -77,9 +77,7 @@ describe('test/unit/lib/utils/logDeprecation.test.ts', () => {
   });
 
   it('should write deprecation docs URL to summary output', async () => {
-    const logDeprecation = (await import('../../../../lib/utils/log-deprecation.ts')).default;
-    const healthStatusFilename = (await import('../../../../lib/utils/health-status-filename.ts'))
-      .default;
+    const logDeprecation = await loadLogDeprecation();
 
     logDeprecation('CODE1', 'Start using deprecation log');
     await logDeprecation.printSummary();
@@ -93,23 +91,24 @@ describe('test/unit/lib/utils/logDeprecation.test.ts', () => {
   });
 
   it('should create the health status parent directory before writing summary output', async () => {
-    const healthStatusFilename = path.join(
+    const tmpHealthStatusFilename = path.join(
       getTmpDirPath(),
       '.serverless',
       'last-command-health-status'
     );
     const logDeprecation = (
       await esmock('../../../../lib/utils/log-deprecation.ts', {
-        '../../../../lib/utils/health-status-filename.ts': healthStatusFilename,
+        // A primitive default export has to be passed as `default`
+        '../../../../lib/utils/health-status-filename.ts': { default: tmpHealthStatusFilename },
       })
     ).default;
 
-    expect(await pathExists(path.dirname(healthStatusFilename))).to.equal(false);
+    expect(await pathExists(path.dirname(tmpHealthStatusFilename))).to.equal(false);
 
     logDeprecation('CODE1', 'Start using deprecation log');
     await logDeprecation.printSummary();
 
-    expect(await fsp.readFile(healthStatusFilename, 'utf8')).to.include(
+    expect(await fsp.readFile(tmpHealthStatusFilename, 'utf8')).to.include(
       'Start using deprecation log'
     );
   });

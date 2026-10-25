@@ -1,11 +1,11 @@
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
 import * as chai from 'chai';
-import requireWithImportFallback from '../../../../lib/utils/require-with-import-fallback.ts';
+import importModule from '../../../../lib/utils/import-module.ts';
 
 const { expect } = chai;
 
-describe('test/unit/lib/utils/require-with-import-fallback.test.ts', () => {
+describe('test/unit/lib/utils/import-module.test.ts', () => {
   let modulePath;
 
   afterEach(async () => {
@@ -17,6 +17,6 @@ describe('test/unit/lib/utils/require-with-import-fallback.test.ts', () => {
     modulePath = path.resolve('esm-module#hash.mjs');
     await fsp.writeFile(modulePath, 'export default { value: true };');
 
-    await expect(requireWithImportFallback(modulePath)).to.eventually.deep.equal({ value: true });
+    await expect(importModule(modulePath)).to.eventually.deep.equal({ value: true });
   });
 });

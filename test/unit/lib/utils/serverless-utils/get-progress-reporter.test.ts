@@ -1,13 +1,14 @@
 import { expect } from 'chai';
-import requireUncached from '../../../../utils/require-uncached.ts';
-import getProgressReporter2 from '../../../../../lib/utils/serverless-utils/lib/log/get-progress-reporter.ts';
+import esmock from 'esmock';
 
 describe('serverless-utils/get-progress-reporter', () => {
   let getProgressReporter;
   let events;
 
-  beforeEach(() => {
-    getProgressReporter = requireUncached(() => getProgressReporter2);
+  beforeEach(async () => {
+    getProgressReporter = (
+      await esmock('../../../../../lib/utils/serverless-utils/lib/log/get-progress-reporter.ts')
+    ).default;
     events = [];
     getProgressReporter.emitter.on('update', (event) => events.push(event));
   });

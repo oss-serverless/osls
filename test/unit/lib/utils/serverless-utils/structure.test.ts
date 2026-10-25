@@ -24,6 +24,10 @@ describe('serverless-utils vendored structure', () => {
     const rootDir = path.resolve(import.meta.dirname, '../../../../../lib/utils/serverless-utils');
     const actual = await collectFiles(rootDir);
 
-    expect(actual).to.deep.equal([...policy.vendoredPaths, ...policy.maintainerPaths].sort());
+    // The vendored sources are TypeScript now, while the policy lists the upstream `.js` names
+    const toSourcePath = (policyPath) => policyPath.replace(/\.js$/, '.ts');
+    expect(actual).to.deep.equal(
+      [...policy.vendoredPaths, ...policy.maintainerPaths].map(toSourcePath).sort()
+    );
   });
 });

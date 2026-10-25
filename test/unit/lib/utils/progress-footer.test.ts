@@ -1,8 +1,9 @@
 import childProcess from 'node:child_process';
 import * as sinon from 'sinon';
 import { expect } from 'chai';
+import esmock from 'esmock';
 
-const modulePath = '../../../../lib/utils/progress-footer';
+const modulePath = '../../../../lib/utils/progress-footer.ts';
 const moveUp = '\x1b[1A';
 const clearLine = '\x1b[2K';
 const clearProgressLine = `${moveUp}${clearLine}`;
@@ -13,16 +14,16 @@ const stringifyChunk = (chunk) => {
   return String(chunk);
 };
 
-const loadProgressFooter = (platform = process.platform) => {
+// Loads a fresh module instance, which reads `process.platform` when it is evaluated
+const loadProgressFooter = async (platform = process.platform) => {
   const originalPlatformDescriptor = Object.getOwnPropertyDescriptor(process, 'platform');
-  delete require.cache[require.resolve(modulePath)];
   Object.defineProperty(process, 'platform', {
     configurable: true,
     value: platform,
   });
 
   try {
-    return require(modulePath);
+    return (await esmock(modulePath)).default;
   } finally {
     Object.defineProperty(process, 'platform', originalPlatformDescriptor);
   }
@@ -54,10 +55,10 @@ const createMockStream = (options = {}) => {
   };
 };
 
-const createFooter = (options = {}) => {
+const createFooter = async (options = {}) => {
   const stdout = createMockStream({ columns: options.columns });
   const stderr = createMockStream({ columns: options.columns });
-  const createProgressFooter = loadProgressFooter(options.platform);
+  const createProgressFooter = await loadProgressFooter(options.platform);
   const footer = createProgressFooter({ stdout: stdout.stream, stderr: stderr.stream });
 
   return { footer, stdout, stderr };
@@ -65,29 +66,28 @@ const createFooter = (options = {}) => {
 
 describe('test/unit/lib/utils/progress-footer.test.ts', () => {
   afterEach(() => {
-    delete require.cache[require.resolve(modulePath)];
     sinon.restore();
   });
 
-  it('writes array progress rows', () => {
-    const { footer, stdout } = createFooter();
+  it('writes array progress rows', async () => {
+    const { footer, stdout } = await createFooter();
 
     footer.updateProgress(['first', 'second']);
 
     expect(stdout.output).to.equal('\nfirst\nsecond\n');
   });
 
-  it('splits string progress rows', () => {
-    const { footer, stdout } = createFooter();
+  it('splits string progress rows', async () => {
+    const { footer, stdout } = await createFooter();
 
     footer.updateProgress('first\nsecond');
 
     expect(stdout.output).to.equal('\nfirst\nsecond\n');
   });
 
-  it('adds animation prefix when enabled', () => {
+  it('adds animation prefix when enabled', async () => {
     const clock = sinon.useFakeTimers();
-    const { footer, stdout } = createFooter();
+    const { footer, stdout } = await createFooter();
     const interval = process.platform === 'win32' ? 100 : 80;
 
     footer.progressAnimationPrefixFrames = ['a', 'b'];
@@ -103,7 +103,7 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     footer.updateProgress();
   });
 
-  it('uses the platform default animation interval', () => {
+  it('uses the platform default animation interval', async () => {
     const intervals = [];
     sinon.stub(global, 'setInterval').callsFake((callback, interval) => {
       intervals.push(interval);
@@ -117,7 +117,7 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     ]) {
       const stdout = createMockStream();
       const stderr = createMockStream();
-      const createProgressFooter = loadProgressFooter(platform);
+      const createProgressFooter = await loadProgressFooter(platform);
       const footer = createProgressFooter({ stdout: stdout.stream, stderr: stderr.stream });
 
       footer.shouldAddProgressAnimationPrefix = true;
@@ -125,36 +125,36 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
       footer.updateProgress();
 
       expect(intervals.pop()).to.equal(expectedInterval);
-      delete require.cache[require.resolve(modulePath)];
     }
   });
 
-  it('restores process.platform descriptor after platform-specific loading', () => {
+  it('restores process.platform descriptor after platform-specific loading', async () => {
     const originalPlatformDescriptor = Object.getOwnPropertyDescriptor(process, 'platform');
 
-    loadProgressFooter('win32');
+    await loadProgressFooter('win32');
 
     expect(Object.getOwnPropertyDescriptor(process, 'platform')).to.deep.equal(
       originalPlatformDescriptor
     );
   });
 
-  it('accepts null options like the upstream footer', () => {
+  it('accepts null options like the upstream footer', async () => {
     const originalStdoutWrite = process.stdout.write;
     const originalStderrWrite = process.stderr.write;
     process.stdout.write = () => true;
     process.stderr.write = () => true;
 
     try {
-      expect(() => loadProgressFooter()(null)).to.not.throw();
+      const createProgressFooter = await loadProgressFooter();
+      expect(() => createProgressFooter(null)).to.not.throw();
     } finally {
       process.stdout.write = originalStdoutWrite;
       process.stderr.write = originalStderrWrite;
     }
   });
 
-  it('clears rendered rows when progress is cleared', () => {
-    const { footer, stdout } = createFooter();
+  it('clears rendered rows when progress is cleared', async () => {
+    const { footer, stdout } = await createFooter();
     footer.updateProgress(['row']);
     stdout.clear();
 
@@ -163,8 +163,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal(`${clearProgressLine}${clearProgressLine}`);
   });
 
-  it('clears and redraws progress around stdout writes without recursion', () => {
-    const { footer, stdout } = createFooter();
+  it('clears and redraws progress around stdout writes without recursion', async () => {
+    const { footer, stdout } = await createFooter();
     footer.updateProgress('progress');
     stdout.clear();
 
@@ -173,8 +173,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal(`${clearProgressLine}${clearProgressLine}log\n\nprogress\n`);
   });
 
-  it('redirects stderr writes through stdout while active', () => {
-    const { footer, stdout, stderr } = createFooter();
+  it('redirects stderr writes through stdout while active', async () => {
+    const { footer, stdout, stderr } = await createFooter();
     footer.updateProgress('progress');
     stdout.clear();
     stderr.clear();
@@ -185,8 +185,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal(`${clearProgressLine}${clearProgressLine}warn\n\nprogress\n`);
   });
 
-  it('tracks partial stdout writes before first progress update', () => {
-    const { footer, stdout } = createFooter();
+  it('tracks partial stdout writes before first progress update', async () => {
+    const { footer, stdout } = await createFooter();
 
     stdout.stream.write('partial');
     footer.updateProgress('progress');
@@ -194,8 +194,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal('partial\n\nprogress\n');
   });
 
-  it('tracks partial stderr writes before first progress update', () => {
-    const { footer, stdout, stderr } = createFooter();
+  it('tracks partial stderr writes before first progress update', async () => {
+    const { footer, stdout, stderr } = await createFooter();
 
     stderr.stream.write('partial');
     footer.updateProgress('progress');
@@ -204,8 +204,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal('\n\nprogress\n');
   });
 
-  it('continues tracking partial stdout writes after progress is cleared', () => {
-    const { footer, stdout } = createFooter();
+  it('continues tracking partial stdout writes after progress is cleared', async () => {
+    const { footer, stdout } = await createFooter();
     footer.updateProgress('progress');
     footer.updateProgress();
     stdout.clear();
@@ -216,8 +216,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal('later\n\nprogress\n');
   });
 
-  it('continues tracking partial stderr writes after progress is cleared', () => {
-    const { footer, stdout, stderr } = createFooter();
+  it('continues tracking partial stderr writes after progress is cleared', async () => {
+    const { footer, stdout, stderr } = await createFooter();
     footer.updateProgress('progress');
     footer.updateProgress();
     stdout.clear();
@@ -230,16 +230,16 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal('\n\nprogress\n');
   });
 
-  it('preserves the upstream leading spacer on first clean progress render', () => {
-    const { footer, stdout } = createFooter();
+  it('preserves the upstream leading spacer on first clean progress render', async () => {
+    const { footer, stdout } = await createFooter();
 
     footer.updateProgress('progress');
 
     expect(stdout.output).to.equal('\nprogress\n');
   });
 
-  it('keeps a blank spacer after partial stdout writes', () => {
-    const { footer, stdout } = createFooter();
+  it('keeps a blank spacer after partial stdout writes', async () => {
+    const { footer, stdout } = await createFooter();
     stdout.stream.write('partial');
     stdout.clear();
 
@@ -248,8 +248,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal('\n\nprogress\n');
   });
 
-  it('keeps a blank spacer after newline-terminated stdout writes', () => {
-    const { footer, stdout } = createFooter();
+  it('keeps a blank spacer after newline-terminated stdout writes', async () => {
+    const { footer, stdout } = await createFooter();
     stdout.stream.write('line\n');
     stdout.clear();
 
@@ -258,8 +258,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal('\nprogress\n');
   });
 
-  it('does not add an extra spacer after an already empty line', () => {
-    const { footer, stdout } = createFooter();
+  it('does not add an extra spacer after an already empty line', async () => {
+    const { footer, stdout } = await createFooter();
     stdout.stream.write('\n\n');
     stdout.clear();
 
@@ -268,8 +268,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal('progress\n');
   });
 
-  it('preserves split stdout writes without inserting logical newlines', () => {
-    const { footer, stdout } = createFooter();
+  it('preserves split stdout writes without inserting logical newlines', async () => {
+    const { footer, stdout } = await createFooter();
     footer.updateProgress('progress');
     stdout.clear();
 
@@ -282,8 +282,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.chunks).to.not.include('\nllo\n');
   });
 
-  it('counts multiline and wrapped rows when clearing', () => {
-    const { footer, stdout } = createFooter({ columns: 3 });
+  it('counts multiline and wrapped rows when clearing', async () => {
+    const { footer, stdout } = await createFooter({ columns: 3 });
     footer.updateProgress(['abcdef', 'x\ny']);
     stdout.clear();
 
@@ -292,8 +292,8 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.equal(clearProgressLine.repeat(5));
   });
 
-  it('supports write callbacks, Buffer chunks, and Uint8Array chunks', () => {
-    const { footer, stdout } = createFooter();
+  it('supports write callbacks, Buffer chunks, and Uint8Array chunks', async () => {
+    const { footer, stdout } = await createFooter();
     let callbackCalled = false;
     footer.updateProgress('progress');
     stdout.clear();
@@ -308,14 +308,14 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(stdout.output).to.include('bytes\n');
   });
 
-  it('does not patch child_process APIs', () => {
+  it('does not patch child_process APIs', async () => {
     const originalMethods = {
       exec: childProcess.exec,
       execFile: childProcess.execFile,
       fork: childProcess.fork,
       spawn: childProcess.spawn,
     };
-    const { footer } = createFooter();
+    const { footer } = await createFooter();
 
     footer.updateProgress('progress');
     footer.updateProgress();
@@ -326,10 +326,10 @@ describe('test/unit/lib/utils/progress-footer.test.ts', () => {
     expect(childProcess.spawn).to.equal(originalMethods.spawn);
   });
 
-  it('does not discard stdin, hide the cursor, or install stdin SIGINT forwarding', () => {
+  it('does not discard stdin, hide the cursor, or install stdin SIGINT forwarding', async () => {
     const stdinDataListeners = process.stdin.listeners('data');
     const stdinSigintListeners = process.stdin.listeners('SIGINT');
-    const { footer, stdout } = createFooter();
+    const { footer, stdout } = await createFooter();
 
     footer.updateProgress('progress');
     footer.updateProgress();

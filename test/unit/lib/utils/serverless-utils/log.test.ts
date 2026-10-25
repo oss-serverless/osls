@@ -1,12 +1,11 @@
 import { expect } from 'chai';
-import requireUncached from '../../../../utils/require-uncached.ts';
-import log2 from '../../../../../lib/utils/serverless-utils/log.ts';
+import esmock from 'esmock';
 
 describe('serverless-utils/log', () => {
   let logModule;
 
-  beforeEach(() => {
-    logModule = requireUncached(() => log2);
+  beforeEach(async () => {
+    logModule = (await esmock('../../../../../lib/utils/serverless-utils/log.ts')).default;
   });
 
   afterEach(() => {

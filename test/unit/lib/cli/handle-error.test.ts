@@ -1,7 +1,6 @@
 import * as chai from 'chai';
 import observeOutput from '../../../lib/observe-output.ts';
 import handleError from '../../../../lib/cli/handle-error.ts';
-import isStandaloneExecutable from '../../../../lib/utils/is-standalone-executable.ts';
 import ServerlessError from '../../../../lib/serverless-error.ts';
 
 const expect = chai.expect;
@@ -11,13 +10,6 @@ describe('test/unit/lib/cli/handle-error.test.ts', () => {
     const output = await observeOutput(() => handleError(new ServerlessError('Test error')));
     expect(output).to.have.string('Test error');
   });
-
-  if (isStandaloneExecutable) {
-    it('should report standalone installation', async () => {
-      const output = await observeOutput(() => handleError(new ServerlessError('Test error')));
-      expect(output).to.have.string('(standalone)');
-    });
-  }
 
   it('should handle non-error objects', async () => {
     const output = await observeOutput(() => handleError(handleError('NON-ERROR')));

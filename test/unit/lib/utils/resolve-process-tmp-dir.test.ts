@@ -1,10 +1,8 @@
 import { promises as fsp } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import requireUncached from '../../../utils/require-uncached.ts';
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import resolveProcessTmpDir2 from '../../../../lib/utils/resolve-process-tmp-dir.ts';
 import esmock from 'esmock';
 
 describe('test/unit/lib/utils/resolve-process-tmp-dir.test.ts', () => {
@@ -15,7 +13,8 @@ describe('test/unit/lib/utils/resolve-process-tmp-dir.test.ts', () => {
   });
 
   it('creates and reuses a process temp directory', async () => {
-    const resolveProcessTmpDir = requireUncached(() => resolveProcessTmpDir2);
+    const resolveProcessTmpDir = (await esmock('../../../../lib/utils/resolve-process-tmp-dir.ts'))
+      .default;
 
     const firstTmpDir = await resolveProcessTmpDir();
     const secondTmpDir = await resolveProcessTmpDir();
