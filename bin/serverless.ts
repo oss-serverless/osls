@@ -1,21 +1,17 @@
 #!/usr/bin/env node
+// Only the Node.js version check is imported statically, everything else is imported after
+// the check passes, so unsupported Node.js versions get a readable error
 import isSupportedNodeVersion from '../lib/cli/is-supported-node-version.ts';
-import packageModule from '../package.json' with { type: 'json' };
-import isStandaloneExecutable from '../lib/utils/is-standalone-executable.ts';
-import standalonePatch from '../lib/utils/standalone-patch.ts';
-import triage from '../lib/cli/triage.ts';
-import serverless from '../scripts/serverless.ts';
-import runCompose from '../lib/cli/run-compose.ts';
+import { packageJson } from '../lib/utils/package-root.ts';
 
 // `EvalError` is used to not pollute global namespace but still have the value accessible globally
 // Can already be set, if we're in context of local fallback
-const isMainModule = !EvalError.$serverlessCommandStartTime;
-if (isMainModule) EvalError.$serverlessCommandStartTime = process.hrtime();
+if (!EvalError.$serverlessCommandStartTime)
+  EvalError.$serverlessCommandStartTime = process.hrtime();
 
 if (!isSupportedNodeVersion(process.version)) {
-  const serverlessVersion = packageModule.version;
   process.stderr.write(
-    `Error: osls v${serverlessVersion} does not support ` +
+    `Error: osls v${packageJson.version} does not support ` +
       `Node.js ${process.version}. Please use a supported release. ` +
       `Supported versions: ${isSupportedNodeVersion.supportedRange}.\n`
   );
@@ -28,19 +24,15 @@ const crashAsync = (error) => {
   });
 };
 
-if (isMainModule) {
-  if (isStandaloneExecutable) {
-    standalonePatch;
-  }
-}
+const { default: triage } = await import('../lib/cli/triage.ts');
 
 triage()
-  .then((cliName) => {
+  .then(async (cliName) => {
     switch (cliName) {
       case 'serverless':
-        return serverless;
+        return import('../scripts/serverless.ts');
       case '@osls/compose':
-        return runCompose();
+        return (await import('../lib/cli/run-compose.ts')).default();
       default:
         throw new Error(`Unrecognized CLI name "${cliName}"`);
     }

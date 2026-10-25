@@ -9,7 +9,7 @@ import readFileSync from '../utils/fs/read-file-sync.ts';
 import readFile from '../utils/fs/read-file.ts';
 import walkDirSync from '../utils/fs/walk-dir-sync.ts';
 import dirExistsSync from '../utils/fs/dir-exists-sync.ts';
-import packageModule from '../../package.json' with { type: 'json' };
+import { packageJson as packageModule } from '../utils/package-root.ts';
 const version = packageModule.version;
 
 class Utils {

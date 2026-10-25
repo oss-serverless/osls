@@ -1,6 +1,7 @@
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+import resolveFrom from '../utils/resolve-from.ts';
 import spawn from '../utils/spawn.ts';
 import inquirer from '../utils/serverless-utils/inquirer/index.ts';
 import isInteractive2 from '../utils/is-interactive.ts';
@@ -15,7 +16,7 @@ const ensureMinimalPackageJson = async () => {
 
 const resolveAbsoluteModulePath = (contextDirname, modulePath) => {
   try {
-    return createRequire(path.resolve(contextDirname, 'require-resolver')).resolve(modulePath);
+    return resolveFrom(contextDirname, modulePath);
   } catch {
     return null;
   }
@@ -31,31 +32,32 @@ const resolveGlobalNpmPath = async () => {
   })();
 
   if (!npmNodeModulesPath) return null;
-  try {
-    return require.resolve(`${npmNodeModulesPath}/${relativeBinPath}`);
-  } catch {
-    return null;
-  }
+  return resolveAbsoluteModulePath(import.meta.dirname, `${npmNodeModulesPath}/${relativeBinPath}`);
 };
+
+// The compose CLI starts when its bin module is evaluated
+const runComposeBin = (binPath) => import(pathToFileURL(binPath).href);
 
 export default async () => {
   // 1. If installed locally in service node_modules, run it
   const localNpmPath = resolveAbsoluteModulePath(process.cwd(), relativeBinPath);
   if (localNpmPath) {
-    require(localNpmPath);
+    await runComposeBin(localNpmPath);
     return;
   }
 
   // 2. If installed as npm global installation, run it
   const globalNpmPath = await resolveGlobalNpmPath();
   if (globalNpmPath) {
-    require(globalNpmPath);
+    await runComposeBin(globalNpmPath);
     return;
   }
 
   let packageJsonContent;
   try {
-    packageJsonContent = require(path.join(process.cwd(), 'package.json'));
+    packageJsonContent = JSON.parse(
+      await fsp.readFile(path.join(process.cwd(), 'package.json'), 'utf8')
+    );
   } catch {
     // Pass
   }
@@ -175,6 +177,6 @@ export default async () => {
   if (hasInstalledCompose) {
     // Try to run local compose
     const installedLocalNpmPath = resolveAbsoluteModulePath(process.cwd(), relativeBinPath);
-    require(installedLocalNpmPath);
+    await runComposeBin(installedLocalNpmPath);
   }
 };

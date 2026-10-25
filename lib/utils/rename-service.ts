@@ -57,4 +57,5 @@ function renameService(name, serviceDir) {
   throw new ServerlessError(errorMessage, 'MISSING_SERVICE_FILE');
 }
 
-module.exports.renameService = renameService;
+export { renameService };
+export default { renameService };

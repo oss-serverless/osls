@@ -1,5 +1,5 @@
 import log from '../../utils/serverless-utils/log.ts';
-import packageModule from '../../../package.json' with { type: 'json' };
+import { packageJson as packageModule } from '../../utils/package-root.ts';
 import globalOptions from '../commands-schema/common-options/global.ts';
 import resolveInput from '../resolve-input.ts';
 import generateCommandUsage from './generate-command-usage.ts';

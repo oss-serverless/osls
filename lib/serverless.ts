@@ -1,4 +1,5 @@
-import Module from 'node:module';
+import { registerHooks } from 'node:module';
+import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
 import isObject from 'type/object/is.js';
@@ -16,35 +17,44 @@ import Utils from './classes/utils.ts';
 import Service from './classes/service.ts';
 import ConfigSchemaHandler from './classes/config-schema-handler/index.ts';
 import ServerlessError from './serverless-error.ts';
-import packageModule from '../package.json' with { type: 'json' };
-import isStandaloneExecutable from './utils/is-standalone-executable.ts';
+import { packageJson } from './utils/package-root.ts';
 import { setByPath } from './utils/object-path.ts';
 import { hasOwn } from './utils/safe-object.ts';
 import logDeprecation from './utils/log-deprecation.ts';
 import commmandsSchema from './cli/commands-schema/index.ts';
-import resolveMeta from './configuration/variables/resolve-meta.ts';
+import { parseEntries } from './configuration/variables/resolve-meta.ts';
 import validateStage from './utils/validate-stage.ts';
-import colors2 from './utils/colors.ts';
+import colors from './utils/colors.ts';
 
-// Compatibility aliases: third-party plugins (e.g. Bref) require `@serverless/utils`
-// entry points, which osls vendors under `lib/utils/serverless-utils`
-const vendoredServerlessUtilsPath = path.resolve(import.meta.dirname, 'utils/serverless-utils');
-const compatibilityAliases = new Map(
-  Object.entries({
-    '@serverless/utils/config': 'config.js',
-    '@serverless/utils/config.js': 'config.js',
-    '@serverless/utils/log': 'log.js',
-    '@serverless/utils/log.js': 'log.js',
-  }).map(([request, target]) => [request, path.join(vendoredServerlessUtilsPath, target)])
-);
+// Compatibility aliases: third-party plugins (e.g. Bref) require or import `@serverless/utils`
+// entry points, which osls vendors under `lib/utils/serverless-utils`. The vendored modules
+// have the extension of this file: `.ts` in the sources, `.js` in `dist/`
+const compatibilityAliasesKey = Symbol.for('osls.compatibilityAliases');
+if (!globalThis[compatibilityAliasesKey]) {
+  globalThis[compatibilityAliasesKey] = true;
+  const vendoredServerlessUtilsPath = path.resolve(import.meta.dirname, 'utils/serverless-utils');
+  const extension = path.extname(import.meta.filename);
+  const compatibilityAliases = new Map(
+    Object.entries({
+      '@serverless/utils/config': 'config',
+      '@serverless/utils/config.js': 'config',
+      '@serverless/utils/log': 'log',
+      '@serverless/utils/log.js': 'log',
+    }).map(([request, target]) => [
+      request,
+      pathToFileURL(path.join(vendoredServerlessUtilsPath, `${target}${extension}`)).href,
+    ])
+  );
+  registerHooks({
+    resolve(specifier, context, nextResolve) {
+      const url = compatibilityAliases.get(specifier);
+      if (url) return { url, shortCircuit: true };
+      return nextResolve(specifier, context);
+    },
+  });
+}
 
-const originalResolveFilename = Module._resolveFilename;
-Module._resolveFilename = function (request, ...args) {
-  return originalResolveFilename.call(this, compatibilityAliases.get(request) || request, ...args);
-};
-
-const version = packageModule.version;
-const parseEntries = resolveMeta.parseEntries;
+const version = packageJson.version;
 
 // Old local fallback is triggered in older versions by Serverless constructor directly
 const isStackFromOldLocalFallback = RegExp.prototype.test.bind(
@@ -57,7 +67,6 @@ class Serverless {
 
     if (isStackFromOldLocalFallback(new Error().stack)) {
       // Prevent old local fallback, as it's not compatible with this version of the CLI
-      const colors = colors2;
       throw new ServerlessError(
         [
           'Cannot run a local osls installation with an outdated global version.',
@@ -148,7 +157,8 @@ class Serverless {
     this.classes.ConfigSchemaHandler = ConfigSchemaHandler;
 
     this.serverlessDirPath = path.join(os.homedir(), '.serverless');
-    this.isStandaloneExecutable = isStandaloneExecutable;
+    // Kept for plugins that read it: osls is distributed as an npm package only
+    this.isStandaloneExecutable = false;
     this.triggeredDeprecations = logDeprecation.triggeredDeprecations;
     this.isConfigurationExtendable = true;
 

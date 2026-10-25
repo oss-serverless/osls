@@ -1,5 +1,5 @@
 import memoizee from 'memoizee';
-import packageModule from '../../package.json' with { type: 'json' };
+import { packageJson as packageModule } from './package-root.ts';
 import ensureExists from './ensure-exists.ts';
 import path from 'node:path';
 import os from 'node:os';

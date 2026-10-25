@@ -15,14 +15,11 @@ import ServerlessError from '../../../serverless-error.ts';
 import isObject from 'type/object/is.js';
 import dirExists from '../../../utils/fs/dir-exists.ts';
 import fileExists from '../../../utils/fs/file-exists.ts';
-import isStandalone from '../../../utils/is-standalone-executable.ts';
-import ensureArtifact from '../../../utils/ensure-artifact.ts';
 import ensureValidLayerPath from '../../../utils/ensure-valid-layer-path.ts';
 import { safeShallowAssign } from '../../../utils/safe-object.ts';
 import { isAwsCredentialsNotFoundError } from '../../../aws/aws-sdk-v3-error.ts';
 import log2 from '../../../utils/serverless-utils/log.ts';
 import copy from '../../../utils/fs/copy.ts';
-import ensureFile from '../../../utils/fs/ensure-file.ts';
 import { LambdaClient, GetLayerVersionCommand } from '@aws-sdk/client-lambda';
 import {
   CloudFormationClient,
@@ -38,13 +35,7 @@ const cachePath = path.join(resolveCacheDir('serverless'), 'invokeLocal');
 const mainProgress = progress.get('main');
 const dockerProgress = progress.get('invokeLocalDocker');
 
-const ensureRuntimeWrappers = isStandalone
-  ? async () =>
-      ensureArtifact('runtime-wrappers/validationFile', async (runtimeCachePath) => {
-        await copy(path.resolve(import.meta.dirname, 'runtime-wrappers'), runtimeCachePath);
-        return ensureFile(path.resolve(runtimeCachePath, 'validationFile'));
-      })
-  : () => import.meta.dirname;
+const ensureRuntimeWrappers = () => import.meta.dirname;
 
 const javaClassNamePattern =
   /^(?:[A-Za-z_$][A-Za-z0-9_$]*\.)*[A-Za-z_$][A-Za-z0-9_$]*(?:\$[A-Za-z_$][A-Za-z0-9_$]*)*$/;
@@ -177,7 +168,8 @@ class AwsInvokeLocal {
     }
     if (absolutePath.endsWith('.js')) {
       // to support js - export as an input data
-      this.options[key] = require(absolutePath);
+      const namespace = await import(pathToFileURL(absolutePath).href);
+      this.options[key] = 'default' in namespace ? namespace.default : namespace;
       return;
     }
     const contents = await (async () => {
@@ -920,17 +912,18 @@ class AwsInvokeLocal {
     let pathToHandler;
     let hasResponded = false;
     try {
-      /*
-       * we need require() here to load the handler from the file system
-       * which the user has to supply by passing the function name
-       */
+      // The handler module is loaded from the file system with `import()`, which loads both
+      // ES modules and CommonJS modules
       pathToHandler = path.join(
         this.serverless.serviceDir,
         this.options.extraServicePath || '',
         handlerPath
       );
       const handlersContainer = await loadModule(pathToHandler);
-      lambda = handlersContainer[handlerName];
+      // CommonJS exports that Node cannot detect statically are only available on `default`
+      lambda =
+        handlersContainer[handlerName] ??
+        (handlersContainer.default && handlersContainer.default[handlerName]);
     } catch (error) {
       log.error(inspect(error));
       throw new ServerlessError(
@@ -947,25 +940,26 @@ class AwsInvokeLocal {
     }
 
     async function loadModule(modulePath) {
-      try {
-        return require(modulePath);
-      } catch (error) {
-        if (error.code === 'ERR_REQUIRE_ESM') {
-          return await import(pathToFileURL(`${modulePath}.js`).href);
-        } else if (error.code === 'MODULE_NOT_FOUND') {
-          // Attempt to require handler with `.cjs` extension
-          pathToHandler = `${pathToHandler}.cjs`;
-          try {
-            return require(pathToHandler);
-          } catch (innerError) {
-            // Throw original error if still "MODULE_NOT_FOUND", as not finding module with `.cjs` might be confusing
-            if (innerError.code !== 'MODULE_NOT_FOUND') {
-              throw innerError;
-            }
-          }
+      // Same lookup order as the AWS Lambda Node.js runtime
+      for (const candidate of [
+        modulePath,
+        `${modulePath}.js`,
+        `${modulePath}.mjs`,
+        `${modulePath}.cjs`,
+      ]) {
+        let stats;
+        try {
+          stats = await fsp.stat(candidate);
+        } catch {
+          continue;
         }
-        throw error;
+        if (!stats.isFile()) continue;
+        pathToHandler = candidate;
+        return import(pathToFileURL(candidate).href);
       }
+      throw Object.assign(new Error(`Cannot find module "${modulePath}"`), {
+        code: 'MODULE_NOT_FOUND',
+      });
     }
 
     function handleError(err) {

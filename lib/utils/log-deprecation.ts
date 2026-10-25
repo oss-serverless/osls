@@ -43,7 +43,7 @@ const resolveMode = (serviceConfig) => {
     case 'warn':
       return modeByConfig;
     default:
-      return module.exports.defaultMode;
+      return logDeprecation.defaultMode;
   }
 };
 
@@ -57,7 +57,7 @@ const isDisabledByEnv = (code) => {
   return disabledDeprecationCodesByEnv.has(code) || disabledDeprecationCodesByEnv.has('*');
 };
 
-export default (code, message, { serviceConfig } = {}) => {
+const logDeprecation = (code, message, { serviceConfig } = {}) => {
   try {
     if (triggeredDeprecations.has(code) || isDisabledByEnv(code)) {
       return;
@@ -87,10 +87,10 @@ export default (code, message, { serviceConfig } = {}) => {
   }
 };
 
-module.exports.triggeredDeprecations = triggeredDeprecations;
-module.exports.defaultMode = 'warn:summary';
+logDeprecation.triggeredDeprecations = triggeredDeprecations;
+logDeprecation.defaultMode = 'warn:summary';
 
-module.exports.printSummary = async () => {
+logDeprecation.printSummary = async () => {
   if (!bufferedDeprecations.length) {
     try {
       await fsp.unlink(healthStatusFilename);
@@ -152,3 +152,5 @@ module.exports.printSummary = async () => {
     bufferedDeprecations.length = 0;
   }
 };
+
+export default logDeprecation;

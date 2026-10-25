@@ -188,6 +188,8 @@ function ignoreDeniedNotificationCleanup(error) {
   throw error;
 }
 
-export default {
-  handler: handlerWrapper(handler, 'CustomResourceExistingS3'),
-};
+// AWS Lambda resolves the handler as a named export of the ES module
+const wrappedHandler = handlerWrapper(handler, 'CustomResourceExistingS3');
+
+export { wrappedHandler as handler };
+export default { handler: wrappedHandler };

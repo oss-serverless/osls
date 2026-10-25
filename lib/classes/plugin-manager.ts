@@ -4,8 +4,8 @@ import ServerlessError from '../serverless-error.ts';
 import mergePlainObjects from '../utils/merge-plain-objects.ts';
 import renderCommandHelp from '../cli/render-help/command.ts';
 import tokenizeException from '../utils/tokenize-exception.ts';
-import getRequire from '../utils/get-require.ts';
-import importModule from '../utils/require-with-import-fallback.ts';
+import resolveFrom from '../utils/resolve-from.ts';
+import importModule from '../utils/import-module.ts';
 import log2 from '../utils/serverless-utils/log.ts';
 import pluginManagement from '../commands/plugin-management.ts';
 const { log, getPluginWriters } = log2;
@@ -209,28 +209,22 @@ class PluginManager {
   }
 
   async requireServicePlugin(serviceDir, pluginPath, legacyLocalPluginsPath) {
-    if (legacyLocalPluginsPath && !pluginPath.startsWith('./')) {
-      // TODO (BREAKING): Consider removing support for localPluginsPath with next major
-      const absolutePluginPath = path.resolve(legacyLocalPluginsPath, pluginPath);
-
-      const isLocatedAtLegacyPluginsPath = (() => {
-        try {
-          require.resolve(absolutePluginPath);
-          return true;
-        } catch {
-          return false;
-        }
-      })();
-      if (isLocatedAtLegacyPluginsPath) return require(absolutePluginPath);
-    }
-    const serviceDirRequire = getRequire(serviceDir);
-    const localPluginPath = (() => {
+    const tryResolve = (dirname, request) => {
       try {
-        return serviceDirRequire.resolve(pluginPath);
+        return resolveFrom(dirname, request);
       } catch {
         return null;
       }
-    })();
+    };
+    if (legacyLocalPluginsPath && !pluginPath.startsWith('./')) {
+      // TODO (BREAKING): Consider removing support for localPluginsPath with next major
+      const legacyPluginPath = tryResolve(
+        import.meta.dirname,
+        path.resolve(legacyLocalPluginsPath, pluginPath)
+      );
+      if (legacyPluginPath) return importModule(legacyPluginPath);
+    }
+    const localPluginPath = tryResolve(serviceDir, pluginPath);
     if (localPluginPath) {
       if (pluginPath.startsWith('./')) {
         this.localPluginsPaths.push({ resolvedPath: localPluginPath, inputPath: pluginPath });
@@ -239,13 +233,10 @@ class PluginManager {
     }
 
     // Search in the "node_modules" where osls is placed
-    const externalPluginPath = (() => {
-      try {
-        return require.resolve(pluginPath);
-      } catch {
-        throw Object.assign(new Error('Plugin not found'), { code: 'PLUGIN_NOT_FOUND' });
-      }
-    })();
+    const externalPluginPath = tryResolve(import.meta.dirname, pluginPath);
+    if (!externalPluginPath) {
+      throw Object.assign(new Error('Plugin not found'), { code: 'PLUGIN_NOT_FOUND' });
+    }
     return importModule(externalPluginPath);
   }
 

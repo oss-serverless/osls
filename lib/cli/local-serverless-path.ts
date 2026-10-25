@@ -1,15 +1,9 @@
-// This module should stay dependency-free because it's used at local fallback triage.
-
 import path from 'node:path';
-
-import { createRequire } from 'node:module';
+import resolveFrom from '../utils/resolve-from.ts';
 
 export default ({ cwd = process.cwd() } = {}) => {
   try {
-    return path.resolve(
-      path.dirname(createRequire(path.resolve(cwd, 'require-resolver')).resolve('serverless')),
-      '..'
-    );
+    return path.resolve(path.dirname(resolveFrom(cwd, 'serverless')), '..');
   } catch {
     return null;
   }

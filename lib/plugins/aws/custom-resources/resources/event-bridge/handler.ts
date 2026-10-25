@@ -123,6 +123,8 @@ async function remove(event, context) {
     );
 }
 
-export default {
-  handler: handlerWrapper(handler, 'CustomResourceEventBridge'),
-};
+// AWS Lambda resolves the handler as a named export of the ES module
+const wrappedHandler = handlerWrapper(handler, 'CustomResourceEventBridge');
+
+export { wrappedHandler as handler };
+export default { handler: wrappedHandler };

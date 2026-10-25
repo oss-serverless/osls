@@ -10,7 +10,7 @@ const outputEmitter = (() => {
   return globalState.outputEmitter;
 })();
 
-export default memoizee(
+const getOutputReporter = memoizee(
   (namespace) => {
     return {
       get: memoizee(
@@ -29,4 +29,7 @@ export default memoizee(
   { primitive: true }
 );
 
-module.exports.emitter = outputEmitter;
+getOutputReporter.emitter = outputEmitter;
+
+export { outputEmitter as emitter };
+export default getOutputReporter;

@@ -32,10 +32,13 @@ const parseEntries = (entries, parentPropertyPathKeys, map) => {
   return map;
 };
 
-export default (configuration) => {
+const resolveMeta = (configuration) => {
   ensurePlainObject(configuration);
 
   return parseEntries(Object.entries(configuration), [], new Map());
 };
 
-module.exports.parseEntries = parseEntries;
+resolveMeta.parseEntries = parseEntries;
+
+export { parseEntries };
+export default resolveMeta;

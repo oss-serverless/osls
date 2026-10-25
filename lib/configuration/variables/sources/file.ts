@@ -2,10 +2,19 @@ import ensureString from 'type/string/ensure.js';
 import isPlainFunction from 'type/plain-function/is.js';
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import * as yaml from 'js-yaml';
 import cloudformationSchema from '../../../utils/serverless-utils/cloudformation-schema.ts';
 import ServerlessError from '../../../serverless-error.ts';
 import { canFollowProperty } from '../../../utils/safe-object.ts';
+
+const isFile = async (filePath) => {
+  try {
+    return (await fsp.stat(filePath)).isFile();
+  } catch {
+    return false;
+  }
+};
 
 const readFile = async (filePath, serviceDir) => {
   try {
@@ -88,15 +97,13 @@ export default {
           }
         }
         case '.js':
-        case '.cjs': {
-          try {
-            require.resolve(filePath);
-          } catch {
-            return null;
-          }
+        case '.cjs':
+        case '.mjs': {
+          if (!(await isFile(filePath))) return null;
           let result;
           try {
-            result = require(filePath);
+            const namespace = await import(pathToFileURL(filePath).href);
+            result = 'default' in namespace ? namespace.default : namespace;
           } catch (error) {
             throw new ServerlessError(
               `Cannot load "${filePath.slice(serviceDir.length + 1)}": Initialization error: ${

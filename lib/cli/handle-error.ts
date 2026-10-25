@@ -1,7 +1,6 @@
 import { stripVTControlCharacters as stripAnsi } from 'node:util';
 import log2 from '../utils/serverless-utils/log.ts';
-import packageModule from '../../package.json' with { type: 'json' };
-import isStandaloneExecutable from '../utils/is-standalone-executable.ts';
+import { packageJson as packageModule } from '../utils/package-root.ts';
 import tokenizeException from '../utils/tokenize-exception.ts';
 import isLocallyInstalled from './is-locally-installed.ts';
 const { style, writeText, log } = log2;
@@ -14,7 +13,6 @@ export default (exception) => {
   const platform = process.platform;
   const nodeVersion = process.version.replace(/^[v|V]/, '');
   const installationModePostfix = (() => {
-    if (isStandaloneExecutable) return ' (standalone)';
     return isLocallyInstalled ? ' (local)' : '';
   })();
   const globalInstallationPostfix = (() => {

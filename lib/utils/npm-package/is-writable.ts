@@ -1,9 +1,9 @@
-import path from 'node:path';
 import { promises as fsp } from 'node:fs';
 import log2 from '../serverless-utils/log.ts';
+import { packageRoot } from '../package-root.ts';
 const { log } = log2;
 
-const npmPackageRoot = path.resolve(import.meta.dirname, '../../../');
+const npmPackageRoot = packageRoot;
 
 export default async () => {
   const stats = await fsp.stat(npmPackageRoot);

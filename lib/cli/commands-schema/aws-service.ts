@@ -1,7 +1,7 @@
 import awsServiceOptions from './common-options/aws-service.ts';
 import serviceCommands from './service.ts';
 
-const commands = (module.exports = new Map());
+const commands = new Map();
 
 commands.commonOptions = awsServiceOptions;
 
@@ -288,3 +288,5 @@ commands.set('package', {
     },
   },
 });
+
+export default commands;

@@ -1,4 +1,4 @@
-import compileCodegen from 'ajv/dist/compile/codegen';
+import compileCodegen from 'ajv/dist/compile/codegen/index.js';
 
 // Implementation has been heavily inspired by `ajv-keywords` implementation from:
 // https://github.com/ajv-validator/ajv-keywords/blob/9656614be0104fe71d229459a5217ccac11958a6/src/definitions/regexp.ts

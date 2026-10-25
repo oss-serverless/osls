@@ -2,7 +2,7 @@ import globalOptions from './common-options/global.ts';
 import serviceOptions from './common-options/service.ts';
 import awsServiceOptions from './common-options/aws-service.ts';
 
-const commands = (module.exports = new Map());
+const commands = new Map();
 
 commands.commonOptions = globalOptions;
 
@@ -150,3 +150,5 @@ for (const [name, schema] of commands) {
     schema.options.version = { ...schema.options.version, shortcut: 'v' };
   }
 }
+
+export default commands;

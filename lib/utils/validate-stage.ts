@@ -14,5 +14,7 @@ const validateStage = (stage) => {
   return stage;
 };
 
+validateStage.STAGE_NAME_PATTERN = STAGE_NAME_PATTERN;
+
+export { STAGE_NAME_PATTERN };
 export default validateStage;
-module.exports.STAGE_NAME_PATTERN = STAGE_NAME_PATTERN;

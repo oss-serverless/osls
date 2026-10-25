@@ -1,22 +1,24 @@
-import ajv2 from 'ajv';
+import ajvModule from 'ajv';
 import path from 'node:path';
 import os from 'node:os';
-import Module from 'node:module';
-import distStandalone from 'ajv/dist/standalone';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { pathToFileURL } from 'node:url';
+import standaloneModule from 'ajv/dist/standalone/index.js';
+import addFormats from 'ajv-formats';
+import { log } from '../../utils/serverless-utils/log.ts';
+import resolveFrom from '../../utils/resolve-from.ts';
+import regexpKeyword from './regexp-keyword.ts';
 import { promises as fsp } from 'node:fs';
 import resolveTmpdir from '../../utils/resolve-process-tmp-dir.ts';
 import safeMoveFile from '../../utils/fs/safe-move-file.ts';
 import getSchemaHash from './schema-hash.ts';
 import ensureExists from '../../utils/ensure-exists.ts';
 import ServerlessError from '../../serverless-error.ts';
-import packageModule from 'ajv/package.json' with { type: 'json' };
-import packageModule2 from 'ajv-formats/package.json' with { type: 'json' };
-const Ajv = ajv2.default;
-const standaloneCode = distStandalone.default;
-const { log } = log2;
-const ajvVersion = packageModule.version;
-const ajvFormatsVersion = packageModule2.version;
+import ajvPackageJson from 'ajv/package.json' with { type: 'json' };
+import ajvFormatsPackageJson from 'ajv-formats/package.json' with { type: 'json' };
+const Ajv = ajvModule.default;
+const standaloneCode = standaloneModule.default;
+const ajvVersion = ajvPackageJson.version;
+const ajvFormatsVersion = ajvFormatsPackageJson.version;
 
 const getCacheDir = () => {
   return path.resolve(
@@ -25,14 +27,22 @@ const getCacheDir = () => {
   );
 };
 
-// The filename must point inside this package so that requires in the
-// generated code resolve against our dependencies and not the cache location
-const loadModuleFromString = (code, filename) => {
-  const generatedModule = new Module(filename);
-  generatedModule.filename = filename;
-  generatedModule.paths = Module._nodeModulePaths(path.dirname(filename));
-  generatedModule._compile(code, filename);
-  return generatedModule.exports;
+// AJV standalone code references its runtime helpers (and the formats configured below) with
+// `require("...")` calls. They are replaced with imports of the files those requests resolve to
+// from this package, so they resolve against our dependencies and not the cache location, and
+// the validator is evaluated as an ES module. The cached code stays free of absolute paths
+const importValidatorModule = async (code) => {
+  const dependencies = new Map();
+  const body = code.replace(/require\("([^"\\]+)"\)/g, (match, request) => {
+    if (!dependencies.has(request)) dependencies.set(request, `__dependency${dependencies.size}`);
+    return dependencies.get(request);
+  });
+  const imports = Array.from(dependencies, ([request, name]) => {
+    const url = pathToFileURL(resolveFrom(import.meta.dirname, request)).href;
+    return `import ${name} from ${JSON.stringify(url)};`;
+  });
+  const source = `${imports.join('\n')}\n${body}`;
+  return import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 };
 
 // Validators are cached by schema hash for the purpose
@@ -46,7 +56,7 @@ const getValidate = async (schema) => {
   if (cachedValidatorsBySchemaHash[schemaHash]) {
     return cachedValidatorsBySchemaHash[schemaHash];
   }
-  const filename = `${schemaHash}.js`;
+  const filename = `${schemaHash}.mjs`;
   const cachePath = path.resolve(getCacheDir(), filename);
 
   const generate = async () => {
@@ -56,13 +66,13 @@ const getValidate = async (schema) => {
       verbose: true,
       strict: true,
       strictRequired: false,
-      code: { source: true },
+      code: { source: true, esm: true },
     });
-    (await import('ajv-formats')).default.default(ajv);
+    addFormats.default(ajv);
     // Ensure AJV related packages work well when there are multiple AJV installations around
     // See: https://github.com/ajv-validator/ajv/issues/1390#issuecomment-763138202
     ajv.opts.code.formats = Ajv._`require("ajv-formats/dist/formats").fullFormats`;
-    ajv.addKeyword((await import('./regexp-keyword.ts')).default);
+    ajv.addKeyword(regexpKeyword);
     let validate;
     try {
       validate = ajv.compile(schema);
@@ -96,10 +106,7 @@ const getValidate = async (schema) => {
     // as a cache miss: regenerate once and retry.
     loadedModuleCode = await loadValidatorModuleCode();
   }
-  const validator = loadModuleFromString(
-    loadedModuleCode,
-    path.resolve(import.meta.dirname, `[generated-ajv-validate]${filename}`)
-  );
+  const validator = (await importValidatorModule(loadedModuleCode)).default;
   if (typeof validator !== 'function') {
     log.error('Unexpected validator %o, resolved from source %s', validator, loadedModuleCode);
     throw new Error(

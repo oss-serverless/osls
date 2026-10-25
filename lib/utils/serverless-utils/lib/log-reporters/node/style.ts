@@ -37,7 +37,7 @@ for (const key of Object.keys(style)) {
   if (!decorator) {
     continue;
   }
-  module.exports[key] = style[key] = (text, ...textTokens) =>
+  style[key] = (text, ...textTokens) =>
     decorator(joinTextTokens([text, ...textTokens]).slice(0, -1));
 }
 
@@ -47,3 +47,6 @@ Object.defineProperties(log, {
     return this.notice(`${cliStyle.noticeSymbol('✔')} ${text}`, ...messageTokens);
   }),
 });
+
+// The shared log style object, with the CLI decorators applied above
+export default style;

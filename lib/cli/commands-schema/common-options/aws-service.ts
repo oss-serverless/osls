@@ -1,6 +1,6 @@
 import service from './service.ts';
 
-export default {
+const options = {
   'region': {
     usage: 'Region of the service',
     shortcut: 'r',
@@ -11,6 +11,8 @@ export default {
   ...service,
 };
 
-for (const optionSchema of Object.values(module.exports)) {
+for (const optionSchema of Object.values(options)) {
   if (!optionSchema.type) optionSchema.type = 'string';
 }
+
+export default options;

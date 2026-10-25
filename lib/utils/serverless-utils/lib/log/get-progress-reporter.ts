@@ -14,7 +14,7 @@ const progressEmitter = (() => {
   return globalState.progressEmitter;
 })();
 
-export default memoizee(
+const getProgressReporter = memoizee(
   (namespace) => {
     return {
       get: memoizee(
@@ -73,4 +73,7 @@ export default memoizee(
   { primitive: true }
 );
 
-module.exports.emitter = progressEmitter;
+getProgressReporter.emitter = progressEmitter;
+
+export { progressEmitter as emitter };
+export default getProgressReporter;

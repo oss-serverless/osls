@@ -2,7 +2,7 @@ import serviceOptions from './common-options/service.ts';
 import awsServiceOptions from './common-options/aws-service.ts';
 import noServiceCommands from './no-service.ts';
 
-const commands = (module.exports = new Map());
+const commands = new Map();
 
 commands.commonOptions = serviceOptions;
 
@@ -82,3 +82,5 @@ for (const schema of commands.values()) {
 }
 
 for (const [name, schema] of noServiceCommands) commands.set(name, schema);
+
+export default commands;

@@ -137,6 +137,8 @@ function remove() {
   // No actions
 }
 
-export default {
-  handler: handlerWrapper(handler, 'CustomResourceApiGatewayAccountCloudWatchRole'),
-};
+// AWS Lambda resolves the handler as a named export of the ES module
+const wrappedHandler = handlerWrapper(handler, 'CustomResourceApiGatewayAccountCloudWatchRole');
+
+export { wrappedHandler as handler };
+export default { handler: wrappedHandler };

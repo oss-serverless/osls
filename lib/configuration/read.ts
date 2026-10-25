@@ -6,9 +6,6 @@ import { promises as fsp } from 'node:fs';
 import * as yaml from 'js-yaml';
 import cloudformationSchema from '../utils/serverless-utils/cloudformation-schema.ts';
 import ServerlessError from '../serverless-error.ts';
-import typescript from 'typescript';
-import fs2 from 'node:fs';
-import module2 from 'node:module';
 
 const readConfigurationFile = async (configurationPath) => {
   try {
@@ -27,51 +24,70 @@ const readConfigurationFile = async (configurationPath) => {
   }
 };
 
-const loadWithTypeScript = (configurationPath) => {
+const ensureConfigurationFile = async (configurationPath) => {
   try {
-    const ts = typescript;
-    const fs = fs2;
-    const source = fs.readFileSync(configurationPath, 'utf8');
+    if ((await fsp.stat(configurationPath)).isFile()) return;
+  } catch {
+    // Reported below
+  }
+  throw new ServerlessError(
+    `Cannot load "${path.basename(configurationPath)}": File not found`,
+    'CONFIGURATION_NOT_FOUND'
+  );
+};
 
-    const configDir = path.dirname(path.resolve(configurationPath));
-    const tsconfigPath = ts.findConfigFile(configDir, ts.sys.fileExists, 'tsconfig.json');
+// CommonJS configurations come through Node's interop as the default export. ES modules
+// transpiled to CommonJS (eg. by tsx, when the service is not `"type": "module"`) carry
+// their default export one level deeper, marked with `__esModule`
+const unwrapDefaultExport = (namespace) => {
+  const value = namespace.default;
+  return value && value.__esModule && 'default' in value ? value.default : value;
+};
 
-    let compilerOptions = {
-      module: ts.ModuleKind.CommonJS,
-      target: ts.ScriptTarget.ES2020,
-      esModuleInterop: true,
-      moduleResolution: ts.ModuleResolutionKind.NodeJs,
-      allowJs: true,
-    };
+const importConfiguration = async (configurationPath) =>
+  unwrapDefaultExport(await import(pathToFileURL(configurationPath).href));
 
-    if (tsconfigPath) {
-      const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
-      if (!configFile.error) {
-        const parsed = ts.parseJsonConfigFileContent(configFile.config, ts.sys, configDir);
-        compilerOptions = { ...compilerOptions, ...parsed.options };
-        // Ensure we can output CommonJS
-        compilerOptions.module = ts.ModuleKind.CommonJS;
-      }
-    }
+// Errors that Node raises while loading or linking a TypeScript module, before any of its code
+// runs, when the module needs more than type stripping (enums, namespaces, parameter
+// properties, extensionless imports, tsconfig paths) or type stripping is disabled
+const nativeTypeScriptLimitationCodes = new Set([
+  'ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX',
+  'ERR_INVALID_TYPESCRIPT_SYNTAX',
+  'ERR_UNKNOWN_FILE_EXTENSION',
+  'ERR_MODULE_NOT_FOUND',
+  'ERR_UNSUPPORTED_DIR_IMPORT',
+  'ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING',
+]);
 
-    const result = ts.transpileModule(source, {
-      compilerOptions,
-      fileName: configurationPath,
-    });
-
-    const Module = module2;
-    const filename = configurationPath;
-    const dirname = path.dirname(configurationPath);
-
-    const mod = new Module(filename);
-    mod.filename = filename;
-    mod.paths = Module._nodeModulePaths(dirname);
-    mod._compile(result.outputText, filename);
-
-    const content = mod.exports;
-    return content.default !== undefined ? content.default : content;
+const importTypeScriptConfiguration = async (configurationPath) => {
+  try {
+    // Node.js 22.18+ and 24 run TypeScript natively through type stripping
+    return await importConfiguration(configurationPath);
   } catch (error) {
-    throw error;
+    if (
+      !(error instanceof SyntaxError) &&
+      !nativeTypeScriptLimitationCodes.has(error && error.code)
+    ) {
+      throw error;
+    }
+  }
+  const { tsImport } = await import('tsx/esm/api');
+  return unwrapDefaultExport(
+    await tsImport(pathToFileURL(configurationPath).href, import.meta.url)
+  );
+};
+
+const loadModuleConfiguration = async (configurationPath, load) => {
+  await ensureConfigurationFile(configurationPath);
+  try {
+    return await load(configurationPath);
+  } catch (error) {
+    throw new ServerlessError(
+      `Cannot load "${path.basename(configurationPath)}": Initialization error: ${
+        error && error.stack ? error.stack : error
+      }`,
+      'CONFIGURATION_INITIALIZATION_ERROR'
+    );
   }
 };
 
@@ -104,79 +120,12 @@ const parseConfigurationFile = async (configurationPath) => {
       }
     }
     case '.ts':
-    case '.mts': {
-      try {
-        try {
-          const content = loadWithTypeScript(configurationPath);
-          return content;
-        } catch (tsError) {
-          const tsx = await import('tsx/cjs/api');
-          const content = tsx.require(configurationPath, import.meta.filename);
-          return content.default || content;
-        }
-      } catch (error) {
-        throw new ServerlessError(
-          `Cannot parse "${path.basename(configurationPath)}": Initialization error: ${
-            error && error.stack ? error.stack : error
-          }`,
-          'CONFIGURATION_INITIALIZATION_ERROR'
-        );
-      }
-    }
-    // fallthrough
+    case '.mts':
+      return loadModuleConfiguration(configurationPath, importTypeScriptConfiguration);
     case '.cjs':
-    case '.js': {
-      const configurationEventuallyDeferred = (() => {
-        try {
-          require.resolve(configurationPath);
-        } catch {
-          throw new ServerlessError(
-            `Cannot load "${path.basename(configurationPath)}": File not found`,
-            'CONFIGURATION_NOT_FOUND'
-          );
-        }
-        try {
-          return require(configurationPath);
-        } catch (error) {
-          throw new ServerlessError(
-            `Cannot load "${path.basename(configurationPath)}": Initialization error: ${
-              error && error.stack ? error.stack : error
-            }`,
-            'CONFIGURATION_INITIALIZATION_ERROR'
-          );
-        }
-      })();
-      try {
-        return await configurationEventuallyDeferred;
-      } catch (error) {
-        throw new ServerlessError(
-          `Cannot load "${path.basename(configurationPath)}": Initialization error: ${
-            error && error.stack ? error.stack : error
-          }`,
-          'CONFIGURATION_INITIALIZATION_ERROR'
-        );
-      }
-    }
-    case '.mjs': {
-      try {
-        require.resolve(configurationPath);
-      } catch {
-        throw new ServerlessError(
-          `Cannot load "${path.basename(configurationPath)}": File not found`,
-          'CONFIGURATION_NOT_FOUND'
-        );
-      }
-      try {
-        return (await import(pathToFileURL(configurationPath).href)).default;
-      } catch (error) {
-        throw new ServerlessError(
-          `Cannot load "${path.basename(configurationPath)}": Initialization error: ${
-            error && error.stack ? error.stack : error
-          }`,
-          'CONFIGURATION_INITIALIZATION_ERROR'
-        );
-      }
-    }
+    case '.js':
+    case '.mjs':
+      return loadModuleConfiguration(configurationPath, importConfiguration);
     default:
       throw new ServerlessError(
         `Cannot parse "${path.basename(configurationPath)}": Unsupported file extension`,

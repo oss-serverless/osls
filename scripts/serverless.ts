@@ -6,6 +6,9 @@ import log2 from '../lib/utils/serverless-utils/log.ts';
 import handleError from '../lib/cli/handle-error.ts';
 import logDeprecation from '../lib/utils/log-deprecation.ts';
 import paramRegExp from '../lib/cli/param-reg-exp.ts';
+import path from 'node:path';
+import { randomUUID } from 'node:crypto';
+import clear from 'ext/object/clear.js';
 
 Error.stackTraceLimit = Infinity;
 
@@ -134,9 +137,6 @@ process.once('uncaughtException', (error) => {
       );
     }
 
-    const path = (await import('node:path')).default;
-    const { randomUUID } = (await import('node:crypto')).default;
-    const clear = (await import('ext/object/clear.js')).default;
     const Serverless = (await import('../lib/serverless.ts')).default;
     const { safeShallowAssign } = (await import('../lib/utils/safe-object.ts')).default;
     const resolveVariables = (await import('../lib/configuration/variables/resolve.ts')).default;
@@ -514,7 +514,11 @@ process.once('uncaughtException', (error) => {
 
     // Names of the commands which are configured independently in root `commands` folder
     // and not in Serverless class internals
-    const notIntegratedCommands = new Set(['doctor', 'plugin install', 'plugin uninstall']);
+    const notIntegratedCommands = new Map([
+      ['doctor', () => import('../commands/doctor.ts')],
+      ['plugin install', () => import('../commands/plugin-install.ts')],
+      ['plugin uninstall', () => import('../commands/plugin-uninstall.ts')],
+    ]);
     const isStandaloneCommand = notIntegratedCommands.has(command);
 
     if (!isHelpRequest) {
@@ -522,7 +526,9 @@ process.once('uncaughtException', (error) => {
         processLog.debug('run standalone command');
         if (configuration)
           (await import('../lib/cli/ensure-supported-command.ts')).default(configuration, cliInput);
-        await require(`../commands/${commands.join('-')}`)({
+        await (
+          await notIntegratedCommands.get(command)()
+        ).default({
           configuration,
           serviceDir,
           configurationFilename,

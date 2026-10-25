@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
+import { packageRoot } from './package-root.ts';
 
-const localNpmBinPath = path.join(import.meta.dirname, '../../node_modules/npm/bin/npm-cli.js');
+const localNpmBinPath = path.join(packageRoot, 'node_modules/npm/bin/npm-cli.js');
 
 export default fsp
   .stat(localNpmBinPath)

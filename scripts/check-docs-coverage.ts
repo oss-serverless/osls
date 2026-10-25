@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 
 import path from 'node:path';
+import commands from '../lib/cli/commands-schema/index.ts';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
 const CLI_DIR = path.join(REPO_ROOT, 'docs', 'cli-reference');
@@ -50,7 +51,6 @@ const linkedBasenames = (navFile) => {
 };
 
 function checkCommands(errors) {
-  const commands = require(path.join(REPO_ROOT, 'lib', 'cli', 'commands-schema'));
   const existingPages = mdBasenames(CLI_DIR);
   const navLinks = linkedBasenames(CLI_NAV);
 

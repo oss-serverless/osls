@@ -1,6 +1,6 @@
 import global from './global.ts';
 
-export default {
+const options = {
   config: {
     usage: 'Path to serverless config file',
     shortcut: 'c',
@@ -16,6 +16,8 @@ export default {
   ...global,
 };
 
-for (const optionSchema of Object.values(module.exports)) {
+for (const optionSchema of Object.values(options)) {
   if (!optionSchema.type) optionSchema.type = 'string';
 }
+
+export default options;
