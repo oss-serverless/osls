@@ -1,12 +1,16 @@
 import * as chai from 'chai';
+import path from 'node:path';
 import * as sinon from 'sinon';
 import AwsCompileCloudFrontEvents from '../../../../../../../../lib/plugins/aws/package/compile/events/cloud-front.ts';
 import runServerless from '../../../../../../../utils/run-serverless.ts';
+import logModule from '../../../../../../../../lib/utils/serverless-utils/log.ts';
 import { createAwsEventCompilerContext } from './test-utils.ts';
 
 const { expect } = chai;
-const logModulePath = require.resolve('../../../../../../../../lib/utils/serverless-utils/log');
-const logModule = require(logModulePath);
+const logModulePath = path.resolve(
+  import.meta.dirname,
+  '../../../../../../../../lib/utils/serverless-utils/log.ts'
+);
 
 const removeReminderMessage =
   "Don't forget to manually remove your Lambda@Edge functions once the CloudFront distribution removal is successfully propagated!";

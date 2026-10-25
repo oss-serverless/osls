@@ -3,7 +3,7 @@ import path from 'node:path';
 import { expect } from 'chai';
 import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
 
-describe('test/utils/setup-programmatic-fixture', () => {
+describe('test/unit/test-utils/setup-programmatic-fixture.test.ts', () => {
   it('sets up a mutable copied fixture with config extensions and serviceName', async () => {
     const { servicePath, serviceConfig, updateConfig } = await setupProgrammaticFixture(
       'function',

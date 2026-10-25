@@ -13,10 +13,11 @@ import runServerless from '../../utils/run-serverless.ts';
 import spawn from '../../../lib/utils/spawn.ts';
 import setupProgrammaticFixture from '../../utils/setup-programmatic-fixture.ts';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import * as yaml from 'js-yaml';
-import config2 from '../../../lib/utils/serverless-utils/config.ts';
-import log2 from '../../../lib/utils/serverless-utils/log.ts';
-import extendConfigPluginIndex from '../../fixtures/programmatic/plugin/extend-config-plugin/index.js';
+import vendoredConfig from '../../../lib/utils/serverless-utils/config.ts';
+import vendoredLog from '../../../lib/utils/serverless-utils/log.ts';
+import { createTmpDir, outputFile } from '../../utils/fs.ts';
 
 const { expect } = chai;
 
@@ -213,10 +214,53 @@ describe('Serverless', () => {
   });
 
   describe('compatibility aliases', () => {
-    it('resolves @serverless/utils/config through require.main.require', () => {
-      const config = require.main.require('@serverless/utils/config');
-      const configJs = require.main.require('@serverless/utils/config.js');
-      const vendoredConfig = config2;
+    // Third-party plugins load the aliases with `require()` (CommonJS) or `import`
+    let pluginDir;
+    let commonJsPluginExports;
+    let esmPluginExports;
+    before(async () => {
+      pluginDir = createTmpDir();
+      await outputFile(
+        path.join(pluginDir, 'plugin.cjs'),
+        [
+          'module.exports = {',
+          "  config: require('@serverless/utils/config'),",
+          "  configJs: require('@serverless/utils/config.js'),",
+          "  log: require('@serverless/utils/log'),",
+          "  logJs: require('@serverless/utils/log.js'),",
+          '};',
+          '',
+        ].join('\n')
+      );
+      await outputFile(
+        path.join(pluginDir, 'plugin.mjs'),
+        [
+          "export { default as config } from '@serverless/utils/config';",
+          "export { default as configJs } from '@serverless/utils/config.js';",
+          "export { default as log } from '@serverless/utils/log';",
+          "export { default as logJs } from '@serverless/utils/log.js';",
+          '',
+        ].join('\n')
+      );
+      commonJsPluginExports = (await import(pathToFileURL(path.join(pluginDir, 'plugin.cjs')).href))
+        .default;
+      esmPluginExports = await import(pathToFileURL(path.join(pluginDir, 'plugin.mjs')).href);
+    });
+
+    it('resolves @serverless/utils/config through require', () => {
+      // `require()` of an ES module returns its namespace: named exports and `default`
+      const { config, configJs } = commonJsPluginExports;
+
+      expect(config.default).to.equal(vendoredConfig);
+      expect(configJs.default).to.equal(vendoredConfig);
+      expect(config.get).to.equal(vendoredConfig.get);
+      expect(configJs.getConfig).to.equal(vendoredConfig.getConfig);
+      expect(typeof config.get).to.equal('function');
+      expect(typeof config.getConfig).to.equal('function');
+    });
+
+    it('resolves @serverless/utils/config through import', () => {
+      const { config, configJs } = esmPluginExports;
 
       expect(config).to.equal(vendoredConfig);
       expect(configJs).to.equal(vendoredConfig);
@@ -224,10 +268,18 @@ describe('Serverless', () => {
       expect(typeof config.getConfig).to.equal('function');
     });
 
-    it('resolves @serverless/utils/log through require.main.require', () => {
-      const log = require.main.require('@serverless/utils/log');
-      const logJs = require.main.require('@serverless/utils/log.js');
-      const vendoredLog = log2;
+    it('resolves @serverless/utils/log through require', () => {
+      const { log, logJs } = commonJsPluginExports;
+
+      expect(log).to.equal(vendoredLog);
+      expect(logJs).to.equal(vendoredLog);
+      expect(typeof log.log).to.equal('function');
+      expect(typeof log.writeText).to.equal('function');
+      expect(typeof log.progress.create).to.equal('function');
+    });
+
+    it('resolves @serverless/utils/log through import', () => {
+      const { log, logJs } = esmPluginExports;
 
       expect(log).to.equal(vendoredLog);
       expect(logJs).to.equal(vendoredLog);
@@ -259,9 +311,7 @@ describe('test/unit/lib/serverless.test.ts', () => {
   });
 
   describe('Extend configuration', () => {
-    const pluginConfig = extendConfigPluginIndex.pluginConfig;
-
-    const serverlessPath = path.resolve(import.meta.dirname, '../../../scripts/serverless.js');
+    const serverlessPath = path.resolve(import.meta.dirname, '../../../scripts/serverless.ts');
 
     it('Extends configuration with given values', async () => {
       const customExt = { custom: {} };
@@ -272,11 +322,14 @@ describe('test/unit/lib/serverless.test.ts', () => {
         },
         custom: {},
       };
-      setByPath(customExt, pluginConfig.overwriteValuePath, 'test_value');
-
       const { servicePath: serviceDir } = await setupProgrammaticFixture('plugin', {
         configExt,
       });
+      // The plugin is CommonJS: load it from the copied fixture, outside of this ESM package
+      const { pluginConfig } = (
+        await import(pathToFileURL(path.join(serviceDir, 'extend-config-plugin/index.js')).href)
+      ).default;
+      setByPath(customExt, pluginConfig.overwriteValuePath, 'test_value');
       const serverlessProcess = await spawn('node', [serverlessPath, 'print'], {
         cwd: serviceDir,
       });
