@@ -793,6 +793,89 @@ describe('Custom resource Cognito user pool configuration', () => {
     ).to.be.rejectedWith('Could not find Cognito User Pool "orders-pool"');
   });
 
+  it('should configure the InboundFederation trigger with its Lambda version', async () => {
+    const { sentCommands, lib } = makeUserPoolLib([
+      { UserPools: [{ Id: 'us-east-1_orders', Name: 'orders-pool' }] },
+      {
+        UserPool: {
+          Id: 'us-east-1_orders',
+          Name: 'orders-pool',
+          LambdaConfig: {
+            PreSignUp: 'arn:aws:lambda:us-east-1:123456789012:function:signup',
+          },
+          Policies: { PasswordPolicy: {} },
+          AdminCreateUserConfig: {},
+        },
+      },
+      {},
+    ]);
+
+    await lib.updateConfiguration({
+      lambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:orders:provisioned',
+      userPoolName: 'orders-pool',
+      userPoolConfigs: [{ Trigger: 'InboundFederation', LambdaVersion: 'V1_0' }],
+      region: 'us-east-1',
+    });
+
+    expect(sentCommands.map((command) => command.constructor.name)).to.deep.equal([
+      'ListUserPoolsCommand',
+      'DescribeUserPoolCommand',
+      'UpdateUserPoolCommand',
+    ]);
+    expect(sentCommands[2].input.LambdaConfig).to.deep.equal({
+      PreSignUp: 'arn:aws:lambda:us-east-1:123456789012:function:signup',
+      InboundFederation: {
+        LambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:orders:provisioned',
+        LambdaVersion: 'V1_0',
+      },
+    });
+  });
+
+  it('should remove only the InboundFederation trigger owned by the function', async () => {
+    const { sentCommands, lib } = makeUserPoolLib([
+      { UserPools: [{ Id: 'us-east-1_orders', Name: 'orders-pool' }] },
+      {
+        UserPool: {
+          Id: 'us-east-1_orders',
+          Name: 'orders-pool',
+          LambdaConfig: {
+            PreSignUp: 'arn:aws:lambda:us-east-1:123456789012:function:signup',
+            PreTokenGenerationConfig: {
+              LambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:tokens',
+              LambdaVersion: 'V2_0',
+            },
+            InboundFederation: {
+              LambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:orders:provisioned',
+              LambdaVersion: 'V1_0',
+            },
+          },
+          Policies: { PasswordPolicy: {} },
+          AdminCreateUserConfig: {},
+        },
+      },
+      {},
+    ]);
+
+    await lib.removeConfiguration({
+      lambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:orders:provisioned',
+      userPoolName: 'orders-pool',
+      region: 'us-east-1',
+    });
+
+    expect(sentCommands.map((command) => command.constructor.name)).to.deep.equal([
+      'ListUserPoolsCommand',
+      'DescribeUserPoolCommand',
+      'UpdateUserPoolCommand',
+    ]);
+    expect(sentCommands[2].input.LambdaConfig).to.deep.equal({
+      PreSignUp: 'arn:aws:lambda:us-east-1:123456789012:function:signup',
+      PreTokenGenerationConfig: {
+        LambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:tokens',
+        LambdaVersion: 'V2_0',
+      },
+    });
+  });
+
   it('should no-op delete when the target user pool no longer exists', async () => {
     const { sentCommands, lib } = makeUserPoolLib([{ UserPools: [] }]);
 

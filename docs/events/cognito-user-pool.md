@@ -13,6 +13,7 @@ Contents:
   - [Custom Sender Triggers](#custom-sender-triggers)
   - [Custom Sender Triggers Handlers](#custom-sender-triggers-handlers)
   - [PreTokenGeneration Trigger](#pretokengeneration-trigger)
+  - [InboundFederation Trigger](#inboundfederation-trigger)
   - [Custom Message Trigger Handlers](#custom-message-trigger-handlers)
 - [Using existing pools](#using-existing-pools)
 - [Overriding a generated User Pool](#overriding-a-generated-user-pool)
@@ -193,6 +194,20 @@ functions:
 - `V3_0`: Includes machine-to-machine (M2M) client-credentials grants
 
 **NOTE:** V2_0 and V3_0 require your user pool to be on the Essentials or Plus feature plan, as documented [by AWS](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-token-generation.html).
+
+### InboundFederation Trigger
+
+The [InboundFederation trigger](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-inbound-federation.html) lets a function add, override or suppress the attributes Cognito receives from an external SAML, OIDC or social identity provider before they are stored on the user profile. Cognito requires a `lambdaVersion` for this trigger and `V1_0` is the only supported value, so it is set automatically:
+
+```yaml
+functions:
+  inboundFederation:
+    handler: inboundFederation.handler
+    events:
+      - cognitoUserPool:
+          pool: MyUserPool
+          trigger: InboundFederation
+```
 
 ### Custom Message Trigger Handlers
 

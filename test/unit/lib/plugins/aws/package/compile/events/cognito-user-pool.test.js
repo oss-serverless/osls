@@ -200,6 +200,34 @@ const preTokenGenerationConfigurationExtension = {
   },
 };
 
+const inboundFederationConfigurationExtension = {
+  functions: {
+    inboundFederation: {
+      handler: 'index.js',
+      events: [
+        {
+          cognitoUserPool: {
+            pool: 'InboundFederationPool',
+            trigger: 'InboundFederation',
+          },
+        },
+      ],
+    },
+    inboundFederationExisting: {
+      handler: 'index.js',
+      events: [
+        {
+          cognitoUserPool: {
+            pool: 'InboundFederationPoolExisting',
+            trigger: 'InboundFederation',
+            existing: true,
+          },
+        },
+      ],
+    },
+  },
+};
+
 const customUserPoolDependency = 'CustomCognitoUserPoolDependency';
 
 const scopedCognitoLambdaResource = () => ({
@@ -1865,6 +1893,74 @@ describe('lib/plugins/aws/package/compile/events/cognito-user-pool.test.js', () 
           Trigger: 'PreTokenGeneration',
           LambdaVersion: 'V2_0',
         });
+      });
+    });
+  });
+
+  describe('InboundFederation Trigger', () => {
+    describe('Schema Issues', () => {
+      it('should throw if an unsupported lambdaVersion is configured', () => {
+        return expect(
+          runServerless({
+            fixture: 'function',
+            configExt: {
+              functions: {
+                basic: {
+                  events: [
+                    {
+                      cognitoUserPool: {
+                        pool: 'MyUserPool1',
+                        trigger: 'InboundFederation',
+                        lambdaVersion: 'V2_0',
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+            command: 'package',
+          })
+        ).to.eventually.be.rejectedWith('InboundFederation only supports: V1_0');
+      });
+    });
+
+    describe('New Pools', () => {
+      it('should create a versioned InboundFederation configuration', async () => {
+        const { cfTemplate, awsNaming } = await runServerless({
+          fixture: 'cognito-user-pool',
+          configExt: inboundFederationConfigurationExtension,
+          command: 'package',
+        });
+
+        const userPoolResource = cfTemplate.Resources.CognitoUserPoolInboundFederationPool;
+        expect(userPoolResource.Properties.LambdaConfig).to.deep.equal({
+          InboundFederation: {
+            LambdaArn: {
+              'Fn::GetAtt': [awsNaming.getLambdaLogicalId('inboundFederation'), 'Arn'],
+            },
+            LambdaVersion: 'V1_0',
+          },
+        });
+      });
+    });
+
+    describe('Existing Pools', () => {
+      it('should create a versioned UserPoolConfigs entry', async () => {
+        const { cfTemplate } = await runServerless({
+          fixture: 'cognito-user-pool',
+          configExt: inboundFederationConfigurationExtension,
+          command: 'package',
+        });
+
+        const customResource = Object.values(cfTemplate.Resources).find(
+          (resource) =>
+            resource.Type === 'Custom::CognitoUserPool' &&
+            resource.Properties.UserPoolName === 'InboundFederationPoolExisting'
+        );
+
+        expect(customResource.Properties.UserPoolConfigs).to.deep.equal([
+          { Trigger: 'InboundFederation', LambdaVersion: 'V1_0' },
+        ]);
       });
     });
   });
