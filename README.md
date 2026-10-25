@@ -8,7 +8,7 @@ osls v4 is the current stable release. The osls v3 line lives on the [`3.x` bran
 
 ## Installation
 
-Requires Node.js `^20.19.0 || ^22.13.0 || >=24`.
+Requires Node.js `^22.18.0 || ^24.0.0`.
 
 If you are replacing a global Serverless Framework installation, remove it first so the `serverless` command resolves to osls.
 
@@ -46,6 +46,7 @@ This repository was created and is maintained by [Bref](https://bref.sh) maintai
 - The documentation is focused on the current osls release and AWS usage. Documentation for non-AWS providers has been removed.
 - New AWS Lambda runtimes are kept up to date.
 - osls is published as an npm package only. There is no standalone binary distribution.
+- osls is written in TypeScript and published as ES modules with type declarations. TypeScript service configurations run on Node.js's built-in type stripping, and configuration types are available with `import type { AWS } from 'osls'`.
 - Internal AWS calls use AWS SDK for JavaScript v3 in osls v4, including support for IAM Identity Center credentials.
 - Known inherited dependency vulnerabilities have been fixed.
 - Serverless Dashboard, Enterprise, and Console features have been removed. If you rely on those hosted upstream services, use upstream Serverless Framework instead.

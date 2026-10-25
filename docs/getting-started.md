@@ -11,7 +11,7 @@ npm uninstall -g serverless
 npm install -g osls@4
 ```
 
-_Requires Node.js `^20.19.0 || ^22.13.0 || >=24`. If you don’t already have a supported Node.js version on your machine, [install it first](https://nodejs.org/)._
+_Requires Node.js `^22.18.0 || ^24.0.0`. If you don’t already have a supported Node.js version on your machine, [install it first](https://nodejs.org/)._
 
 The package installs the `osls`, `sls`, and `serverless` commands. This guide uses `osls` to avoid confusion with other Serverless Framework installations.
 

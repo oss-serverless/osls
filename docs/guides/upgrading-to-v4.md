@@ -46,6 +46,18 @@ These commands were deprecated (and broken) in v3 and are removed in v4:
 
 ## Breaking changes
 
+### Node.js 22.18+ or 24 required, osls ships as ES modules
+
+osls v4 requires Node.js `^22.18.0 || ^24.0.0`. Node.js 20 and earlier Node.js 22 releases are no longer supported.
+
+osls is written in TypeScript and published as ES modules with type declarations:
+
+- Plugins written as CommonJS or ES modules keep working. The `@serverless/utils/config` and `@serverless/utils/log` compatibility aliases keep working for `require()` and `import`.
+- Plugins that deep-require osls internal modules (`osls/lib/...`) get ES modules through Node.js's `require()` of ES modules: a module's default export is on `.default`. Internal modules are not part of the public plugin API.
+- TypeScript service configurations (`serverless.ts`, `serverless.mts`) run on Node.js's built-in type stripping, with [tsx](https://tsx.is) as the fallback for syntax Node.js cannot strip (such as `enum`), extensionless relative imports and tsconfig `paths`. The `typescript` package is no longer a dependency of osls.
+- Configuration types: `import type { AWS } from 'osls'`.
+- The custom resource Lambda functions osls deploys are ES modules (Node.js Lambda runtimes support them).
+
 ### Update a pinned `frameworkVersion`
 
 If your `serverless.yml` pins `frameworkVersion` to a v3 range, **every osls command fails immediately** after upgrading, with `FRAMEWORK_VERSION_MISMATCH`:
