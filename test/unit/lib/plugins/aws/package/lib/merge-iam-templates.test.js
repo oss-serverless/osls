@@ -685,6 +685,55 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
         });
       });
 
+      it('should reject an Infrequent Access log group named like the log group of another function', async () => {
+        await expect(
+          runServerless({
+            fixture: 'function',
+            command: 'package',
+            configExt: {
+              functions: {
+                'basic': {
+                  logs: {
+                    logGroupClass: 'infrequent_access',
+                  },
+                },
+                'basic-ia': {
+                  handler: 'index.handler',
+                },
+              },
+            },
+          })
+        ).to.be.eventually.rejected.and.have.property(
+          'code',
+          'FUNCTION_INFREQUENT_ACCESS_LOG_GROUP_NAME_CONFLICT'
+        );
+      });
+
+      it('should reject an Infrequent Access log group named like the log group of a function with disabled logs', async () => {
+        await expect(
+          runServerless({
+            fixture: 'function',
+            command: 'package',
+            configExt: {
+              functions: {
+                'basic': {
+                  logs: {
+                    logGroupClass: 'infrequent_access',
+                  },
+                },
+                'basic-ia': {
+                  handler: 'index.handler',
+                  disableLogs: true,
+                },
+              },
+            },
+          })
+        ).to.be.eventually.rejected.and.have.property(
+          'code',
+          'FUNCTION_INFREQUENT_ACCESS_LOG_GROUP_NAME_CONFLICT'
+        );
+      });
+
       it('should not have allow rights to put logs for custom named function when disableLogs option is enabled', async () => {
         expect(
           cfResources[naming.getRoleLogicalId()].Properties.Policies[0].PolicyDocument.Statement[0]

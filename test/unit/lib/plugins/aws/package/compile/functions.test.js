@@ -5109,7 +5109,7 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
         expect(originalVersionArn).to.not.equal(updatedVersionArn);
       });
 
-      it('should create a different version if logging configuration changed', async () => {
+      it('should create a different version if the log group class changed', async () => {
         const { servicePath: serviceDir, updateConfig } = await setupProgrammaticFixture(
           'function',
           {

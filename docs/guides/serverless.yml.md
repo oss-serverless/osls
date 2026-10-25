@@ -572,7 +572,7 @@ provider:
       systemLogLevel: INFO
       # The LogGroup that will be used by default. If this is set the CLI will not create LogGroups for any functions
       logGroup: /aws/lambda/global-log-group
-      # The log group class for all functions: 'standard' (default) or 'infrequent_access'. Cannot be combined with `logGroup`
+      # The log group class for all functions: 'standard' (default) or 'infrequent_access'. Mutually exclusive with `logGroup`
       logGroupClass: infrequent_access
 
     # Enable HTTP API logs
@@ -822,7 +822,7 @@ functions:
       applicationLogLevel: DEBUG
       logFormat: JSON
       logGroup: helloLoggingLogGroup
-      # 'standard' (default) or 'infrequent_access'. Cannot be combined with `logGroup`
+      # 'standard' (default) or 'infrequent_access'. Mutually exclusive with `logGroup`
       logGroupClass: infrequent_access
       systemLogLevel: DEBUG
 ```
