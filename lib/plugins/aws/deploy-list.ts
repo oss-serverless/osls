@@ -1,4 +1,4 @@
-import log2 from '../../utils/serverless-utils/log.ts';
+import { log, writeText } from '../../utils/serverless-utils/log.ts';
 import validate from './lib/validate.ts';
 import parseDeploymentObjectKey from './utils/parse-deployment-object-key.ts';
 import setBucketName from './lib/set-bucket-name.ts';
@@ -13,7 +13,6 @@ import { isS3ListObjectsAccessDeniedError } from '../../aws/aws-sdk-v3-error.ts'
 import promiseLimit2 from 'ext/promise/limit.js';
 
 const promiseLimit = promiseLimit2.bind(Promise);
-const { log, writeText } = log2;
 
 class AwsDeployList {
   constructor(serverless, options) {

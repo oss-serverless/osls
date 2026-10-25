@@ -1,10 +1,9 @@
 import identity from 'ext/function/identity.js';
 import colors from '../../../../colors.ts';
 import { methodDescriptor } from '../../../../property-descriptors.ts';
-import log2 from '../../../log.ts';
+import { style, log } from '../../../log.ts';
 import joinTextTokens from '../../log/join-text-tokens.ts';
 const { stderrColors } = colors;
-const { style, log } = log2;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 

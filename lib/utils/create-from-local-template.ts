@@ -1,9 +1,8 @@
 import untildify from './untildify.ts';
 import { promises as fsp } from 'node:fs';
 import copy from './fs/copy.ts';
-import renameService2 from './rename-service.ts';
+import { renameService } from './rename-service.ts';
 import ServerlessError from '../serverless-error.ts';
-const { renameService } = renameService2;
 
 export default async ({ templatePath, projectDir, projectName }) => {
   const sourcePath = untildify(templatePath);

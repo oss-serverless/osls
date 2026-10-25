@@ -1,5 +1,5 @@
 import wait from '../../utils/sleep.ts';
-import log from '../../utils/serverless-utils/log.ts';
+import { writeText } from '../../utils/serverless-utils/log.ts';
 import validate from './lib/validate.ts';
 import formatLambdaLogEvent from './utils/format-lambda-log-event.ts';
 import { parseTimeInput, subtractTime } from './utils/time.ts';
@@ -9,7 +9,6 @@ import {
   DescribeLogStreamsCommand,
   FilterLogEventsCommand,
 } from '@aws-sdk/client-cloudwatch-logs';
-const { writeText } = log;
 
 class AwsLogs {
   constructor(serverless, options) {

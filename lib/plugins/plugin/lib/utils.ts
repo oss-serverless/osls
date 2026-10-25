@@ -1,6 +1,5 @@
 import buildFetchDispatcher from '../../../utils/build-fetch-dispatcher.ts';
-import log2 from '../../../utils/serverless-utils/log.ts';
-const { log, writeText, style } = log2;
+import { log, writeText, style } from '../../../utils/serverless-utils/log.ts';
 
 export default {
   async getPlugins() {

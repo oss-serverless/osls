@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import processTmpDir from './process-tmp-dir.ts';
 const { mkdir } = fs.promises;
 
-export default () =>
+const provisionTmpDir = () =>
   new Promise((resolve) => {
     const tmpDirName = path.join(processTmpDir, crypto.randomBytes(12).toString('hex'));
     resolve(
@@ -12,8 +12,10 @@ export default () =>
         () => tmpDirName,
         (error) => {
           if (error.code !== 'EEXIST') throw error;
-          return module.exports(); // Name taken (rare edge case), retry
+          return provisionTmpDir(); // Name taken (rare edge case), retry
         }
       )
     );
   });
+
+export default provisionTmpDir;

@@ -4,9 +4,8 @@ import schema from '../../config-schema.ts';
 import ServerlessError from '../../serverless-error.ts';
 import normalizeAjvErrors from './normalize-ajv-errors.ts';
 import resolveAjvValidate from './resolve-ajv-validate.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { log, style } from '../../utils/serverless-utils/log.ts';
 import { setByPath } from '../../utils/object-path.ts';
-const { log, style } = log2;
 
 const FUNCTION_NAME_PATTERN = '^[a-zA-Z0-9-_]+$';
 const ERROR_PREFIX = 'Configuration error';

@@ -1,9 +1,7 @@
-'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
 
-const fs = require('node:fs');
-const path = require('node:path');
-
-const bootstrapState = global.__SERVERLESS_TEST_BOOTSTRAP__;
+const bootstrapState = globalThis.__SERVERLESS_TEST_BOOTSTRAP__;
 const originalCwd = process.cwd();
 const originalEnv = Object.assign(Object.create(null), process.env);
 const originalArgv = process.argv.slice();
@@ -99,4 +97,4 @@ class RuntimeSandbox {
   }
 }
 
-module.exports = new RuntimeSandbox();
+export default new RuntimeSandbox();

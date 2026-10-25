@@ -1,12 +1,11 @@
 import memoizee from 'memoizee';
 import memoizeeMethods from 'memoizee/methods.js';
-import log2 from '../../../../../utils/serverless-utils/log.ts';
+import { log } from '../../../../../utils/serverless-utils/log.ts';
 import ServerlessError from '../../../../../serverless-error.ts';
 import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
 import { methodDescriptor } from '../../../../../utils/property-descriptors.ts';
 import { safeShallowAssign } from '../../../../../utils/safe-object.ts';
 import isObject from 'type/object/is.js';
-const { log } = log2;
 
 const allowedMethods = new Set(['ANY', 'GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'HEAD', 'DELETE']);
 const methodPattern = new RegExp(`^(?:\\*|${Array.from(allowedMethods).join('|')})$`, 'i');

@@ -17,13 +17,12 @@ import filesize from '../../utils/filesize.ts';
 import getHashForFilePath from '../../utils/get-hash-for-file-path.ts';
 import ServerlessError from '../../serverless-error.ts';
 import { safeShallowAssign } from '../../utils/safe-object.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { log, style, progress } from '../../utils/serverless-utils/log.ts';
 import {
   isLambdaResourceNotFoundError,
   isLambdaResourceConflictError,
 } from '../../aws/aws-sdk-v3-error.ts';
 const fsp = fs.promises;
-const { log, style, progress } = log2;
 
 const mainProgress = progress.get('main');
 

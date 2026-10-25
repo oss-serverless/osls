@@ -4,12 +4,11 @@ import path from 'node:path';
 import isPlainObject from 'type/plain-object/is.js';
 import * as yaml from 'js-yaml';
 import cloudformationSchema from '../lib/utils/serverless-utils/cloudformation-schema.ts';
-import log2 from '../lib/utils/serverless-utils/log.ts';
+import { log, progress, style } from '../lib/utils/serverless-utils/log.ts';
 import yamlAstParser from '../lib/utils/yaml-ast-parser.ts';
 import npmCommandDeferred from '../lib/utils/npm-command-deferred.ts';
 import { readJson, writeJson } from '../lib/utils/fs/json-file.ts';
 import pluginManagement from '../lib/commands/plugin-management.ts';
-const { log, progress, style } = log2;
 
 const { getServerlessFilePath, parsePluginUninstallSpec, validate } = pluginManagement;
 

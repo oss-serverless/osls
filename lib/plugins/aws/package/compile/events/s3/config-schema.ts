@@ -1,5 +1,4 @@
-import awsSchemaGetCfValue from '../../../../../../utils/aws-schema-get-cf-value.ts';
-const { cfValue } = awsSchemaGetCfValue;
+import { cfValue } from '../../../../../../utils/aws-schema-get-cf-value.ts';
 
 const destination = {
   type: 'object',

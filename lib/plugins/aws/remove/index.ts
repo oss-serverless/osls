@@ -5,8 +5,7 @@ import emptyS3Bucket from './lib/bucket.ts';
 import removeStack from './lib/stack.ts';
 import removeEcrRepository from './lib/ecr.ts';
 import checkIfEcrRepositoryExists from '../lib/check-if-ecr-repository-exists.ts';
-import log2 from '../../../utils/serverless-utils/log.ts';
-const { log, style, progress } = log2;
+import { log, style, progress } from '../../../utils/serverless-utils/log.ts';
 
 const mainProgress = progress.get('main');
 

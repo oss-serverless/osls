@@ -7,10 +7,9 @@ import uploadS3Object from '../../lib/upload-s3-object.ts';
 import getLambdaLayerArtifactPath from '../../utils/get-lambda-layer-artifact-path.ts';
 import ServerlessError from '../../../../serverless-error.ts';
 import setS3UploadEncryptionOptions from '../../../../aws/set-s3-upload-encryption-options.ts';
-import log2 from '../../../../utils/serverless-utils/log.ts';
+import { progress, log } from '../../../../utils/serverless-utils/log.ts';
 import promiseLimit from 'ext/promise/limit.js';
 const limit = promiseLimit.bind(Promise);
-const { progress, log } = log2;
 
 const MAX_CONCURRENT_ARTIFACTS_UPLOADS =
   Number(process.env.SLS_MAX_CONCURRENT_ARTIFACTS_UPLOADS) || 3;

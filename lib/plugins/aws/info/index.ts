@@ -1,11 +1,10 @@
-import log2 from '../../../utils/serverless-utils/log.ts';
+import log2, { progress, style } from '../../../utils/serverless-utils/log.ts';
 import writeServiceOutputs from '../../../cli/write-service-outputs.ts';
 import validate from '../lib/validate.ts';
 import getStackInfo from './get-stack-info.ts';
 import getResourceCount from './get-resource-count.ts';
 import getApiKeyValues from './get-api-key-values.ts';
 import display from './display.ts';
-const { progress, style } = log2;
 const { log } = log2;
 
 const mainProgress = progress.get('main');

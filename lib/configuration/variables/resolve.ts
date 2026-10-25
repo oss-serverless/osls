@@ -16,9 +16,8 @@ import { methodDescriptor } from '../../utils/property-descriptors.ts';
 import { canFollowProperty, hasOwn, safeSet } from '../../utils/safe-object.ts';
 import humanizePropertyPath from './humanize-property-path-keys.ts';
 import parse from './parse.ts';
-import resolveMeta from './resolve-meta.ts';
+import { parseEntries } from './resolve-meta.ts';
 import VariableSourceResolutionError from './source-resolution-error.ts';
-const { parseEntries } = resolveMeta;
 
 const objPropertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 const variableProcessingErrorNames = new Set(['ServerlessError', 'VariableSourceResolutionError']);

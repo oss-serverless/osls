@@ -33,13 +33,13 @@ import {
   isIdentityExpired,
   doesIdentityRequireRefresh,
 } from '@smithy/core';
-import awsSchemaGetCfValue from '../../utils/aws-schema-get-cf-value.ts';
+import { cfValue } from '../../utils/aws-schema-get-cf-value.ts';
 import reportDeprecatedProperties from '../../utils/report-deprecated-properties.ts';
 import { toCacheKey } from '../../utils/to-cache-key.ts';
 import { getByPath } from '../../utils/object-path.ts';
 import { methodDescriptor } from '../../utils/property-descriptors.ts';
 import { hasOwn } from '../../utils/safe-object.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { progress, log } from '../../utils/serverless-utils/log.ts';
 import validateStage from '../../utils/validate-stage.ts';
 
 import {
@@ -54,8 +54,6 @@ import promiseLimit2 from 'ext/promise/limit.js';
 import configSchema from './package/compile/events/s3/config-schema.ts';
 const promiseLimit = promiseLimit2.bind(Promise);
 const { ALB_LISTENER_REGEXP } = validate;
-const { cfValue } = awsSchemaGetCfValue;
-const { progress, log } = log2;
 
 const isLambdaArn = RegExp.prototype.test.bind(/^arn:[^:]+:lambda:/);
 const isEcrUri = RegExp.prototype.test.bind(

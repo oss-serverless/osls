@@ -1,0 +1,12 @@
+{
+  "require": [
+    "./test/mocha/esmock-type-stripping.ts",
+    "./test/mocha/module-stubs.ts",
+    "./test/mocha/bootstrap.ts",
+    "./test/mocha/root-hooks.ts"
+  ],
+  "extension": ["ts"],
+  "timeout": 60000,
+  "parallel": false,
+  "node-option": ["unhandled-rejections=strict"]
+}

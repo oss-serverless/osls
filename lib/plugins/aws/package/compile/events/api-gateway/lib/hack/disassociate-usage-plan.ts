@@ -4,11 +4,10 @@ import {
   UpdateUsagePlanCommand,
 } from '@aws-sdk/client-api-gateway';
 import { CloudFormationClient, DescribeStackResourceCommand } from '@aws-sdk/client-cloudformation';
-import log2 from '../../../../../../../../utils/serverless-utils/log.ts';
+import { log } from '../../../../../../../../utils/serverless-utils/log.ts';
 import promiseLimit2 from 'ext/promise/limit.js';
 
 const promiseLimit = promiseLimit2.bind(Promise);
-const { log } = log2;
 
 function getApiGatewayRequestLimiter(context) {
   if (!context.limitApiGatewayRequests) {

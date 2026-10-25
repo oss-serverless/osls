@@ -6,9 +6,8 @@ import renderCommandHelp from '../cli/render-help/command.ts';
 import tokenizeException from '../utils/tokenize-exception.ts';
 import resolveFrom from '../utils/resolve-from.ts';
 import importModule from '../utils/import-module.ts';
-import log2 from '../utils/serverless-utils/log.ts';
+import { log, getPluginWriters } from '../utils/serverless-utils/log.ts';
 import pluginManagement from '../commands/plugin-management.ts';
-const { log, getPluginWriters } = log2;
 const { splitPackageSpec, validatePluginName } = pluginManagement;
 
 let hooksIdCounter = 0;

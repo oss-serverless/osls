@@ -1,8 +1,7 @@
 import colors from '../utils/colors.ts';
-import log2 from '../utils/serverless-utils/log.ts';
+import { log } from '../utils/serverless-utils/log.ts';
 import renderHelp from '../cli/render-help/index.ts';
 const { stdoutColors, stderrColors } = colors;
-const { log } = log2;
 
 const legacyPluginLog = log.get('plugin-legacy');
 

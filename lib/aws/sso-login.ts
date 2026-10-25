@@ -14,8 +14,7 @@ import ServerlessError from '../serverless-error.ts';
 import { isAwsCredentialProviderError } from './aws-sdk-v3-error.ts';
 import isInteractive from '../utils/is-interactive.ts';
 import wait from '../utils/sleep.ts';
-import log from '../utils/serverless-utils/log.ts';
-const { writeText } = log;
+import { writeText } from '../utils/serverless-utils/log.ts';
 
 const DEFAULT_SSO_REGISTRATION_SCOPES = ['sso:account:access'];
 const DEVICE_CODE_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:device_code';

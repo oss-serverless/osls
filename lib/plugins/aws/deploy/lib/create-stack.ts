@@ -1,4 +1,4 @@
-import log2 from '../../../../utils/serverless-utils/log.ts';
+import { progress, log } from '../../../../utils/serverless-utils/log.ts';
 import ServerlessError from '../../../../serverless-error.ts';
 import isChangeSetWithoutChanges from '../../utils/is-change-set-without-changes.ts';
 
@@ -12,7 +12,6 @@ import {
 } from '@aws-sdk/client-cloudformation';
 
 import { isCloudFormationMissingStackError } from '../../../../aws/aws-sdk-v3-error.ts';
-const { progress, log } = log2;
 
 const inactiveStateNames = new Set(['REVIEW_IN_PROGRESS']);
 

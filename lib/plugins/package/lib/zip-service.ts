@@ -7,12 +7,11 @@ import { Readable } from 'node:stream';
 import glob from '../../../utils/glob.ts';
 import memoizee from 'memoizee';
 import ServerlessError from '../../../serverless-error.ts';
-import log2 from '../../../utils/serverless-utils/log.ts';
+import { log } from '../../../utils/serverless-utils/log.ts';
 import spawnExt from '../../../utils/spawn.ts';
 import promiseLimit from 'ext/promise/limit.js';
 const fsp = fs.promises;
 const limit = promiseLimit.bind(Promise);
-const { log } = log2;
 
 const npmList = async (cwd, envName, outputFilePath) => {
   const outputFile = await fsp.open(outputFilePath, 'a');

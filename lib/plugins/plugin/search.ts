@@ -1,7 +1,6 @@
-import log2 from '../../utils/serverless-utils/log.ts';
+import { log } from '../../utils/serverless-utils/log.ts';
 import cliCommandsSchema from '../../cli/commands-schema/index.ts';
 import pluginUtils from './lib/utils.ts';
-const { log } = log2;
 
 class PluginSearch {
   constructor(serverless, options) {

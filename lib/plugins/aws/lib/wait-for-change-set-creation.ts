@@ -1,11 +1,10 @@
 import wait from '../../../utils/sleep.ts';
 import ServerlessError from '../../../serverless-error.ts';
 import isChangeSetWithoutChanges from '../utils/is-change-set-without-changes.ts';
-import log2 from '../../../utils/serverless-utils/log.ts';
+import { log } from '../../../utils/serverless-utils/log.ts';
 import getMonitoringFrequency from '../utils/get-monitoring-frequency.ts';
 import { CloudFormationClient, DescribeChangeSetCommand } from '@aws-sdk/client-cloudformation';
 import retry from '../../../aws/retry.ts';
-const { log } = log2;
 const { retryOnThrottlingError } = retry;
 
 function getCloudFormationClient(context) {

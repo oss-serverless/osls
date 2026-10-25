@@ -1,10 +1,8 @@
-'use strict';
+import * as sinon from 'sinon';
+import runtimeSandbox from './runtime-sandbox.ts';
+import clearCaches from './clear-caches.ts';
 
-const sinon = require('sinon');
-const runtimeSandbox = require('./runtime-sandbox.cjs');
-const clearCaches = require('./clear-caches.cjs');
-
-exports.mochaHooks = {
+export const mochaHooks = {
   beforeAll() {
     runtimeSandbox.prepareSuite();
   },

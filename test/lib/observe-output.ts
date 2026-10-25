@@ -1,8 +1,6 @@
 import isThenable from 'type/thenable/is.js';
-import getOutputReporter from '../../lib/utils/serverless-utils/lib/log/get-output-reporter.ts';
+import { emitter as outputEmitter } from '../../lib/utils/serverless-utils/lib/log/get-output-reporter.ts';
 import joinTextTokens from '../../lib/utils/serverless-utils/lib/log/join-text-tokens.ts';
-
-const { emitter: outputEmitter } = getOutputReporter;
 
 export default (callback) => {
   let output = '';

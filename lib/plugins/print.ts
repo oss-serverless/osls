@@ -5,8 +5,7 @@ import * as yaml from 'js-yaml';
 import ServerlessError from '../serverless-error.ts';
 import cliCommandsSchema from '../cli/commands-schema/index.ts';
 import { getReachableByPath } from '../utils/safe-object.ts';
-import log from '../utils/serverless-utils/log.ts';
-const { writeText } = log;
+import { writeText } from '../utils/serverless-utils/log.ts';
 
 class Print {
   constructor(serverless, options) {

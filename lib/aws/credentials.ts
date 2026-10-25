@@ -7,8 +7,7 @@ import { NodeHttpHandler } from '@smithy/node-http-handler';
 import { buildHttpOptions } from './config.ts';
 import { withInteractiveSsoLogin } from './sso-login.ts';
 import ServerlessError from '../serverless-error.ts';
-import log2 from '../utils/serverless-utils/log.ts';
-const { log } = log2;
+import { log } from '../utils/serverless-utils/log.ts';
 
 // Inner SSO/OIDC/STS clients created during credential resolution inherit the same
 // proxy, CA, and timeout configuration as regular clients

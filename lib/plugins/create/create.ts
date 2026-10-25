@@ -6,9 +6,8 @@ import download from '../../utils/download-template-from-repo.ts';
 import renameService2 from '../../utils/rename-service.ts';
 import copyDirContentsSync from '../../utils/fs/copy-dir-contents-sync.ts';
 import dirExistsSync from '../../utils/fs/dir-exists-sync.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { progress, log, style } from '../../utils/serverless-utils/log.ts';
 const renameService = renameService2.renameService;
-const { progress, log, style } = log2;
 
 const mainProgress = progress.get('main');
 

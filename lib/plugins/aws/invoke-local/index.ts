@@ -17,7 +17,7 @@ import fileExists from '../../../utils/fs/file-exists.ts';
 import ensureValidLayerPath from '../../../utils/ensure-valid-layer-path.ts';
 import { safeShallowAssign } from '../../../utils/safe-object.ts';
 import { isAwsCredentialsNotFoundError } from '../../../aws/aws-sdk-v3-error.ts';
-import log2 from '../../../utils/serverless-utils/log.ts';
+import { writeText, progress, log } from '../../../utils/serverless-utils/log.ts';
 import copy from '../../../utils/fs/copy.ts';
 import { LambdaClient, GetLayerVersionCommand } from '@aws-sdk/client-lambda';
 import {
@@ -27,7 +27,6 @@ import {
 } from '@aws-sdk/client-cloudformation';
 import promiseLimit2 from 'ext/promise/limit.js';
 const promiseLimit = promiseLimit2.bind(Promise);
-const { writeText, progress, log } = log2;
 
 const cachePath = path.join(resolveCacheDir('serverless'), 'invokeLocal');
 

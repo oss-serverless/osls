@@ -1,10 +1,9 @@
-import log2 from '../../../utils/serverless-utils/log.ts';
+import { log } from '../../../utils/serverless-utils/log.ts';
 import { ECRClient, DescribeRepositoriesCommand } from '@aws-sdk/client-ecr';
 import {
   isEcrRepositoryNotFoundError,
   isEcrAccessDeniedError,
 } from '../../../aws/aws-sdk-v3-error.ts';
-const { log } = log2;
 
 function getEcrClient(context) {
   context.ecrClientPromise ||= context.provider

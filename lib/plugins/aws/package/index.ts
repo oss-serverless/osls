@@ -8,8 +8,7 @@ import saveCompiledTemplate from './lib/save-compiled-template.ts';
 import mergeIamTemplates from './lib/merge-iam-templates.ts';
 import addExportNameForOutputs from './lib/add-export-name-for-outputs.ts';
 import validateTemplate from './lib/validate-template.ts';
-import log2 from '../../../utils/serverless-utils/log.ts';
-const { log, style, progress } = log2;
+import { log, style, progress } from '../../../utils/serverless-utils/log.ts';
 
 const mainProgress = progress.get('main');
 

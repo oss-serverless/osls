@@ -1,8 +1,7 @@
 import path from 'node:path';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { log } from '../../utils/serverless-utils/log.ts';
 import ServerlessError from '../../serverless-error.ts';
 import resolveCliInput from '../../cli/resolve-input.ts';
-const { log } = log2;
 
 export default (configurationPath, configuration, variablesMeta, options = {}) => {
   if (!options) options = {};

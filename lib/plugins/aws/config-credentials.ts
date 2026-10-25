@@ -2,8 +2,7 @@ import os from 'node:os';
 import credentials from './utils/credentials.ts';
 import ServerlessError from '../../serverless-error.ts';
 import cliCommandsSchema from '../../cli/commands-schema/index.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
-const { log } = log2;
+import { log } from '../../utils/serverless-utils/log.ts';
 
 class AwsConfigCredentials {
   constructor(serverless, options) {

@@ -1,7 +1,6 @@
 import ServerlessError from '../../../../../serverless-error.ts';
 import resolveLambdaTarget from '../../../utils/resolve-lambda-target.ts';
-import log2 from '../../../../../utils/serverless-utils/log.ts';
-const { log, style } = log2;
+import { log, style } from '../../../../../utils/serverless-utils/log.ts';
 
 const rateSyntax = '^rate\\((?:1 (?:minute|hour|day)|(?:1\\d+|[2-9]\\d*) (?:minute|hour|day)s)\\)$';
 const cronSyntax = '^cron\\(\\S+ \\S+ \\S+ \\S+ \\S+ \\S+\\)$';

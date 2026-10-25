@@ -12,7 +12,7 @@ try {
   if (error.code !== 'EEXIST') throw error;
 }
 
-export default (function self() {
+const processTmpDir = (function self() {
   const processTmpDir = path.join(serverlessTmpDir, crypto.randomBytes(12).toString('hex'));
   try {
     mkdirSync(processTmpDir);
@@ -25,9 +25,11 @@ export default (function self() {
 
 process.on('exit', () => {
   try {
-    rmSync(module.exports, { recursive: true, force: true });
+    rmSync(processTmpDir, { recursive: true, force: true });
   } catch (error) {
     if (rmTmpDirIgnorableErrorCodes.has(error.code)) return;
     throw error;
   }
 });
+
+export default processTmpDir;

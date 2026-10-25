@@ -1,7 +1,6 @@
 import { promises as fsp } from 'node:fs';
-import log2 from '../lib/utils/serverless-utils/log.ts';
+import { writeText, log } from '../lib/utils/serverless-utils/log.ts';
 import healthStatusFilename from '../lib/utils/health-status-filename.ts';
-const { writeText, log } = log2;
 
 export default async () => {
   const healthStatus = await (async () => {

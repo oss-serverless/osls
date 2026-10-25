@@ -3,8 +3,7 @@ import url from 'node:url';
 import isObject from 'type/object/is.js';
 import ServerlessError from '../../../../../serverless-error.ts';
 import { hasOwn, safeSet, safeShallowAssign } from '../../../../../utils/safe-object.ts';
-import log2 from '../../../../../utils/serverless-utils/log.ts';
-const { log, style } = log2;
+import { log, style } from '../../../../../utils/serverless-utils/log.ts';
 
 const originLimits = { maxTimeout: 30, maxMemorySize: 10240 };
 const viewerLimits = { maxTimeout: 5, maxMemorySize: 128 };

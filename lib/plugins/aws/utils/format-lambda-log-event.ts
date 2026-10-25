@@ -1,6 +1,5 @@
-import log from '../../../utils/serverless-utils/log.ts';
+import { style } from '../../../utils/serverless-utils/log.ts';
 import { formatLogTimestamp } from './time.ts';
-const { style } = log;
 
 export default (msgParam) => {
   let msg = msgParam;

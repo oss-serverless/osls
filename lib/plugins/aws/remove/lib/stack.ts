@@ -4,12 +4,11 @@ import {
   DescribeStacksCommand,
 } from '@aws-sdk/client-cloudformation';
 import ServerlessError from '../../../../serverless-error.ts';
-import log2 from '../../../../utils/serverless-utils/log.ts';
+import { log } from '../../../../utils/serverless-utils/log.ts';
 import {
   getAwsErrorMessage,
   isCloudFormationMissingStackError,
 } from '../../../../aws/aws-sdk-v3-error.ts';
-const { log } = log2;
 
 function getCloudFormationClient(context) {
   context.cloudFormationClientPromise ||= context.provider

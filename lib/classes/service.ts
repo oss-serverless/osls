@@ -5,9 +5,8 @@ import isObject from 'type/object/is.js';
 import isPlainObject from 'type/plain-object/is.js';
 import mergePlainObjects from '../utils/merge-plain-objects.ts';
 import { hasOwn } from '../utils/safe-object.ts';
-import log2 from '../utils/serverless-utils/log.ts';
+import { log } from '../utils/serverless-utils/log.ts';
 import validateStage from '../utils/validate-stage.ts';
-const { log } = log2;
 // const currentVersion = require('../../package').version;
 // const isLocallyInstalled = require('../cli/is-locally-installed');
 

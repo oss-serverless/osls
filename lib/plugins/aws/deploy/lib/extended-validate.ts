@@ -1,8 +1,7 @@
 import path from 'node:path';
 import ServerlessError from '../../../../serverless-error.ts';
 import { safeShallowAssign } from '../../../../utils/safe-object.ts';
-import log2 from '../../../../utils/serverless-utils/log.ts';
-const { log } = log2;
+import { log } from '../../../../utils/serverless-utils/log.ts';
 
 export default {
   async extendedValidate() {

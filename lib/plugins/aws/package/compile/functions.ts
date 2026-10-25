@@ -11,8 +11,7 @@ import { hasOwn, safeShallowAssign } from '../../../../utils/safe-object.ts';
 import getHashForFilePath from '../../../../utils/get-hash-for-file-path.ts';
 import resolveLambdaTarget from '../../utils/resolve-lambda-target.ts';
 import parseS3URI from '../../utils/parse-s3-uri.ts';
-import log2 from '../../../../utils/serverless-utils/log.ts';
-const { log } = log2;
+import { log } from '../../../../utils/serverless-utils/log.ts';
 
 const defaultCors = {
   allowedOrigins: ['*'],

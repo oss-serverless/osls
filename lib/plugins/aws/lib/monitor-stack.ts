@@ -1,11 +1,10 @@
 import wait from '../../../utils/sleep.ts';
 import ServerlessError from '../../../serverless-error.ts';
-import log2 from '../../../utils/serverless-utils/log.ts';
+import { log, style, progress } from '../../../utils/serverless-utils/log.ts';
 import getMonitoringFrequency from '../utils/get-monitoring-frequency.ts';
 import { CloudFormationClient, DescribeStackEventsCommand } from '@aws-sdk/client-cloudformation';
 import { isCloudFormationMissingStackError } from '../../../aws/aws-sdk-v3-error.ts';
 import retry from '../../../aws/retry.ts';
-const { log, style, progress } = log2;
 const { retryOnThrottlingError } = retry;
 
 const mainProgress = progress.get('main');

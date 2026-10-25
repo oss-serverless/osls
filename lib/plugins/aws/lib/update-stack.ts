@@ -1,5 +1,5 @@
 import getS3EndpointForRegion from '../utils/get-s3-endpoint-for-region.ts';
-import log2 from '../../../utils/serverless-utils/log.ts';
+import { log, progress } from '../../../utils/serverless-utils/log.ts';
 import isChangeSetWithoutChanges from '../utils/is-change-set-without-changes.ts';
 
 import {
@@ -14,7 +14,6 @@ import {
 
 import { isCloudFormationNoUpdateError } from '../../../aws/aws-sdk-v3-error.ts';
 import retry from '../../../aws/retry.ts';
-const { log, progress } = log2;
 const { retryOnThrottlingError } = retry;
 
 function getCloudFormationClient(context) {

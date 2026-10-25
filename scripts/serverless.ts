@@ -1,8 +1,7 @@
-#!/usr/bin/env node
-// Setup log writing
+#!/usr/bin/env node// Setup log writing
 import '../lib/utils/serverless-utils/log-reporters/node.ts';
 
-import log2 from '../lib/utils/serverless-utils/log.ts';
+import { log, progress } from '../lib/utils/serverless-utils/log.ts';
 import handleError from '../lib/cli/handle-error.ts';
 import logDeprecation from '../lib/utils/log-deprecation.ts';
 import paramRegExp from '../lib/cli/param-reg-exp.ts';
@@ -11,8 +10,6 @@ import { randomUUID } from 'node:crypto';
 import clear from 'ext/object/clear.js';
 
 Error.stackTraceLimit = Infinity;
-
-const { log, progress } = log2;
 
 const processLog = log.get('process');
 

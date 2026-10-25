@@ -2,12 +2,11 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import fs from 'node:fs';
 import getLambdaLayerArtifactPath from '../../utils/get-lambda-layer-artifact-path.ts';
-import log2 from '../../../../utils/serverless-utils/log.ts';
+import { log } from '../../../../utils/serverless-utils/log.ts';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import { isCloudFormationMissingStackError } from '../../../../aws/aws-sdk-v3-error.ts';
 import promiseLimit2 from 'ext/promise/limit.js';
 const promiseLimit = promiseLimit2.bind(Promise);
-const { log } = log2;
 
 const getLayerArtifactHash = async (layerArtifactPath, layerForHash) =>
   new Promise((resolve, reject) => {

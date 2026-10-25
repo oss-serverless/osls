@@ -3,10 +3,9 @@ import {
   UpdateTerminationProtectionCommand,
 } from '@aws-sdk/client-cloudformation';
 import ServerlessError from '../../serverless-error.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { log } from '../../utils/serverless-utils/log.ts';
 import { getAwsErrorMessage } from '../../aws/aws-sdk-v3-error.ts';
 import retry from '../../aws/retry.ts';
-const { log } = log2;
 const { retryOnThrottlingError } = retry;
 
 class AwsDeletionProtection {

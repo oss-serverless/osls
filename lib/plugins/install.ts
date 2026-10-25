@@ -1,7 +1,6 @@
 import cliCommandsSchema from '../cli/commands-schema/index.ts';
 import download from '../utils/download-template-from-repo.ts';
-import log2 from '../utils/serverless-utils/log.ts';
-const { log, progress, style } = log2;
+import { log, progress, style } from '../utils/serverless-utils/log.ts';
 
 class Install {
   constructor(serverless, options) {

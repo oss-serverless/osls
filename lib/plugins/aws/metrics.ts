@@ -1,11 +1,10 @@
 import validate from './lib/validate.ts';
-import log from '../../utils/serverless-utils/log.ts';
+import { writeText, style } from '../../utils/serverless-utils/log.ts';
 import { parseTimeInput, subtractTime, formatDisplayTime } from './utils/time.ts';
 import { CloudWatchClient, GetMetricStatisticsCommand } from '@aws-sdk/client-cloudwatch';
 import promiseLimit2 from 'ext/promise/limit.js';
 
 const promiseLimit = promiseLimit2.bind(Promise);
-const { writeText, style } = log;
 
 function getCloudWatchClient(context) {
   context.cloudWatchClientPromise ||= context.provider

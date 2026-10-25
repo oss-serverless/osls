@@ -3,9 +3,8 @@ import validate from './lib/validate.ts';
 import stdin from '../../utils/get-stdin.ts';
 import formatLambdaLogEvent from './utils/format-lambda-log-event.ts';
 import ServerlessError from '../../serverless-error.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { writeText, style } from '../../utils/serverless-utils/log.ts';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-const { writeText, style } = log2;
 
 class AwsInvoke {
   constructor(serverless, options) {

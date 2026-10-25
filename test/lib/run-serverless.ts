@@ -2,9 +2,11 @@ import ensureString from 'type/string/ensure.js';
 import ensureIterable from 'type/iterable/ensure.js';
 import ensurePlainObject from 'type/plain-object/ensure.js';
 import ensurePlainFunction from 'type/plain-function/ensure.js';
-import { realpathSync } from 'node:fs';
+import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { pathToFileURL } from 'node:url';
+import { resetModuleStubs, setModuleStubs } from '../mocha/module-stubs.ts';
 import { overrideEnv, overrideCwd, overrideArgv } from '../utils/process.ts';
 import * as sinon from 'sinon';
 import resolveEnv from './resolve-env.ts';
@@ -13,32 +15,15 @@ import provisionTmpDir from './provision-tmp-dir.ts';
 import configureAwsSdkV3Stub from './configure-aws-sdk-v3-stub.ts';
 import { writeJsonFile } from '../utils/fs.ts';
 
-const hasOwn = Function.call.bind(Object.prototype.hasOwnProperty);
+const importDefault = async (modulePath) => (await import(pathToFileURL(modulePath).href)).default;
 
-const resolveModuleRealPath = (basePath, moduleId) =>
-  realpathSync(require.resolve(moduleId, { paths: [basePath] }));
-
+// Module stubs apply for the duration of the run (see test/mocha/module-stubs.ts)
 const resolveServerless = async (serverlessPath, modulesCacheStub, callback) => {
-  if (!modulesCacheStub) {
-    return callback(require(serverlessPath));
-  }
-
-  const originalCache = Object.assign({}, require.cache);
-  for (const key of Object.keys(require.cache)) delete require.cache[key];
-  for (const [key, value] of Object.entries(modulesCacheStub)) {
-    require.cache[path.isAbsolute(key) ? key : resolveModuleRealPath(serverlessPath, key)] = {
-      exports: value,
-    };
-  }
-
-  const restore = () => {
-    for (const key of Object.keys(require.cache)) delete require.cache[key];
-    Object.assign(require.cache, originalCache);
-  };
+  if (modulesCacheStub) await setModuleStubs(modulesCacheStub);
   try {
-    return await callback(require(serverlessPath));
+    return await callback(await importDefault(path.resolve(serverlessPath, 'lib/serverless.ts')));
   } finally {
-    restore();
+    if (modulesCacheStub) resetModuleStubs();
   }
 };
 
@@ -71,13 +56,9 @@ export default async (
       errorMessage: "Expected 'serverlessPath' to be a string. Received: %v",
     })
   );
-  try {
-    require.resolve(serverlessPath);
-  } catch (error) {
+  if (!fs.existsSync(path.resolve(serverlessPath, 'lib/serverless.ts'))) {
     throw new TypeError(
-      `Provided 'serverlessPath' (${serverlessPath}) ` +
-        `doesn't point a working node module: ${error.message}`,
-      { cause: error }
+      `Provided 'serverlessPath' (${serverlessPath}) doesn't point an osls package root`
     );
   }
   cwd = ensureString(cwd, {
@@ -146,27 +127,27 @@ export default async (
   }
   if (shouldStubSpawn) {
     if (!modulesCacheStub) modulesCacheStub = {};
-    modulesCacheStub[path.resolve(serverlessPath, 'lib/utils/spawn.js')] = sinon
+    modulesCacheStub[path.resolve(serverlessPath, 'lib/utils/spawn.ts')] = sinon
       .stub()
       .resolves({});
   }
-  if (modulesCacheStub) {
-    const httpsProxyAgentModuleId = 'https-proxy-agent';
-    const httpsProxyAgentPath = resolveModuleRealPath(serverlessPath, httpsProxyAgentModuleId);
-    if (
-      !hasOwn(modulesCacheStub, httpsProxyAgentModuleId) &&
-      !hasOwn(modulesCacheStub, httpsProxyAgentPath)
-    ) {
-      modulesCacheStub[httpsProxyAgentPath] = require(httpsProxyAgentPath);
-    }
-  }
   const confirmedCwd = await resolveCwd({ cwd, config });
 
-  const resolveConfigurationPath = require(
-    path.resolve(serverlessPath, 'lib/cli/resolve-configuration-path')
+  const resolveConfigurationPath = await importDefault(
+    path.resolve(serverlessPath, 'lib/cli/resolve-configuration-path.ts')
   );
-  const readConfiguration = require(path.resolve(serverlessPath, 'lib/configuration/read'));
-  const resolveVariables = require(path.resolve(serverlessPath, 'lib/configuration/variables'));
+  const readConfiguration = await importDefault(
+    path.resolve(serverlessPath, 'lib/configuration/read.ts')
+  );
+  const resolveVariables = await importDefault(
+    path.resolve(serverlessPath, 'lib/configuration/variables/index.ts')
+  );
+  const resolveInput = await importDefault(
+    path.resolve(serverlessPath, 'lib/cli/resolve-input.ts')
+  );
+  const commandsSchema = await importDefault(
+    path.resolve(serverlessPath, 'lib/cli/commands-schema/index.ts')
+  );
 
   return overrideEnv(
     {
@@ -178,7 +159,6 @@ export default async (
         resolveServerless(serverlessPath, modulesCacheStub, async (Serverless) => {
           // Temporary patch to ensure resolveInput result matches the options
           // (to be removed once we fully remove `resolveInput` dependency from `Serverless` class)
-          const resolveInput = require(path.resolve(serverlessPath, 'lib/cli/resolve-input'));
           resolveInput.clear();
           overrideArgv(
             {
@@ -202,7 +182,7 @@ export default async (
                   .filter(Boolean),
               ],
             },
-            () => resolveInput(require(path.resolve(serverlessPath, 'lib/cli/commands-schema')))
+            () => resolveInput(commandsSchema)
           );
 
           if (hooks.before) await hooks.before(Serverless, { cwd: confirmedCwd });

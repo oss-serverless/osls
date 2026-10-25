@@ -1,9 +1,8 @@
 import { stripVTControlCharacters as stripAnsi } from 'node:util';
-import log2 from '../utils/serverless-utils/log.ts';
+import { style, writeText, log } from '../utils/serverless-utils/log.ts';
 import { packageJson as packageModule } from '../utils/package-root.ts';
 import tokenizeException from '../utils/tokenize-exception.ts';
 import isLocallyInstalled from './is-locally-installed.ts';
-const { style, writeText, log } = log2;
 const slsVersion = packageModule.version;
 
 export default (exception) => {

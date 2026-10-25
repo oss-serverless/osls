@@ -11,6 +11,7 @@ import cloudformationSchema from '../../lib/utils/serverless-utils/cloudformatio
 import mergePlainObjects from '../../lib/utils/merge-plain-objects.ts';
 import provisionTmpDir from './provision-tmp-dir.ts';
 import log2 from 'log';
+import { pathToFileURL } from 'node:url';
 const fsp = fs.promises;
 const log = log2.get('serverless:test');
 
@@ -83,7 +84,9 @@ const setupFixture = memoizee(
     if (!hasSetupScript) return setupFixturePath;
     log.notice('run setup for %s (at %s)', path.basename(fixturePath), setupFixturePath);
     const setupScriptPath = path.resolve(setupFixturePath, '_setup.js');
-    await ensurePlainFunction(require(setupScriptPath))(fixturePath);
+    // Fixture setup scripts are CommonJS (user land code), loaded through Node's interop
+    const { default: setup } = await import(pathToFileURL(setupScriptPath).href);
+    await ensurePlainFunction(setup)(fixturePath);
     await fsp.unlink(setupScriptPath);
     return setupFixturePath;
   },

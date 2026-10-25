@@ -2,11 +2,10 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { promises as fsp } from 'node:fs';
 import memoizee from 'memoizee';
-import log2 from '../../../utils/serverless-utils/log.ts';
+import { log } from '../../../utils/serverless-utils/log.ts';
 import generateZip from './generate-zip.ts';
 import ensureArtifact from '../../../utils/ensure-artifact.ts';
 import ServerlessError from '../../../serverless-error.ts';
-const { log } = log2;
 
 const copyCustomResourcesZip = async (zipFilePath) => {
   const [cachedZipFilePath] = await Promise.all([

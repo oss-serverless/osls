@@ -1,5 +1,5 @@
 import ServerlessError from '../../../../serverless-error.ts';
-import log2 from '../../../../utils/serverless-utils/log.ts';
+import { log, progress } from '../../../../utils/serverless-utils/log.ts';
 import * as jsyaml from 'js-yaml';
 import cloudformationSchema from '../../../../utils/serverless-utils/cloudformation-schema.ts';
 import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
@@ -17,7 +17,6 @@ import {
   getS3BucketRegion,
   isCloudFormationMissingResourceError,
 } from '../../../../aws/aws-sdk-v3-error.ts';
-const { log, progress } = log2;
 
 const mainProgress = progress.get('main');
 

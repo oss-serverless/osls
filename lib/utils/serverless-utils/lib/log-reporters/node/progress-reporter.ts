@@ -1,10 +1,8 @@
 import createProgressFooter from '../../../../progress-footer.ts';
-import getProgressReporter from '../../log/get-progress-reporter.ts';
-import log2 from '../../../log.ts';
+import { emitter } from '../../log/get-progress-reporter.ts';
+import { progress, log } from '../../../log.ts';
 import joinTextTokens from '../../log/join-text-tokens.ts';
 import style from './style.ts';
-const { emitter } = getProgressReporter;
-const { progress, log } = log2;
 
 export default ({ logLevelIndex }) => {
   const cliProgressFooter = createProgressFooter();

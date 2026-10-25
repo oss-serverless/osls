@@ -1,12 +1,13 @@
-'use strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { syncBuiltinESMExports } from 'node:module';
+import * as chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import sinonChai from 'sinon-chai';
 
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const chai = require('chai');
-
-chai.use(require('chai-as-promised').default);
-chai.use(require('sinon-chai').default);
+chai.use(chaiAsPromised);
+chai.use(sinonChai);
 
 process.env.SLS_DEPRECATION_NOTIFICATION_MODE ??= 'error';
 process.env.SLS_TELEMETRY_DISABLED = '1';
@@ -16,6 +17,8 @@ const workerHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'serverless-test-'))
 const originalHomedir = os.homedir;
 
 os.homedir = () => workerHomeDir;
+// Propagate the override to named `import { homedir } from 'node:os'` bindings
+syncBuiltinESMExports();
 
 process.on('exit', () => {
   os.homedir = originalHomedir;
@@ -26,7 +29,7 @@ process.on('exit', () => {
   }
 });
 
-global.__SERVERLESS_TEST_BOOTSTRAP__ = {
+globalThis.__SERVERLESS_TEST_BOOTSTRAP__ = {
   workerHomeDir,
   originalHomedir,
 };

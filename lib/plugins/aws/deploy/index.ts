@@ -19,9 +19,8 @@ import validateTemplate from './lib/validate-template.ts';
 import updateStack from '../lib/update-stack.ts';
 import ensureValidBucketExists from './lib/ensure-valid-bucket-exists.ts';
 import path from 'node:path';
-import log2 from '../../../utils/serverless-utils/log.ts';
+import { style, log, progress, writeText } from '../../../utils/serverless-utils/log.ts';
 import memoize from 'memoizee';
-const { style, log, progress, writeText } = log2;
 
 const mainProgress = progress.get('main');
 

@@ -1,7 +1,6 @@
 import wait from '../utils/sleep.ts';
-import log2 from '../utils/serverless-utils/log.ts';
+import { log } from '../utils/serverless-utils/log.ts';
 import { isAwsThrottlingError, isTransientNetworkError } from './aws-sdk-v3-error.ts';
-const { log } = log2;
 
 // Jitter so processes throttled together do not retry in lockstep (4 to 7 s by default, as in v3)
 const jitteredDelay = (delayMs) => Math.round(delayMs * (0.8 + Math.random() * 0.6));

@@ -7,8 +7,7 @@ import {
   hasOwn,
   safeShallowAssign,
 } from '../../../../../../../utils/safe-object.ts';
-import log2 from '../../../../../../../utils/serverless-utils/log.ts';
-const { log } = log2;
+import { log } from '../../../../../../../utils/serverless-utils/log.ts';
 
 const NOT_FOUND = -1;
 const DEFAULT_STATUS_CODES = {

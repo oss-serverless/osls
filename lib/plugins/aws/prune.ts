@@ -8,14 +8,13 @@ import {
 } from '@aws-sdk/client-lambda';
 
 import ServerlessError from '../../serverless-error.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { log } from '../../utils/serverless-utils/log.ts';
 import {
   getAwsErrorMessage,
   getAwsErrorStatusCode,
   isLambdaResourceNotFoundError,
 } from '../../aws/aws-sdk-v3-error.ts';
 import retry from '../../aws/retry.ts';
-const { log } = log2;
 const { retryOnThrottlingError } = retry;
 
 const DEFAULT_PRUNE_VERSIONS = 10;

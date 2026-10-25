@@ -1,5 +1,4 @@
-import log from '../../utils/serverless-utils/log.ts';
-const { style } = log;
+import { style } from '../../utils/serverless-utils/log.ts';
 
 export default (commandName, commandSchema) => {
   const indentFillLength = 30;

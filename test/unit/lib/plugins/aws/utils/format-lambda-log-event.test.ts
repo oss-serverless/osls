@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import log from '../../../../../../lib/utils/serverless-utils/log.ts';
+import { style } from '../../../../../../lib/utils/serverless-utils/log.ts';
 import formatLambdaLogEvent from '../../../../../../lib/plugins/aws/utils/format-lambda-log-event.ts';
-const { style } = log;
 
 // Log timestamps are printed in local time, so expectations are computed from
 // the local clock to stay independent of the machine's time zone

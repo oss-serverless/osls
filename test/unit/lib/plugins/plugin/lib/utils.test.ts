@@ -1,9 +1,8 @@
 import * as chai from 'chai';
 import * as sinon from 'sinon';
 import pluginUtilsModule from '../../../../../../lib/plugins/plugin/lib/utils.ts';
-import log2 from '../../../../../../lib/utils/serverless-utils/log.ts';
+import { log } from '../../../../../../lib/utils/serverless-utils/log.ts';
 import observeOutput from '../../../../../lib/observe-output.ts';
-const { log } = log2;
 
 const expect = chai.expect;
 

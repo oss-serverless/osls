@@ -6,8 +6,7 @@ import isObject from 'type/object/is.js';
 import mergePlainObjects from '../merge-plain-objects.ts';
 import { getByPath, setByPath, unsetByPath } from '../object-path.ts';
 import writeFileAtomic from 'write-file-atomic';
-import log2 from './log.ts';
-const { log } = log2;
+import { log } from './log.ts';
 
 const logDebug = log.get('config').debug;
 

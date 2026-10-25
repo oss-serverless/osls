@@ -1,7 +1,6 @@
 import { promises as fsp } from 'node:fs';
-import log2 from '../serverless-utils/log.ts';
+import { log } from '../serverless-utils/log.ts';
 import { packageRoot } from '../package-root.ts';
-const { log } = log2;
 
 const npmPackageRoot = packageRoot;
 

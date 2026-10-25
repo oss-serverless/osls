@@ -1,8 +1,7 @@
-import log from '../../utils/serverless-utils/log.ts';
+import { writeText } from '../../utils/serverless-utils/log.ts';
 import resolveInput from '../resolve-input.ts';
 import renderOptionsHelp from './options.ts';
 import generateCommandUsage from './generate-command-usage.ts';
-const { writeText } = log;
 
 export default (commandName, resolvedInput = resolveInput()) => {
   const { commandsSchema } = resolvedInput;

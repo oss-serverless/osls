@@ -12,11 +12,10 @@ import findAndGroupDeployments from './utils/find-and-group-deployments.ts';
 import isS3ListAccessDeniedError from './utils/is-s3-list-access-denied-error.ts';
 import s3BodyToString from '../../aws/s3-body-to-string.ts';
 import ServerlessError from '../../serverless-error.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { style, log, progress } from '../../utils/serverless-utils/log.ts';
 import { S3Client, GetObjectCommand, paginateListObjectsV2 } from '@aws-sdk/client-s3';
 import { isS3GetObjectNoSuchKeyError } from '../../aws/aws-sdk-v3-error.ts';
 import retry from '../../aws/retry.ts';
-const { style, log, progress } = log2;
 const { retryOnTransientNetworkError } = retry;
 
 const slsConsoleLog = log.get('console');

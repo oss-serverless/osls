@@ -9,11 +9,10 @@ import normalizeFiles from '../../../../../../../lib/plugins/aws/lib/normalize-f
 import AwsProvider from '../../../../../../../lib/plugins/aws/provider.ts';
 import AwsDeploy from '../../../../../../../lib/plugins/aws/deploy/index.ts';
 import Serverless from '../../../../../../../lib/serverless.ts';
-import log from '../../../../../../../lib/utils/serverless-utils/log.ts';
+import { progress } from '../../../../../../../lib/utils/serverless-utils/log.ts';
 import skipOnDisabledSymlinksInWindows from '../../../../../../lib/skip-on-disabled-symlinks-in-windows.ts';
 import { createTmpDir, ensureFileSync, getTmpDirPath } from '../../../../../../utils/fs.ts';
 import runServerless from '../../../../../../utils/run-serverless.ts';
-const { progress } = log;
 
 const expect = chai.expect;
 

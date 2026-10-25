@@ -5,10 +5,9 @@ import retry from '../../../../aws/retry.ts';
 import isS3ListAccessDeniedError from '../../utils/is-s3-list-access-denied-error.ts';
 import parseDeploymentObjectKey from '../../utils/parse-deployment-object-key.ts';
 import ServerlessError from '../../../../serverless-error.ts';
-import log2 from '../../../../utils/serverless-utils/log.ts';
+import { log } from '../../../../utils/serverless-utils/log.ts';
 import { S3Client, DeleteObjectsCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 const { retryOnThrottlingError } = retry;
-const { log } = log2;
 
 const maxDeleteObjectsCount = 1000;
 

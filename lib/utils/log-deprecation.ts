@@ -4,9 +4,8 @@ import weakMemoizee from 'memoizee/weak.js';
 import resolveTmpdir from './resolve-process-tmp-dir.ts';
 import ServerlessError from '../serverless-error.ts';
 import safeMoveFile from './fs/safe-move-file.ts';
-import log2 from './serverless-utils/log.ts';
+import { style, log } from './serverless-utils/log.ts';
 import healthStatusFilename from './health-status-filename.ts';
-const { style, log } = log2;
 
 const triggeredDeprecations = new Set();
 const bufferedDeprecations = [];

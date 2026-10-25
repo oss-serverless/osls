@@ -5,9 +5,8 @@ import micromatch from 'micromatch';
 import ServerlessError from '../../../serverless-error.ts';
 import parseS3URI from '../../aws/utils/parse-s3-uri.ts';
 import { createRegistry } from '../../../utils/safe-object.ts';
-import log2 from '../../../utils/serverless-utils/log.ts';
+import { log } from '../../../utils/serverless-utils/log.ts';
 import ensureValidLayerPath from '../../../utils/ensure-valid-layer-path.ts';
-const { log } = log2;
 
 export default {
   defaultExcludes: [

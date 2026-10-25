@@ -6,7 +6,7 @@ import {
 import ServerlessError from '../../serverless-error.ts';
 import validate from './lib/validate.ts';
 import buildFetchDispatcher from '../../utils/build-fetch-dispatcher.ts';
-import log2 from '../../utils/serverless-utils/log.ts';
+import { style, log, progress } from '../../utils/serverless-utils/log.ts';
 
 import {
   getAwsErrorCode,
@@ -15,8 +15,6 @@ import {
   isAwsCredentialError,
   isLambdaResourceNotFoundError,
 } from '../../aws/aws-sdk-v3-error.ts';
-
-const { style, log, progress } = log2;
 
 const mainProgress = progress.get('main');
 

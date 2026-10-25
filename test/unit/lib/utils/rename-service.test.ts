@@ -4,8 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { expect } from 'chai';
 import { ensureDirSync, getTmpDirPath } from '../../../utils/fs.ts';
-import renameService2 from '../../../../lib/utils/rename-service.ts';
-const { renameService } = renameService2;
+import { renameService } from '../../../../lib/utils/rename-service.ts';
 
 const createHarness = () => {
   const serverlessLike = {};
