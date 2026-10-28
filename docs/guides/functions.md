@@ -152,10 +152,10 @@ deleteFoo:
 The `runtime` property (set at `provider.runtime` or per function) accepts a fixed set of identifiers that map to the [AWS Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html). The supported identifiers, grouped by language, are:
 
 - **Node.js:** `nodejs22.x`, `nodejs24.x`, `nodejs26.x`
-- **Python:** `python3.10`, `python3.11`, `python3.12`, `python3.13`, `python3.14`, `python3.15`
+- **Python:** `python3.11`, `python3.12`, `python3.13`, `python3.14`, `python3.15`
 - **Java:** `java8.al2`, `java8.al2023`, `java11`, `java11.al2023`, `java17`, `java17.al2023`, `java21`, `java25`
 - **Ruby:** `ruby3.3`, `ruby3.4`, `ruby4.0`
-- **.NET:** `dotnet8`, `dotnet10`
+- **.NET:** `dotnet10`
 - **Custom (OS-only):** `provided.al2023`
 
 Use `provided.al2023` together with [Lambda Layers](#layers) to ship your own custom runtime. Any other value is rejected during schema validation.
