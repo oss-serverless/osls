@@ -314,6 +314,11 @@ describe('#addCustomResourceToService()', () => {
           {
             'Fn::Sub':
               'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
+              ':log-group:/aws/lambda/some-service-dev*',
+          },
+          {
+            'Fn::Sub':
+              'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
               ':log-group:/aws/lambda/some-service-dev*:*',
           },
         ],

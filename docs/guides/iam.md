@@ -191,7 +191,7 @@ resources:
                         - - 'arn:aws:logs'
                           - Ref: 'AWS::Region'
                           - Ref: 'AWS::AccountId'
-                          - 'log-group:/aws/lambda/*:*:*'
+                          - 'log-group:/aws/lambda/*'
                 - Effect: 'Allow'
                   Action:
                     - 's3:PutObject'
@@ -256,7 +256,7 @@ resources:
                         - 'arn:aws:logs'
                         - Ref: 'AWS::Region'
                         - Ref: 'AWS::AccountId'
-                        - 'log-group:/aws/lambda/*:*:*'
+                        - 'log-group:/aws/lambda/*'
                 - Effect: Allow
                   Action:
                     - ec2:CreateNetworkInterface
@@ -295,7 +295,7 @@ resources:
                         - 'arn:aws:logs'
                         - Ref: 'AWS::Region'
                         - Ref: 'AWS::AccountId'
-                        - 'log-group:/aws/lambda/*:*:*'
+                        - 'log-group:/aws/lambda/*'
                 -  Effect: "Allow"
                    Action:
                      - "s3:PutObject"
@@ -356,7 +356,7 @@ resources:
                         - 'arn:aws:logs'
                         - Ref: 'AWS::Region'
                         - Ref: 'AWS::AccountId'
-                        - 'log-group:/aws/lambda/*:*:*'
+                        - 'log-group:/aws/lambda/*'
                 -  Effect: "Allow"
                    Action:
                      - "s3:PutObject"
@@ -396,7 +396,7 @@ resources:
                         - 'arn:aws:logs'
                         - Ref: 'AWS::Region'
                         - Ref: 'AWS::AccountId'
-                        - 'log-group:/aws/lambda/*:*:*'
+                        - 'log-group:/aws/lambda/*'
                 - Effect: Allow
                   Action:
                     - ec2:CreateNetworkInterface
