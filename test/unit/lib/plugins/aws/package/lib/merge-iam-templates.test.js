@@ -120,6 +120,9 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
           'logs:TagResource',
         ]);
         expect(createLogStatement.Resource).to.deep.includes({
+          'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/${service}-dev*`,
+        });
+        expect(createLogStatement.Resource).to.deep.includes({
           'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/${service}-dev*:*`,
         });
 
@@ -142,6 +145,9 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
           'logs:CreateLogGroup',
           'logs:TagResource',
         ]);
+        expect(createLogStatement.Resource).to.deep.includes({
+          'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/myCustomName`,
+        });
         expect(createLogStatement.Resource).to.deep.includes({
           'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/myCustomName:*`,
         });
@@ -570,6 +576,14 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
           'Fn::Sub':
             'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
             `log-group:/aws/lambda/${customFunctionName}:*`,
+        });
+        expect(
+          cfResources[naming.getRoleLogicalId()].Properties.Policies[0].PolicyDocument.Statement[0]
+            .Resource
+        ).to.not.deep.include({
+          'Fn::Sub':
+            'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
+            `log-group:/aws/lambda/${customFunctionName}`,
         });
         expect(
           cfResources[naming.getRoleLogicalId()].Properties.Policies[0].PolicyDocument.Statement[1]
