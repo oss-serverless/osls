@@ -360,6 +360,83 @@ describe('mergeCustomProviderResources', () => {
       expect(cfTemplate.Resources.ListString.DependsOn).to.deep.equal(['d', 'h']);
     });
 
+    it('should keep `Fn::ForEach` loops in resources.Resources unchanged', async () => {
+      const topicsLoop = [
+        'TopicName',
+        ['Success', 'Failure'],
+        {
+          'SnsTopic${TopicName}': {
+            Type: 'AWS::SNS::Topic',
+            Properties: {
+              TopicName: { 'Fn::Sub': 'foreach-${TopicName}' },
+            },
+          },
+        },
+      ];
+      const queuesLoop = [
+        'QueueName',
+        { Ref: 'QueueNames' },
+        {
+          'Fn::ForEach::DeadLetterQueues': [
+            'Suffix',
+            ['Dlq'],
+            {
+              'SqsQueue${QueueName}${Suffix}': {
+                Type: 'AWS::SQS::Queue',
+              },
+            },
+          ],
+        },
+      ];
+
+      const { cfTemplate } = await runServerless({
+        config: {
+          service: 'resources-foreach',
+          provider: 'aws',
+          resources: {
+            Transform: 'AWS::LanguageExtensions',
+            Parameters: {
+              QueueNames: { Type: 'CommaDelimitedList', Default: 'Orders,Payments' },
+            },
+            Resources: {
+              'Fn::ForEach::Topics': topicsLoop,
+              'Fn::ForEach::Queues': queuesLoop,
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Transform).to.deep.equal(['AWS::LanguageExtensions']);
+      expect(cfTemplate.Resources['Fn::ForEach::Topics']).to.deep.equal(topicsLoop);
+      expect(cfTemplate.Resources['Fn::ForEach::Queues']).to.deep.equal(queuesLoop);
+    });
+
+    for (const [description, loopName, loop] of [
+      ['an invalid loop name', 'Fn::ForEach::Not-Valid', ['Name', ['A'], {}]],
+      ['a missing output map', 'Fn::ForEach::Topics', ['Name', ['A']]],
+      ['an object instead of a list', 'Fn::ForEach::Topics', { Name: ['A'] }],
+    ]) {
+      it(`should reject a \`Fn::ForEach\` loop with ${description}`, async () => {
+        await expect(
+          runServerless({
+            config: {
+              service: 'resources-foreach-invalid',
+              provider: 'aws',
+              resources: {
+                Transform: 'AWS::LanguageExtensions',
+                Resources: { [loopName]: loop },
+              },
+            },
+            command: 'package',
+          })
+        ).to.be.eventually.rejected.and.have.property(
+          'code',
+          'INVALID_NON_SCHEMA_COMPLIANT_CONFIGURATION'
+        );
+      });
+    }
+
     it('should throw error for unsupported resources.extensions.*.*', () => {
       awsPackage.serverless.service.provider.compiledCloudFormationTemplate.Resources = {
         SampleResource: {},
