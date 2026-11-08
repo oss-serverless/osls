@@ -23,7 +23,9 @@ export type AwsLogGroupName = string;
 export type AwsKmsArn = AwsCfFunction | string;
 export type AwsLambdaArchitecture = 'arm64' | 'x86_64';
 export type AwsResourceCondition = string;
+export type AwsResourceDeletionPolicy = string | AwsCfFindInMap | AwsCfIf | AwsCfRef;
 export type AwsResourceDependsOn = string[];
+export type AwsResourceUpdateReplacePolicy = string | AwsCfFindInMap | AwsCfIf | AwsCfRef;
 export type EcrImageUri = string;
 export type AwsLambdaLayers = AwsArn[];
 export type AwsLogRetentionInDays =
@@ -1438,7 +1440,7 @@ export interface AWS {
                 CreationPolicy?: {
                   [k: string]: unknown;
                 };
-                DeletionPolicy?: string;
+                DeletionPolicy?: AwsResourceDeletionPolicy;
                 DependsOn?: AwsResourceDependsOn;
                 Metadata?: {
                   [k: string]: unknown;
@@ -1446,7 +1448,7 @@ export interface AWS {
                 UpdatePolicy?: {
                   [k: string]: unknown;
                 };
-                UpdateReplacePolicy?: string;
+                UpdateReplacePolicy?: AwsResourceUpdateReplacePolicy;
                 Condition?: AwsResourceCondition;
               };
         };
@@ -1463,7 +1465,7 @@ export interface AWS {
         CreationPolicy?: {
           [k: string]: unknown;
         };
-        DeletionPolicy?: string;
+        DeletionPolicy?: AwsResourceDeletionPolicy;
         DependsOn?: AwsResourceDependsOn;
         Metadata?: {
           [k: string]: unknown;
@@ -1471,7 +1473,7 @@ export interface AWS {
         UpdatePolicy?: {
           [k: string]: unknown;
         };
-        UpdateReplacePolicy?: string;
+        UpdateReplacePolicy?: AwsResourceUpdateReplacePolicy;
         Condition?: AwsResourceCondition;
       };
     };
