@@ -171,6 +171,34 @@ describe('mergeCustomProviderResources', () => {
       ).to.deep.equal(coreCloudFormationTemplate.Outputs.ServerlessDeploymentBucketName);
     });
 
+    it('should keep Fn::ForEach loops in resources.Resources unchanged', async () => {
+      const topicsLoop = [
+        'TopicName',
+        ['Success', 'Failure'],
+        {
+          'SnsTopic${TopicName}': {
+            Type: 'AWS::SNS::Topic',
+          },
+        },
+      ];
+
+      const { cfTemplate } = await runServerless({
+        config: {
+          service: 'resources-foreach',
+          provider: 'aws',
+          resources: {
+            Transform: 'AWS::LanguageExtensions',
+            Resources: {
+              'Fn::ForEach::Topics': topicsLoop,
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Resources['Fn::ForEach::Topics']).to.deep.equal(topicsLoop);
+    });
+
     it('should overwrite for resources.extensions.*.{CreationPolicy,DeletionPolicy,UpdatePolicy,UpdateReplacePolicy}', () => {
       awsPackage.serverless.service.provider.compiledCloudFormationTemplate.Resources = {
         SampleResource: {
