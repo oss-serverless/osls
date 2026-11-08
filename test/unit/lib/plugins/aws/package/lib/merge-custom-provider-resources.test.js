@@ -171,6 +171,25 @@ describe('mergeCustomProviderResources', () => {
       ).to.deep.equal(coreCloudFormationTemplate.Outputs.ServerlessDeploymentBucketName);
     });
 
+    it('should keep resources.Rules in the compiled template', async () => {
+      const rules = {
+        RegionIsUsEast1: {
+          Assertions: [{ Assert: { 'Fn::Equals': [{ Ref: 'AWS::Region' }, 'us-east-1'] } }],
+        },
+      };
+
+      const { cfTemplate } = await runServerless({
+        config: {
+          service: 'resources-rules',
+          provider: 'aws',
+          resources: { Rules: rules },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Rules).to.deep.equal(rules);
+    });
+
     it('should keep Fn::ForEach loops in resources.Resources unchanged', async () => {
       const topicsLoop = [
         'TopicName',

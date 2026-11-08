@@ -1445,6 +1445,9 @@ export interface AWS {
                 Condition?: AwsResourceCondition;
               };
         };
+    Rules?: {
+      [k: string]: unknown;
+    };
     Transform?: string[];
     extensions?: {
       /**
