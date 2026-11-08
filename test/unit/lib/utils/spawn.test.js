@@ -187,13 +187,14 @@ describe('spawn', () => {
   it('treats std as live while stdBuffer preserves history', async () => {
     const execution = spawn(process.execPath, [
       '-e',
-      'process.stdout.write("early"); setTimeout(() => process.stdout.write("late"), 25);',
+      'process.stdout.write("early"); process.stdin.resume(); process.stdin.on("end", () => process.stdout.write("late"));',
     ]);
 
     await waitFor(() => String(execution.stdoutBuffer).includes('early'));
 
     const stdChunks = [];
     execution.std.on('data', (chunk) => stdChunks.push(Buffer.from(chunk)));
+    execution.child.stdin.end();
 
     const result = await execution;
 
