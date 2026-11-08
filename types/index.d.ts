@@ -1416,28 +1416,39 @@ export interface AWS {
         }
       /**
        * This interface was referenced by `undefined`'s JSON-Schema definition
+       * via the `patternProperty` "^Fn::ForEach::[a-zA-Z0-9]{1,255}$".
+       *
+       * This interface was referenced by `undefined`'s JSON-Schema definition
        * via the `patternProperty` "^[a-zA-Z0-9]{1,255}$".
        */
       | {
-          [k: string]: {
-            Type: string;
-            Properties?: {
-              [k: string]: unknown;
-            };
-            CreationPolicy?: {
-              [k: string]: unknown;
-            };
-            DeletionPolicy?: string;
-            DependsOn?: AwsResourceDependsOn;
-            Metadata?: {
-              [k: string]: unknown;
-            };
-            UpdatePolicy?: {
-              [k: string]: unknown;
-            };
-            UpdateReplacePolicy?: string;
-            Condition?: AwsResourceCondition;
-          };
+          [k: string]:
+            | [
+                string,
+                unknown,
+                {
+                  [k: string]: unknown;
+                },
+              ]
+            | {
+                Type: string;
+                Properties?: {
+                  [k: string]: unknown;
+                };
+                CreationPolicy?: {
+                  [k: string]: unknown;
+                };
+                DeletionPolicy?: string;
+                DependsOn?: AwsResourceDependsOn;
+                Metadata?: {
+                  [k: string]: unknown;
+                };
+                UpdatePolicy?: {
+                  [k: string]: unknown;
+                };
+                UpdateReplacePolicy?: string;
+                Condition?: AwsResourceCondition;
+              };
         };
     Transform?: string[];
     extensions?: {
