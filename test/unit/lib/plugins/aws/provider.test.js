@@ -1853,7 +1853,7 @@ describe('test/unit/lib/plugins/aws/provider.test.js', () => {
             isSettled = true;
           })
           .catch(() => {});
-        for (let index = 0; index < 100 && pendingResolvers.length < 6 && !isSettled; index += 1) {
+        while (pendingResolvers.length < 6 && !isSettled) {
           await new Promise((resolve) => setTimeout(resolve, 0));
         }
         expect(observedMaxActiveRequests).to.equal(6);
