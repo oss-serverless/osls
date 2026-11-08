@@ -218,6 +218,41 @@ describe('mergeCustomProviderResources', () => {
       expect(cfTemplate.Resources['Fn::ForEach::Topics']).to.deep.equal(topicsLoop);
     });
 
+    it('should keep intrinsic functions in DeletionPolicy and UpdateReplacePolicy', async () => {
+      const policy = { 'Fn::If': ['IsProduction', 'Retain', 'Delete'] };
+
+      const { cfTemplate } = await runServerless({
+        config: {
+          service: 'resources-policy-intrinsics',
+          provider: 'aws',
+          resources: {
+            Transform: 'AWS::LanguageExtensions',
+            Resources: {
+              Bucket: {
+                Type: 'AWS::S3::Bucket',
+                DeletionPolicy: policy,
+                UpdateReplacePolicy: policy,
+              },
+            },
+            extensions: {
+              ServerlessDeploymentBucket: {
+                DeletionPolicy: policy,
+                UpdateReplacePolicy: policy,
+              },
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Resources.Bucket.DeletionPolicy).to.deep.equal(policy);
+      expect(cfTemplate.Resources.Bucket.UpdateReplacePolicy).to.deep.equal(policy);
+      expect(cfTemplate.Resources.ServerlessDeploymentBucket.DeletionPolicy).to.deep.equal(policy);
+      expect(cfTemplate.Resources.ServerlessDeploymentBucket.UpdateReplacePolicy).to.deep.equal(
+        policy
+      );
+    });
+
     it('should overwrite for resources.extensions.*.{CreationPolicy,DeletionPolicy,UpdatePolicy,UpdateReplacePolicy}', () => {
       awsPackage.serverless.service.provider.compiledCloudFormationTemplate.Resources = {
         SampleResource: {
