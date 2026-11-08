@@ -42,6 +42,7 @@ export type AwsLogRetentionInDays =
   | 400
   | 545
   | 731
+  | 1096
   | 1827
   | 2192
   | 2557
