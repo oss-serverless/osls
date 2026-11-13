@@ -6,7 +6,7 @@ If the stack has deletion protection enabled (see [`provider.deletionProtection`
 
 With [`provider.deploymentMode: express`](../guides/deploying.md#deployment-mode), the stack is deleted in CloudFormation express mode and the command returns while resources may still be deleting.
 
-[Web apps](../guides/web-apps.md) are removed with the stack, including their endpoints and log groups, and their uploaded code is deleted with the rest of the deployment artifacts.
+Removing the stack also removes the [web apps](../guides/web-apps.md) of the service, and the code osls uploaded for them goes with the other deployment artifacts. AWS Lambda can create log groups of a web app again while the stack is being deleted, and the log groups it created in the other Regions of a multi-Region endpoint are not part of the stack: see [Deploying](../guides/web-apps.md#deploying) for what to delete by hand.
 
 ```bash
 osls remove

@@ -3,6 +3,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const {
+  GetBucketPolicyCommand,
   GetBucketVersioningCommand,
   HeadBucketCommand,
   PutBucketVersioningCommand,
@@ -10,29 +11,34 @@ const {
 const { GetTemplateCommand, UpdateStackCommand } = require('@aws-sdk/client-cloudformation');
 const ensureValidBucketExists = require('../../../../../../../lib/plugins/aws/deploy/lib/ensure-valid-bucket-exists');
 
-const createCustomBucketContext = (send, { webApps = [] } = {}) => ({
+const createCustomBucketContext = (send) => ({
   bucketName: 'deployment-bucket',
   provider: { getRegion: sinon.stub().returns('us-east-1') },
-  serverless: {
-    service: {
-      provider: { deploymentBucket: 'deployment-bucket' },
-      getAllWebApps: () => webApps,
-    },
-  },
+  serverless: { service: { provider: { deploymentBucket: 'deployment-bucket' } } },
   setBucketName: sinon.stub().resolves(),
   s3ClientPromise: Promise.resolve({ send }),
   ...ensureValidBucketExists,
 });
 
-const createManagedBucketContext = (send) => ({
+const createWebAppContext = (send, { deploymentBucket } = {}) => ({
   bucketName: 'deployment-bucket',
-  checkIfBucketExists: sinon.stub().resolves(true),
-  provider: {},
-  serverless: { service: { provider: {}, getAllWebApps: () => ['api'] } },
-  setBucketName: sinon.stub().resolves(),
+  provider: {
+    getAccountInfo: sinon.stub().resolves({ accountId: '123456789012', partition: 'aws' }),
+    getRegion: sinon.stub().returns('us-east-1'),
+  },
+  serverless: {
+    service: {
+      provider: { deploymentBucket },
+      getAllWebApps: () => ['api'],
+      getWebApp: () => ({ name: 'service-dev-api' }),
+    },
+  },
   s3ClientPromise: Promise.resolve({ send }),
   ...ensureValidBucketExists,
 });
+
+const createS3Error = (name, httpStatusCode) =>
+  Object.assign(new Error(name), { name, $metadata: { httpStatusCode } });
 
 const createHeadBucketError = (httpStatusCode, bucketRegion) =>
   Object.assign(new Error('UnknownError'), {
@@ -57,7 +63,6 @@ describe('ensureValidBucketExists', () => {
           provider: {
             deploymentBucket: 'deployment-bucket',
           },
-          getAllWebApps: () => [],
         },
       },
       setBucketName: sinon.stub().resolves(),
@@ -156,7 +161,6 @@ describe('ensureValidBucketExists', () => {
             },
             deploymentMethod: 'direct',
           },
-          getAllWebApps: () => [],
         },
       },
       setBucketName,
@@ -189,40 +193,37 @@ describe('ensureValidBucketExists', () => {
     expect(setBucketName).to.have.been.calledTwice;
   });
 
-  describe('when the service has web apps', () => {
-    it('accepts a versioned custom deployment bucket', async () => {
-      const send = sinon.stub().callsFake(async (command) => {
-        if (command instanceof GetBucketVersioningCommand) return { Status: 'Enabled' };
+  describe('#ensureBucketSupportsWebApps()', () => {
+    const lambdaStatement = {
+      Effect: 'Allow',
+      Principal: { Service: 'lambda.amazonaws.com' },
+      Action: ['s3:GetObject', 's3:GetObjectVersion'],
+      Resource: 'arn:aws:s3:::deployment-bucket/*',
+    };
+    const createSend = ({ versioningStatus = 'Enabled', policy } = {}) =>
+      sinon.stub().callsFake(async (command) => {
+        if (command instanceof GetBucketVersioningCommand) return { Status: versioningStatus };
+        if (command instanceof GetBucketPolicyCommand) {
+          if (policy instanceof Error) throw policy;
+          return { Policy: JSON.stringify(policy) };
+        }
         return {};
       });
-      const context = createCustomBucketContext(send, { webApps: ['api'] });
 
-      await context.ensureValidBucketExists();
+    it('does nothing for a service without web apps', async () => {
+      const send = sinon.stub();
+      const context = createWebAppContext(send);
+      context.serverless.service.getAllWebApps = () => [];
 
-      expect(send).to.have.been.calledTwice;
-      expect(send.secondCall.args[0]).to.be.instanceOf(GetBucketVersioningCommand);
-      expect(send.secondCall.args[0].input).to.deep.equal({ Bucket: 'deployment-bucket' });
-    });
+      await context.ensureBucketSupportsWebApps();
 
-    it('rejects a custom deployment bucket that is not versioned', async () => {
-      const send = sinon.stub().resolves({});
-      const context = createCustomBucketContext(send, { webApps: ['api'] });
-
-      await expect(context.ensureValidBucketExists()).to.eventually.be.rejected.and.have.property(
-        'code',
-        'WEB_APP_DEPLOYMENT_BUCKET_NOT_VERSIONED'
-      );
-      expect(send).to.have.been.calledTwice;
+      expect(send).to.not.have.been.called;
     });
 
     it('enables versioning on the deployment bucket of the stack before code is uploaded', async () => {
-      const send = sinon.stub().callsFake(async (command) => {
-        if (command instanceof GetBucketVersioningCommand) return { Status: 'Suspended' };
-        return {};
-      });
-      const context = createManagedBucketContext(send);
+      const send = createSend({ versioningStatus: 'Suspended' });
 
-      await context.ensureValidBucketExists();
+      await createWebAppContext(send).ensureBucketSupportsWebApps();
 
       expect(send).to.have.been.calledTwice;
       expect(send.secondCall.args[0]).to.be.instanceOf(PutBucketVersioningCommand);
@@ -233,13 +234,98 @@ describe('ensureValidBucketExists', () => {
     });
 
     it('leaves a versioned deployment bucket of the stack as it is', async () => {
-      const send = sinon.stub().resolves({ Status: 'Enabled' });
-      const context = createManagedBucketContext(send);
+      const send = createSend();
 
-      await context.ensureValidBucketExists();
+      await createWebAppContext(send).ensureBucketSupportsWebApps();
 
       expect(send).to.have.been.calledOnce;
       expect(send.firstCall.args[0]).to.be.instanceOf(GetBucketVersioningCommand);
+      expect(send.firstCall.args[0].input).to.deep.equal({ Bucket: 'deployment-bucket' });
     });
+
+    it('reports which action is denied on the deployment bucket', async () => {
+      const send = sinon.stub().rejects(createS3Error('AccessDenied', 403));
+
+      const error = await createWebAppContext(send)
+        .ensureBucketSupportsWebApps()
+        .catch((caughtError) => caughtError);
+
+      expect(error).to.have.property('code', 'WEB_APP_DEPLOYMENT_BUCKET_ACCESS_DENIED');
+      expect(error.message).to.include('"deployment-bucket"').and.include('s3:GetBucketVersioning');
+    });
+
+    it('rejects a custom deployment bucket that is not versioned', async () => {
+      const send = createSend({ versioningStatus: 'Suspended' });
+      const context = createWebAppContext(send, { deploymentBucket: 'deployment-bucket' });
+
+      await expect(
+        context.ensureBucketSupportsWebApps()
+      ).to.eventually.be.rejected.and.have.property(
+        'code',
+        'WEB_APP_DEPLOYMENT_BUCKET_NOT_VERSIONED'
+      );
+      expect(send).to.have.been.calledOnce;
+    });
+
+    it('accepts a custom deployment bucket whose policy lets AWS Lambda read it', async () => {
+      const send = createSend({ policy: { Statement: [lambdaStatement] } });
+      const context = createWebAppContext(send, { deploymentBucket: 'deployment-bucket' });
+
+      await context.ensureBucketSupportsWebApps();
+
+      expect(send.secondCall.args[0]).to.be.instanceOf(GetBucketPolicyCommand);
+      expect(send.secondCall.args[0].input).to.deep.equal({ Bucket: 'deployment-bucket' });
+    });
+
+    for (const [description, policy] of [
+      ['has no policy', createS3Error('NoSuchBucketPolicy', 404)],
+      [
+        'has a policy without a statement for AWS Lambda',
+        { Statement: { ...lambdaStatement, Principal: { AWS: '*' } } },
+      ],
+      [
+        'has a policy that only denies access to AWS Lambda',
+        { Statement: [{ ...lambdaStatement, Effect: 'Deny' }] },
+      ],
+    ]) {
+      it(`rejects a custom deployment bucket that ${description}, with the statement to add`, async () => {
+        const context = createWebAppContext(createSend({ policy }), {
+          deploymentBucket: 'deployment-bucket',
+        });
+
+        const error = await context
+          .ensureBucketSupportsWebApps()
+          .catch((caughtError) => caughtError);
+
+        expect(error).to.have.property('code', 'WEB_APP_DEPLOYMENT_BUCKET_POLICY_MISSING');
+        expect(JSON.parse(error.message.slice(error.message.indexOf('{')))).to.deep.equal({
+          ...lambdaStatement,
+          Condition: {
+            ArnLike: {
+              'aws:SourceArn': [
+                'arn:aws:lambda:us-east-1:123456789012:web-function/service-dev-api/revision/*',
+              ],
+            },
+          },
+        });
+      });
+    }
+
+    for (const [description, error] of [
+      ['is denied', createS3Error('AccessDenied', 403)],
+      [
+        'is not allowed from another account than the one of the bucket',
+        createS3Error('MethodNotAllowed', 405),
+      ],
+    ]) {
+      it(`skips the policy check when reading the policy of a custom deployment bucket ${description}`, async () => {
+        const send = createSend({ policy: error });
+        const context = createWebAppContext(send, { deploymentBucket: 'deployment-bucket' });
+
+        await context.ensureBucketSupportsWebApps();
+
+        expect(send).to.have.been.calledTwice;
+      });
+    }
   });
 });

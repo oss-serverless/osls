@@ -1498,6 +1498,7 @@ export interface AWS {
   };
   webApps?: {
     [k: string]: {
+      build?: false;
       description?: string;
       entry: string;
       environment?: AwsLambdaEnvironment;
@@ -1523,7 +1524,10 @@ export interface AWS {
         | {
             authorizer?: 'aws_iam';
             maxEnvironments?: number;
+            name?: string;
             rateLimit?: number;
+            regions?: string[];
+            type?: 'HomeRegion' | 'MultiRegion' | 'PerRegion';
           };
     };
   };

@@ -117,7 +117,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-apps.test.js', () => {
               { Ref: 'AWS::Partition' },
               ':s3:::',
               { Ref: 'ServerlessDeploymentBucket' },
-              '/*',
+              `/serverless/${serviceConfig.service}/dev/web-apps/*`,
             ],
           ],
         },
@@ -176,13 +176,20 @@ describe('test/unit/lib/plugins/aws/package/compile/web-apps.test.js', () => {
               tags: { stage: 'web app' },
               url: { authorizer: 'aws_iam', maxEnvironments: 50, rateLimit: 0 },
             },
-            inheriting: { entry: 'src/server.js' },
+            inheriting: { entry: 'src/server.js', build: false },
+            multiRegion: {
+              entry: 'src/server.js',
+              url: { type: 'MultiRegion', regions: ['us-east-1', 'us-west-2'], name: 'global' },
+            },
             withRoleLogicalId: { entry: 'src/server.js', role: 'CustomRole' },
             withRoleGetAtt: {
               entry: 'src/server.js',
               role: { 'Fn::GetAtt': ['CustomRole', 'Arn'] },
               url: true,
             },
+          },
+          functions: {
+            api: { handler: 'src/server.handler', name: 'custom-web-app' },
           },
           resources: {
             Resources: {
@@ -249,6 +256,24 @@ describe('test/unit/lib/plugins/aws/package/compile/web-apps.test.js', () => {
       expect(Properties.ThrottleConfig).to.deep.equal({ RateLimit: 0 });
     });
 
+    it('should support `url.type`, `url.regions` and `url.name`', () => {
+      const { Properties } = cfResources[naming.getWebFunctionEndpointLogicalId('multiRegion')];
+
+      expect(Properties).to.include({ EndpointName: 'global', EndpointType: 'MultiRegion' });
+      expect(Properties.Regions).to.deep.equal(['us-east-1', 'us-west-2']);
+      expect(
+        cfResources[naming.getWebFunctionEndpointLogicalId('api')].Properties
+      ).to.not.have.property('Regions');
+    });
+
+    it('should support a function with the key and the name of a web app', () => {
+      expect(cfResources[naming.getLambdaLogicalId('api')].Properties.FunctionName).to.equal(
+        'custom-web-app'
+      );
+      expect(cfResources).to.have.property(naming.getLogGroupLogicalId('api'));
+      expect(cfResources).to.have.property(naming.getWebFunctionLogGroupLogicalId('api'));
+    });
+
     it('should inherit the provider settings that apply to web apps', () => {
       const { Properties } = cfResources[naming.getWebFunctionRevisionLogicalId('inheriting')];
 
@@ -274,20 +299,11 @@ describe('test/unit/lib/plugins/aws/package/compile/web-apps.test.js', () => {
       ]);
     });
 
-    it('should let the default role decrypt with the KMS keys', () => {
+    it('should not grant the default role access to the KMS key of a web app', () => {
       const { Statement } =
         cfResources.IamRoleLambdaExecution.Properties.Policies[0].PolicyDocument;
 
-      expect(Statement).to.deep.include({
-        Effect: 'Allow',
-        Action: ['kms:Decrypt'],
-        Resource: [kmsKeyArn],
-      });
-      expect(Statement).to.deep.include({
-        Effect: 'Allow',
-        Action: ['kms:Decrypt'],
-        Resource: [providerKmsKeyArn],
-      });
+      expect(JSON.stringify(Statement)).to.not.include(kmsKeyArn);
     });
 
     it('should support `role` set to a logical ID', () => {
@@ -312,7 +328,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-apps.test.js', () => {
       const { Statement } =
         cfResources[naming.getDeploymentBucketPolicyLogicalId()].Properties.PolicyDocument;
 
-      expect(Statement[1].Condition.ArnLike['aws:SourceArn']).to.have.lengthOf(4);
+      expect(Statement[1].Condition.ArnLike['aws:SourceArn']).to.have.lengthOf(5);
       expect(Statement[1].Condition.ArnLike['aws:SourceArn'][0]).to.deep.equal({
         'Fn::Sub':
           'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/custom-web-app/revision/*',
@@ -399,7 +415,12 @@ describe('test/unit/lib/plugins/aws/package/compile/web-apps.test.js', () => {
         { provider: { deploymentBucket: { skipPolicySetup: true } } },
         'WEB_APP_DEPLOYMENT_BUCKET_POLICY_REQUIRED',
       ],
-      ['`build`', { webApps: { api: { build: false } } }, 'WEB_APP_BUILD_UNSUPPORTED'],
+      [
+        '`provider.deploymentMode: express` with `provider.disableRollback`',
+        { provider: { deploymentMode: 'express', disableRollback: true } },
+        'WEB_APP_EXPRESS_MODE_WITHOUT_ROLLBACK',
+      ],
+      ['`build: esbuild`', { webApps: { api: { build: 'esbuild' } } }, 'WEB_APP_BUILD_UNSUPPORTED'],
       [
         '`dev`',
         { webApps: { api: { dev: { command: 'npm run dev' } } } },
@@ -452,17 +473,39 @@ describe('test/unit/lib/plugins/aws/package/compile/web-apps.test.js', () => {
         'WEB_APP_INVALID_NAME',
       ],
       [
-        'a key shared with a function',
-        { functions: { api: { handler: 'src/server.handler' } } },
-        'WEB_APP_FUNCTION_KEY_CONFLICT',
+        'a `name` shared with another web app',
+        {
+          webApps: {
+            api: { name: 'shared-name' },
+            other: { entry: 'src/server.js', name: 'shared-name' },
+          },
+        },
+        'WEB_APP_NAME_CONFLICT',
       ],
       [
-        'a `name` shared with a function',
-        {
-          functions: { other: { handler: 'src/server.handler', name: 'shared-name' } },
-          webApps: { api: { name: 'shared-name' } },
-        },
-        'WEB_APP_FUNCTION_NAME_CONFLICT',
+        'a function whose log group gets the logical ID of a log group of the web app',
+        { functions: { apiWebFunctionLocal: { handler: 'src/server.handler' } } },
+        'WEB_APP_FUNCTION_LOGICAL_ID_CONFLICT',
+      ],
+      [
+        '`url.regions` without a multi-Region `url.type`',
+        { webApps: { api: { url: { regions: ['us-west-2'] } } } },
+        'WEB_APP_URL_REGIONS_NOT_ALLOWED',
+      ],
+      [
+        'a multi-Region `url.type` without `url.regions`',
+        { webApps: { api: { url: { type: 'MultiRegion' } } } },
+        'WEB_APP_URL_REGIONS_REQUIRED',
+      ],
+      [
+        '`url.regions` that only lists the Region of the service',
+        { webApps: { api: { url: { type: 'PerRegion', regions: ['us-east-1'] } } } },
+        'WEB_APP_URL_REGIONS_REQUIRED',
+      ],
+      [
+        'a `url.name` with characters AWS Lambda does not accept',
+        { webApps: { api: { url: { name: '_main' } } } },
+        'WEB_APP_INVALID_URL_NAME',
       ],
       [
         'an inherited `provider.timeout` below the minimum of web apps',

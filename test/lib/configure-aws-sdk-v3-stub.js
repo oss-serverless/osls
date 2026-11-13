@@ -105,6 +105,7 @@ const serviceDefinitions = {
     clientName: 'S3Client',
     commands: {
       getObject: 'GetObjectCommand',
+      getBucketPolicy: 'GetBucketPolicyCommand',
       getBucketVersioning: 'GetBucketVersioningCommand',
       putBucketVersioning: 'PutBucketVersioningCommand',
       listObjectsV2: 'ListObjectsV2Command',

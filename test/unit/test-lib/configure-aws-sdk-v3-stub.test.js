@@ -703,17 +703,25 @@ describe('test/unit/test-lib/configure-aws-sdk-v3-stub.test.js', () => {
     ]);
   });
 
-  it('stubs S3 bucket versioning commands', async () => {
+  it('stubs S3 bucket configuration commands', async () => {
     const awsSdkV3Stub = configureAwsSdkV3Stub({
       S3: {
+        getBucketPolicy: { Policy: '{}' },
         getBucketVersioning: { Status: 'Suspended' },
         putBucketVersioning: {},
       },
     });
-    const { S3Client, GetBucketVersioningCommand, PutBucketVersioningCommand } =
-      awsSdkV3Stub.modulesCacheStub['@aws-sdk/client-s3'];
+    const {
+      S3Client,
+      GetBucketPolicyCommand,
+      GetBucketVersioningCommand,
+      PutBucketVersioningCommand,
+    } = awsSdkV3Stub.modulesCacheStub['@aws-sdk/client-s3'];
     const client = new S3Client({ region: 'us-east-1' });
 
+    await expect(
+      client.send(new GetBucketPolicyCommand({ Bucket: 'bucket' }))
+    ).to.eventually.deep.equal({ Policy: '{}' });
     await expect(
       client.send(new GetBucketVersioningCommand({ Bucket: 'bucket' }))
     ).to.eventually.deep.equal({ Status: 'Suspended' });
@@ -725,6 +733,7 @@ describe('test/unit/test-lib/configure-aws-sdk-v3-stub.test.js', () => {
     );
 
     expect(awsSdkV3Stub.sends.map((send) => send.method)).to.deep.equal([
+      'getBucketPolicy',
       'getBucketVersioning',
       'putBucketVersioning',
     ]);

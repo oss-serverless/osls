@@ -19,7 +19,7 @@ This command can't read Infrequent Access log groups, so for functions with `log
 ## Options
 
 - `--function` or `-f` The function you want to fetch the logs for. **Required**, unless `--web-app` is set.
-- `--web-app` The [web app](../guides/web-apps.md#logs) you want to fetch the logs for, instead of a function. The logs are read from the `/aws/lambda/web/<name>.local` log group, where the log lines of a web app arrive first.
+- `--web-app` The [web app](../guides/web-apps.md#logs) you want to fetch the logs for, instead of a function. The logs are read from the `/aws/lambda/web/<name>.local` log group, which AWS Lambda writes to directly, or from `/aws/lambda/web/<name>` when the web app has a [multi-Region endpoint](../guides/web-apps.md#multi-region-endpoints). Cannot be combined with `--function`.
 - `--stage` or `-s` The stage you want to view the function logs for. If not provided, the plugin will use the default stage listed in `serverless.yml`. If that doesn't exist either it'll just fetch the logs from the `dev` stage.
 - `--region` or `-r` The region you want to view the function logs for. If not provided, the plugin will use the default region listed in `serverless.yml`. If that doesn't exist either it'll just fetch the logs from the `us-east-1` region.
 - `--startTime` A specific unit in time to start fetching logs from (ie: `2010-10-20` or `1469694264`). Here's a list of the supported string formats:

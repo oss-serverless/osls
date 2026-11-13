@@ -22,6 +22,7 @@ function createServerlessContext(options) {
     isFunctionLogGroupInfrequentAccess: AwsProvider.prototype.isFunctionLogGroupInfrequentAccess,
     naming: {
       getLogGroupName: (lambdaName) => `/aws/lambda/${lambdaName}`,
+      getWebFunctionLogGroupName: (lambdaName) => `/aws/lambda/web/${lambdaName}`,
       getWebFunctionLocalLogGroupName: (lambdaName) => `/aws/lambda/web/${lambdaName}.local`,
     },
   };
@@ -181,12 +182,40 @@ describe('AwsLogs', () => {
           .with.property('code', 'WEB_APP_MISSING_IN_SERVICE');
       });
 
+      it('it should read the log group that collects the lines of every Region of a multi-Region endpoint', () => {
+        serverless.service.webApps.api.url = { type: 'MultiRegion', regions: ['us-west-2'] };
+
+        awsLogs.extendedValidate();
+
+        expect(awsLogs.options.logGroupName).to.equal('/aws/lambda/web/customName');
+      });
+
       it('it should throw error if the "--function" option is set as well', () => {
         awsLogs.options.function = 'first';
 
         expect(() => awsLogs.extendedValidate())
           .to.throw(ServerlessError)
-          .with.property('code', 'MISSING_REQUIRED_CLI_OPTION');
+          .with.property('code', 'LOGS_FUNCTION_AND_WEB_APP_OPTIONS');
+      });
+
+      it('it should read the logs of a function that shares its key with a web app', () => {
+        delete awsLogs.options['web-app'];
+        awsLogs.options.function = 'api';
+        serverless.service.provider.logs = undefined;
+        serverless.service.functions.api = { handler: true, name: 'functionName' };
+
+        awsLogs.extendedValidate();
+
+        expect(awsLogs.options.logGroupName).to.equal('/aws/lambda/functionName');
+      });
+
+      it('it should point at the "--web-app" option if "--function" names a web app', () => {
+        delete awsLogs.options['web-app'];
+        awsLogs.options.function = 'api';
+
+        expect(() => awsLogs.extendedValidate())
+          .to.throw(ServerlessError)
+          .with.property('code', 'LOGS_WEB_APP_REQUIRES_WEB_APP_OPTION');
       });
 
       it('it should throw error if the "--function" option is not set either', () => {
@@ -257,7 +286,7 @@ describe('AwsLogs', () => {
 
       await expect(awsLogs.getLogStreams()).to.eventually.be.rejectedWith(
         ServerlessError,
-        'No logs yet for web app "api". Send it a request, then run this command again.'
+        'Web app "api" has not logged anything yet. Its logs start with the first request it receives.'
       );
     });
   });

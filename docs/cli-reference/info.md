@@ -37,7 +37,7 @@ functions:
   my-serverless-service-dev-hello
 ```
 
-The URLs of [function URLs](../guides/functions.md#lambda-function-urls) and of [web apps](../guides/web-apps.md) are listed under `endpoints` too, prefixed with the name of the function or web app. A service whose only endpoint is one of those prints it as `endpoint: <url>`.
+[Function URLs](../guides/functions.md#lambda-function-urls) and the URLs of [web apps](../guides/web-apps.md) appear under `endpoints` as well, each as `<key>: <url>`. When such a URL is the only endpoint of the service, the section is a single `endpoint: <url>` line without the key.
 
 #### Verbose
 

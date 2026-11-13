@@ -1020,6 +1020,7 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
           configExt: {
             provider: {
               logRetentionInDays: 5,
+              vpc: { securityGroupIds: ['sg-0a0a0a0a'], subnetIds: ['subnet-01010101'] },
             },
             webApps: {
               withRole: {
@@ -1044,34 +1045,48 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
         expect(cfResources).to.have.property(naming.getRoleLogicalId());
       });
 
-      it('should add logGroup access policies for web apps', () => {
+      it('should add logGroup access policies for web apps, in every Region for the ".local" log groups', () => {
         const { Statement } =
           cfResources[naming.getRoleLogicalId()].Properties.Policies[0].PolicyDocument;
-        const logGroupArnPrefix = 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}';
+        const homeRegionArnPrefix = 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}';
+        const anyRegionArnPrefix = 'arn:${AWS::Partition}:logs:*:${AWS::AccountId}';
 
         expect(Statement[0]).to.deep.equal({
           Effect: 'Allow',
           Action: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:TagResource'],
           Resource: [
-            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/${service}-dev*` },
-            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/${service}-dev*:*` },
-            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app` },
-            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app:*` },
-            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app.local` },
-            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app.local:*` },
+            { 'Fn::Sub': `${homeRegionArnPrefix}:log-group:/aws/lambda/web/${service}-dev*` },
+            { 'Fn::Sub': `${homeRegionArnPrefix}:log-group:/aws/lambda/web/${service}-dev*:*` },
+            { 'Fn::Sub': `${anyRegionArnPrefix}:log-group:/aws/lambda/web/${service}-dev*.local` },
+            {
+              'Fn::Sub': `${anyRegionArnPrefix}:log-group:/aws/lambda/web/${service}-dev*.local:*`,
+            },
+            { 'Fn::Sub': `${homeRegionArnPrefix}:log-group:/aws/lambda/web/custom-web-app` },
+            { 'Fn::Sub': `${homeRegionArnPrefix}:log-group:/aws/lambda/web/custom-web-app:*` },
+            { 'Fn::Sub': `${anyRegionArnPrefix}:log-group:/aws/lambda/web/custom-web-app.local` },
+            { 'Fn::Sub': `${anyRegionArnPrefix}:log-group:/aws/lambda/web/custom-web-app.local:*` },
           ],
         });
         expect(Statement[1]).to.deep.equal({
           Effect: 'Allow',
           Action: ['logs:PutLogEvents'],
           Resource: [
-            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/${service}-dev*:*:*` },
-            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app:*:*` },
+            { 'Fn::Sub': `${homeRegionArnPrefix}:log-group:/aws/lambda/web/${service}-dev*:*:*` },
             {
-              'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app.local:*:*`,
+              'Fn::Sub': `${anyRegionArnPrefix}:log-group:/aws/lambda/web/${service}-dev*.local:*:*`,
+            },
+            { 'Fn::Sub': `${homeRegionArnPrefix}:log-group:/aws/lambda/web/custom-web-app:*:*` },
+            {
+              'Fn::Sub': `${anyRegionArnPrefix}:log-group:/aws/lambda/web/custom-web-app.local:*:*`,
             },
           ],
         });
+      });
+
+      it('should not attach the VPC policy for `provider.vpc`, which does not apply to web apps', () => {
+        expect(cfResources[naming.getRoleLogicalId()].Properties).to.not.have.property(
+          'ManagedPolicyArns'
+        );
       });
 
       it('should configure both LogGroup resources of a web app', () => {

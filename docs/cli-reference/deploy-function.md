@@ -12,7 +12,7 @@ stack. Use this for faster development cycles and not production deployments.
 
 **Note:** This command is not supported for functions configured with `durableConfig` locally or already deployed with durable configuration in AWS. Use `osls deploy` so osls can publish a new durable function version and retarget the generated durable alias.
 
-**Note:** This command deploys functions only. For a [web app](../guides/web-apps.md) it fails with `"<name>" is a web app. Deploy it with "serverless deploy".`, because the code of a web app can only change with a new revision, which `osls deploy` creates.
+**Note:** [Web apps](../guides/web-apps.md) cannot be deployed with this command. New code for a web app needs a new revision, which only `osls deploy` creates, so the command stops with `"<name>" is a web app. Deploy it with "serverless deploy".`
 
 ## Options
 

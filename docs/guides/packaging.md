@@ -192,7 +192,7 @@ functions:
 
 ### Packaging web apps
 
-Every [web app](./web-apps.md#packaging) is packaged into a zip file of its own, whether `individually` is set or not. The service-level `patterns` apply to it, followed by the `patterns` of the web app, and `artifact` deploys a zip file that you built yourself:
+A [web app](./web-apps.md#packaging) never shares a zip file with functions or other web apps, so `individually` does not matter for it. Its zip is filtered by the service-level `patterns` and then by its own `patterns`. Alternatively, `artifact` points at a zip file that you built yourself:
 
 ```yaml
 service: my-service

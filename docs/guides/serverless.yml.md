@@ -180,7 +180,7 @@ provider:
     blockPublicAccess: true
     # Skip the creation of a default bucket policy when the deployment bucket is created (default: false)
     skipPolicySetup: true
-    # Enable bucket versioning (default: false, required for web apps)
+    # Enable bucket versioning (default: false, required for web apps unless the bucket is your own)
     versioning: true
     # Server-side encryption method
     serverSideEncryption: AES256
@@ -1465,58 +1465,67 @@ Deploy HTTP servers as [Lambda Web Functions](./web-apps.md):
 webApps:
   # A web app
   api:
-    # required, the file that starts the HTTP server
+    # required, path of the script that launches the HTTP server
     entry: src/server.js
-    # optional, Node.js 24 or newer (default: provider.runtime when it is nodejs24.x or newer, otherwise nodejs24.x)
+    # optional, nodejs24.x is the only runtime AWS Lambda has for web functions.
+    # Defaults to provider.runtime if that is nodejs24.x or later, and to nodejs24.x otherwise
     runtime: nodejs24.x
-    # optional, name of the deployed web function (default: ${service}-${stage}-${key})
+    # optional, name of the web function in AWS. Defaults to ${service}-${stage}-${key}
     name: ${sls:stage}-api
-    # optional, up to 256 characters
+    # optional, free text of at most 256 characters
     description: Storefront API
-    # optional, request timeout in seconds, 3-900 (default: provider.timeout when it is set, otherwise 30)
+    # optional, seconds one request may run, from 3 to 900.
+    # Defaults to provider.timeout if the service sets it, and to 30 otherwise
     timeout: 60
-    # optional, concurrent requests per execution environment, 1-128 (default: 64)
+    # optional, requests one execution environment handles in parallel, from 1 to 128. Defaults to 64
     maxConcurrency: 32
-    # optional, merged over provider.environment
+    # optional, added to provider.environment and wins over it
     environment:
       TABLE_NAME: !Ref OrdersTable
-    # optional, case-insensitive log levels (default: the provider.logs.lambda levels)
+    # optional, in upper or lower case. Each level defaults to the one in provider.logs.lambda
     logs:
       # trace, debug, info, warn, error or fatal
       applicationLogLevel: info
       # debug, info or warn
       systemLogLevel: info
-    # optional, retention of the log groups of the web app (default: provider.logRetentionInDays)
+    # optional, days to keep the logs of the web app. Defaults to provider.logRetentionInDays
     logRetentionInDays: 14
-    # optional, data protection policy of the log groups of the web app (default: provider.logDataProtectionPolicy)
+    # optional, data protection policy of the log groups of the web app. Defaults to provider.logDataProtectionPolicy
     logDataProtectionPolicy:
       Name: data-protection-policy
       Version: '2021-06-01'
       Statement: []
-    # optional, execution role (default: the role of the service)
+    # optional, a role of your own instead of the execution role of the service
     role: arn:aws:iam::123456789012:role/my-role
-    # optional, key that encrypts the environment variables (default: provider.kmsKeyArn)
+    # optional, KMS key for the environment variables and the code AWS Lambda prepares. Defaults to provider.kmsKeyArn
     kmsKeyArn: arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab
-    # optional, merged over provider.tags
+    # optional, added to provider.tags and wins over them
     tags:
       team: web
     package:
-      # optional, applied after the service-level package.patterns
+      # optional, evaluated once the service-level package.patterns have been
       patterns:
         - '!tests/**'
-      # optional, a prebuilt zip file to deploy as it is, instead of packaging the service directory
+      # optional, skip packaging and upload this zip file untouched
       artifact: build/api.zip
-    # optional, true (the default) or the settings of the HTTPS endpoint. false is not accepted
+    # optional, settings of the HTTPS endpoint that every web app has
     url:
-      # optional, require requests signed with IAM credentials
+      # optional, only let requests through that carry an AWS signature
       authorizer: aws_iam
-      # optional, most execution environments at once, 2-10000
+      # optional, upper limit for the execution environments running at the same time, from 2 to 10000
       maxEnvironments: 50
-      # optional, most requests per second
+      # optional, upper limit for the requests per second
       rateLimit: 2000
+      # optional, HomeRegion (the default), MultiRegion or PerRegion
+      type: MultiRegion
+      # required with the MultiRegion and PerRegion types, the Regions served besides the Region of the service
+      regions:
+        - us-west-2
+      # optional, name of the endpoint. Defaults to main
+      name: global
 ```
 
-Web apps require `provider.deploymentBucket.versioning: true`, see [Deployment bucket](./web-apps.md#deployment-bucket).
+Web apps require `provider.deploymentBucket.versioning: true` when osls manages the deployment bucket, and a versioned bucket with a policy statement for AWS Lambda when you name your own. See [Deployment bucket](./web-apps.md#deployment-bucket).
 
 ## AWS Resources
 

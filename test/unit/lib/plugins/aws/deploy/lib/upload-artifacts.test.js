@@ -826,6 +826,12 @@ describe('test/unit/lib/plugins/aws/deploy/lib/upload-artifacts.test.js', () => 
       expect(zipUploads.map(({ Key }) => Key)).to.deep.equal([artifactS3Key]);
     });
 
+    it('should fail when checking for the code of a web app fails for another reason', async () => {
+      await expect(deployWebApp(rejectWith('InternalError', 500))).to.eventually.be.rejectedWith(
+        'InternalError'
+      );
+    });
+
     it('should not upload the code of a web app that is already uploaded', async () => {
       const { zipUploads } = await deployWebApp({});
 
