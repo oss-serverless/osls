@@ -240,7 +240,7 @@ describe('test/unit/lib/plugins/aws/deploy/lib/ensure-valid-bucket-exists.test.j
       })
     )
       .to.eventually.be.rejectedWith('Deployment bucket "custom-bucket" is not versioned')
-      .and.have.property('code', 'DEPLOYMENT_BUCKET_VERSIONING_NOT_ENABLED');
+      .and.have.property('code', 'DEPLOYMENT_BUCKET_WEB_FUNCTIONS_VERSIONING_NOT_ENABLED');
   });
 
   it('should accept a custom deployment bucket with a policy statement that names the Lambda service', async () => {
@@ -266,43 +266,51 @@ describe('test/unit/lib/plugins/aws/deploy/lib/ensure-valid-bucket-exists.test.j
     ]);
   });
 
-  it('should warn about a custom deployment bucket with a policy statement for all principals', async () => {
-    const logEvents = [];
-    const listener = (event) => logEvents.push(event);
-    logEmitter.on('log', listener);
-    try {
-      await runDeploy({
-        configExt: customBucketConfigExt,
-        s3: {
-          getBucketPolicy: {
-            Policy: JSON.stringify({
-              Statement: [
-                {
-                  ...lambdaStatement,
-                  Principal: '*',
-                  Condition: {
-                    StringEquals: { 'aws:PrincipalServiceName': 'lambda.amazonaws.com' },
-                    ArnLike: {
-                      'aws:SourceArn':
-                        'arn:aws:lambda:us-east-1:999999999999:web-function/web-function-service-dev-basic/revision/*',
+  for (const [description, principal] of [
+    ['all principals', { Principal: '*' }],
+    ['the AWS principal "*"', { Principal: { AWS: '*' } }],
+    ['every principal but one', { NotPrincipal: { AWS: 'arn:aws:iam::999999999999:root' } }],
+  ]) {
+    it(`should warn about a custom deployment bucket with a policy statement for ${description}`, async () => {
+      const logEvents = [];
+      const listener = (event) => logEvents.push(event);
+      logEmitter.on('log', listener);
+      try {
+        await runDeploy({
+          configExt: customBucketConfigExt,
+          s3: {
+            getBucketPolicy: {
+              Policy: JSON.stringify({
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    ...principal,
+                    Action: lambdaStatement.Action,
+                    Resource: lambdaStatement.Resource,
+                    Condition: {
+                      StringEquals: { 'aws:PrincipalServiceName': 'lambda.amazonaws.com' },
+                      ArnLike: {
+                        'aws:SourceArn':
+                          'arn:aws:lambda:us-east-1:999999999999:web-function/web-function-service-dev-basic/revision/*',
+                      },
                     },
                   },
-                },
-              ],
-            }),
+                ],
+              }),
+            },
           },
-        },
-      });
-    } finally {
-      logEmitter.off('log', listener);
-    }
+        });
+      } finally {
+        logEmitter.off('log', listener);
+      }
 
-    const warnings = logEvents
-      .filter((event) => event.logger.level === 'warning')
-      .map((event) => event.messageTokens[0]);
-    expect(warnings).to.have.lengthOf(1);
-    expect(warnings[0]).to.include('the policy of the deployment bucket "custom-bucket"');
-  });
+      const warnings = logEvents
+        .filter((event) => event.logger.level === 'warning')
+        .map((event) => event.messageTokens[0]);
+      expect(warnings).to.have.lengthOf(1);
+      expect(warnings[0]).to.include('the policy of the deployment bucket "custom-bucket"');
+    });
+  }
 
   for (const [description, getBucketPolicy] of [
     ['without a policy', createS3Error('NoSuchBucketPolicy')],
@@ -322,6 +330,14 @@ describe('test/unit/lib/plugins/aws/deploy/lib/ensure-valid-bucket-exists.test.j
     [
       'with a policy that only denies Lambda to read',
       { Policy: JSON.stringify({ Statement: [{ ...lambdaStatement, Effect: 'Deny' }] }) },
+    ],
+    [
+      'with a policy that only denies all principals',
+      {
+        Policy: JSON.stringify({
+          Statement: [{ ...lambdaStatement, Principal: '*', Effect: 'Deny' }],
+        }),
+      },
     ],
   ]) {
     it(`should reject a custom deployment bucket ${description} for web functions`, async () => {

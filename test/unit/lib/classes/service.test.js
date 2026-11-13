@@ -257,6 +257,19 @@ describe('Service', () => {
       );
     });
 
+    it('should throw when receives non-object web functions configuration', async () => {
+      await expect(
+        runServerless({
+          fixture: 'web-function',
+          command: 'print',
+          configExt: { webFunctions: ['api'] },
+        })
+      ).to.be.eventually.rejected.and.have.property(
+        'code',
+        'NON_OBJECT_WEB_FUNCTIONS_CONFIGURATION'
+      );
+    });
+
     it('should reject invalid short stage alias', async () => {
       const service = new Service({}, null);
 

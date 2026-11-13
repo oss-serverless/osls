@@ -125,7 +125,7 @@ webFunctions:
 
 Callers sign their requests for the `lambda` service and have to send the `X-Amz-Content-SHA256` header with every request. A [`MultiRegion` endpoint](#multi-region-endpoints) needs SigV4a signatures.
 
-`maxEnvironments` caps the number of execution environments Lambda starts for the endpoint. `rateLimit` caps the requests per second. Requests beyond either limit get status 429. At the time of writing Lambda accepts `0` (reject every request), `100` to `1000` in steps of 100 and `2000` to `10000` in steps of 1000, but the supported values can vary by region, and the deployment fails with the list of values the region supports when another one is set. Removing either setting from the configuration removes the limit from the deployed endpoint.
+`maxEnvironments` caps the number of execution environments Lambda starts for the endpoint, and `rateLimit` the requests per second, in each region the endpoint serves. Requests beyond either limit get status 429. At the time of writing Lambda accepts a `rateLimit` of `0` (every request gets status 503), `100` to `1000` in steps of 100 and `2000` to `10000` in steps of 1000, but the supported values can vary by region, and the deployment fails with the list of values the region supports when another one is set. Removing either setting from the configuration removes the limit from the deployed endpoint.
 
 The URL belongs to the endpoint. It stays the same across deployments, but it is retired for good when the endpoint is deleted. Removing the service, removing the web function from the configuration or changing its `name` or its `endpoint.name` all delete the endpoint, and a later deployment gets a new URL.
 
@@ -160,7 +160,7 @@ Keep in mind:
   ```
 
 - For a `PerRegion` endpoint, the URL osls shows and exports is the one of the region of the service. `aws lambda-web get-web-function-endpoint --function-name <name> --endpoint-name <endpoint name>` shows the URLs of the other regions.
-- A request is logged in the region that served it, to a `/aws/lambda/web/<name>.local` log group that Lambda creates there without a retention period, and Lambda copies the lines to the `/aws/lambda/web/<name>` log group in the region of the service. [`osls logs`](../cli-reference/logs.md) reads that log group for these endpoints. `osls remove` does not delete the `.local` log groups of the other regions.
+- A request is logged in the region that served it, to a `/aws/lambda/web/<name>.local` log group that Lambda creates there without a retention period, and Lambda copies the lines to the `/aws/lambda/web/<name>` log group in the region of the service. [`osls logs`](#logs) reads that log group for these endpoints. `osls remove` does not delete the `.local` log groups of the other regions.
 - The default role is allowed to write to the `.local` log groups in every region. A role you supply yourself needs the same permission in every region of the endpoint, or the lines of the other regions are lost without an error, see [Permissions](#permissions).
 - With `kmsKeyArn`, the key has to be a multi-Region key with a replica in every region of the endpoint, see [Encryption](#encryption).
 
@@ -234,7 +234,7 @@ The snippet relies on the logical IDs of the [generated resources](#generated-re
 
 ## Deployment bucket
 
-Lambda does not copy the code of a web function. It reads the zip from the S3 bucket it was deployed from for as long as the web function uses it, which sets two requirements on the deployment bucket that functions do not have: the bucket has to be versioned, and its policy has to let the Lambda service read the code.
+Lambda keeps a reference to the exact version of the zip of a revision in the deployment bucket, and keeps checking that it may read it, for as long as the revision exists. That sets two requirements on the deployment bucket that functions do not have: the bucket has to be versioned, and its policy has to let the Lambda service read the code.
 
 ### Bucket created by osls
 
@@ -271,7 +271,7 @@ A bucket set with `provider.deploymentBucket` or `provider.deploymentBucket.name
 }
 ```
 
-`osls deploy` checks the bucket before it uploads anything. It fails when the bucket is not versioned, when it has no bucket policy, or when the policy has no `Allow` statement for the `lambda.amazonaws.com` service or for all principals, and then prints the statement to add. When the policy only has an `Allow` statement for all principals, osls cannot tell whether its conditions let Lambda in, so it prints a warning with the statement and continues. It skips a check when it is not allowed to read the versioning state or the policy, for example for a bucket of another account.
+`osls deploy` checks the bucket before it uploads anything. It fails when the bucket is not versioned. It also fails, and prints the statement to add, when the bucket has no policy or when the policy has no `Allow` statement for the `lambda.amazonaws.com` service or for all principals. When the policy only has an `Allow` statement for all principals, osls cannot tell whether its conditions let Lambda in, so it prints a warning with the statement and continues. It skips a check when it is not allowed to read the versioning state or the policy, for example for a bucket of another account.
 
 When the bucket encrypts objects with a KMS key (`serverSideEncryption: aws:kms`), the policy of that key has to allow `lambda.amazonaws.com` to call `kms:Decrypt`, whoever created the bucket. See [Deploying Web Function code from Amazon S3](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-code-s3.html) for the details.
 
@@ -282,7 +282,7 @@ osls uploads the zip of a web function to `<deploymentPrefix>/<service>/<stage>/
 - A revision is replaced only when the zip or the settings of its web function change. A deployment that changes only other parts of the service leaves the revision and the running server alone, also with `osls deploy --force`. To keep the zip of a web function from changing with every other file of the service, see [Packaging](#packaging).
 - The cleanup of [previous deployments](./packaging.md#pruning-previous-deployment-artifacts) and `osls deploy list` do not see these zips. One zip per distinct build accumulates until `osls remove` deletes them.
 
-Do not delete these zips, and do not add a lifecycle rule that expires objects or noncurrent versions under the prefix of the service. A revision whose zip is gone keeps serving for a while, more than an hour in a test, and then fails for good: every request gets status 409 with the header `lambda-web-error-type: Platform.RevisionNotActive`. Deploying again does not repair it, because the same build gives the same key and therefore the same template. Change the web function, for example its `description`, so that the next deployment creates a new revision.
+Do not delete these zips, and do not add a lifecycle rule that expires objects or noncurrent versions under the prefix of the service. A revision whose zip is gone keeps serving for a while and then fails for good: every request gets status 409 with the header `lambda-web-error-type: Platform.RevisionNotActive`. Deploying again does not repair it, because the same build gives the same key and therefore the same template. Change the web function, for example its `description`, so that the next deployment creates a new revision.
 
 On a versioned bucket, pruning previous deployments only adds delete markers: the old versions of the pruned artifacts stay in the bucket until the service is removed.
 
@@ -402,15 +402,15 @@ Other settings that provide defaults for functions, such as `runtime`, `timeout`
 
 ## Deploying, rolling back and removing
 
-Web functions are deployed with [`osls deploy`](../cli-reference/deploy.md), together with the rest of the service. Lambda keeps the code and the settings of a web function in an immutable revision. When the zip or the settings of a web function change, the deployment creates a new revision, moves the endpoint to it once it is ready and deletes the previous one, which also restarts the server. Otherwise the revision stays, see [Where the code is stored](#where-the-code-is-stored).
+Web functions are deployed with [`osls deploy`](../cli-reference/deploy.md), together with the rest of the service. Lambda keeps the code and most settings of a web function in an immutable revision. When the zip of a web function or a setting of its revision changes, the deployment creates a new revision, moves the endpoint to it once it is ready and deletes the previous one, which also restarts the server, see [Where the code is stored](#where-the-code-is-stored). `tags`, `logRetentionInDays`, `logDataProtectionPolicy` and the `authorizer`, `maxEnvironments` and `rateLimit` of the endpoint are not part of the revision and are updated in place.
 
 When nothing changed since the last deployment, osls skips the deployment of a service that has functions ("No changes to deploy"). A service with only web functions is not skipped: it reaches CloudFormation, which finds no changes and replaces nothing, as for any service without functions.
 
 Lambda considers a revision ready without starting the server. A server that crashes on startup is deployed successfully and then fails every request, so send a request to the URL after deploying.
 
-Prefer the default [deployment mode](./deploying.md#deployment-mode) where a successful deployment must mean that the web function is ready to serve. Express mode works with web functions, except together with `disableRollback: true`: CloudFormation then rejects every update that replaces a resource, which every change to a web function does to its revision, so `osls package`, `osls deploy` and `osls rollback` fail for that combination.
+Prefer the default [deployment mode](./deploying.md#deployment-mode) where a successful deployment must mean that the web function is ready to serve. Express mode works with web functions, except together with `disableRollback: true`: CloudFormation then rejects every update that replaces a resource, which a change to the code or most settings of a web function does to its revision, so `osls package`, `osls deploy` and `osls rollback` fail for that combination.
 
-[`osls rollback --timestamp`](../cli-reference/rollback.md) re-applies the template of an earlier deployment, which gives every web function that changed since then a new revision from the zip of that deployment. The zips are never pruned, so the pruning of the [deployment artifacts](./packaging.md#pruning-previous-deployment-artifacts) alone limits how far back it goes. Right after a rollback, `osls deploy` with unchanged files reports that there is nothing to deploy, as it does for functions: run `osls deploy --force` to deploy the current code again.
+[`osls rollback --timestamp`](../cli-reference/rollback.md) re-applies the template of an earlier deployment, which gives every web function whose zip or revision settings changed since then a new revision from the zip of that deployment. The zips are never pruned, so the pruning of the [deployment artifacts](./packaging.md#pruning-previous-deployment-artifacts) alone limits how far back it goes. Right after a rollback, `osls deploy` with unchanged files reports that there is nothing to deploy when the service also has functions: run `osls deploy --force` to deploy the current code again. A service with only web functions is deployed again in any case.
 
 [`osls remove`](../cli-reference/remove.md) deletes the web functions, their endpoints, the log groups of the stack and the zips, together with the rest of the service. Log groups without a retention period can remain:
 
@@ -502,7 +502,7 @@ resources:
 Declared like this the property is merged into the `ServiceConfig` osls generates. The same under `resources.extensions` would replace the whole `ServiceConfig`.
 
 - The operator role is required. Without it CloudFormation fails with `NetworkConnectorOperatorRole is required for VPC_EGRESS connector type`.
-- Creating the connector takes several minutes, about five in a test.
+- Creating the connector takes several minutes.
 - Once the connector is attached, all outbound traffic of the web function goes through the VPC. It reaches private resources there, and loses direct internet access unless the subnets route through a NAT gateway.
 - A connector cannot be used with `MultiRegion` or `PerRegion` endpoints.
 - `osls remove` deletes the connector and its network interfaces with the stack.
@@ -511,17 +511,15 @@ The identity that deploys needs [more permissions](#permissions-to-deploy) for t
 
 ## Troubleshooting
 
-**The second region of a service fails with "does not exist".** Lambda keeps the names of web functions unique in an account across all regions. When the same service and stage is deployed to a second region with the default names, the stack of that region fails on the revision and is rolled back:
+**The second region of a service fails with "does not exist".** Lambda keeps the names of web functions unique in an account across all regions, see [Configuration](#configuration). With the default names, the stack of the second region fails on the revision and is rolled back:
 
 ```text
 The function arn:aws:lambda:us-east-2:123456789012:web-function/myService-dev-api does not exist. (Service: Lambda Web; Operation: CreateWebFunctionRevision; Status Code: 404; Error Code: ResourceNotFoundException)
 ```
 
-Set a `name` that contains the region on the web function, for example `${self:service}-${sls:stage}-${aws:region}-api`, or serve several regions from one stack with a [multi-Region endpoint](#multi-region-endpoints).
-
 **An endpoint "already exists" after changing its type or regions.** Lambda cannot change these on an existing endpoint. Change `endpoint.name` in the same deployment, see [Multi-Region endpoints](#multi-region-endpoints).
 
-**The deployment fails on the revision with "does not have s3:GetObject and s3:GetObjectVersion permission".** The policy of an existing deployment bucket does not let Lambda read the code, see [Existing bucket](#existing-bucket). If this was the first deployment of the service, the stack is left in the `ROLLBACK_COMPLETE` state: run `osls remove` before deploying again.
+**The deployment fails on the revision with "does not have s3:GetObject and s3:GetObjectVersion permission".** The policy of an existing deployment bucket does not let Lambda read the code, see [Existing bucket](#existing-bucket). If this was the first deployment of the service, the stack can be left in the `ROLLBACK_COMPLETE` state: run `osls remove` before deploying again.
 
 **Every request fails with status 502 after a successful deployment.** The server did not start, or does not listen on the `host:port` of `AWS_LAMBDA_HTTP_ENDPOINT`, see [The server](#the-server). `osls logs` shows the error.
 

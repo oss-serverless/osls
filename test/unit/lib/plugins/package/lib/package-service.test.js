@@ -5,6 +5,7 @@ const path = require('path');
 const fsp = require('fs').promises;
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
+const yazl = require('yazl');
 const { listFileProperties, listZipFiles } = require('../../../../../utils/fs');
 const runServerless = require('../../../../../utils/run-serverless');
 const setupProgrammaticFixture = require('../../../../../utils/setup-programmatic-fixture');
@@ -329,6 +330,16 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
 
   describe('web functions', () => {
     const configExt = { provider: { deploymentBucket: { versioning: true } } };
+    const createZipBuffer = (fileNames) =>
+      new Promise((resolve, reject) => {
+        const zip = new yazl.ZipFile();
+        const chunks = [];
+        zip.outputStream.on('data', (chunk) => chunks.push(chunk));
+        zip.outputStream.on('error', reject);
+        zip.outputStream.on('end', () => resolve(Buffer.concat(chunks)));
+        for (const fileName of fileNames) zip.addBuffer(Buffer.from(''), fileName);
+        zip.end();
+      });
     let serviceDir;
     let webZippedFiles;
 
@@ -409,6 +420,19 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
       });
     }
 
+    it('should apply the unzipped size limit of web functions', async () => {
+      const { servicePath } = await setupProgrammaticFixture('web-function');
+      // Sparse file: only its size is read
+      await fsp.writeFile(path.join(servicePath, 'large.bin'), '');
+      await fsp.truncate(path.join(servicePath, 'large.bin'), 520 * 1024 * 1024);
+
+      await expect(runServerless({ cwd: servicePath, command: 'package' }))
+        .to.eventually.be.rejectedWith(
+          'The "basic.web.zip" package is 520.0 MiB unzipped, above the 512 MiB AWS Lambda limit for web function code.'
+        )
+        .and.have.property('code', 'PACKAGE_TOO_LARGE');
+    });
+
     it('should reject a `webFunctions[].package.artifact` hosted on S3', async () => {
       await expect(
         runServerless({
@@ -437,7 +461,7 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
           },
         })
       )
-        .to.eventually.be.rejectedWith('it is not a zip file')
+        .to.eventually.be.rejectedWith('it cannot be read as a zip file')
         .and.have.property('code', 'INVALID_PACKAGE_ARTIFACT');
     });
 
@@ -459,6 +483,43 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
           'Web function "web" has no "dir2/index.js" file in its package artifact "artifact-function.zip"'
         )
         .and.have.property('code', 'WEB_FUNCTION_ENTRY_POINT_NOT_FOUND');
+    });
+
+    it('should support a `webFunctions[].package.artifact` with entries that start with `./`', async () => {
+      const { servicePath } = await setupProgrammaticFixture('packaging', {
+        configExt: {
+          ...configExt,
+          webFunctions: { web: { package: { artifact: 'dot-slash.zip' } } },
+        },
+        files: [{ to: 'dot-slash.zip', contents: await createZipBuffer(['./index.js']) }],
+      });
+
+      await runServerless({ cwd: servicePath, command: 'package', awsSdkV3StubMap });
+    });
+
+    it('should reject a `webFunctions[].package.artifact` with a backslash in an entry name', async () => {
+      const zip = await createZipBuffer(['dir2/index.js']);
+      const { servicePath } = await setupProgrammaticFixture('packaging', {
+        configExt: {
+          ...configExt,
+          webFunctions: {
+            web: { entryPoint: 'dir2/index.js', package: { artifact: 'backslash.zip' } },
+          },
+        },
+        files: [
+          {
+            to: 'backslash.zip',
+            contents: Buffer.from(
+              zip.toString('latin1').replaceAll('dir2/index.js', 'dir2\\index.js'),
+              'latin1'
+            ),
+          },
+        ],
+      });
+
+      await expect(runServerless({ cwd: servicePath, command: 'package', awsSdkV3StubMap }))
+        .to.eventually.be.rejectedWith('invalid characters in fileName')
+        .and.have.property('code', 'INVALID_PACKAGE_ARTIFACT');
     });
 
     it('should reject a `webFunctions[].package.artifact` that does not exist', async () => {

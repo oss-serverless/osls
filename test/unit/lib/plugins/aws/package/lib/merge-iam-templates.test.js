@@ -87,6 +87,24 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
       const IamRoleLambdaExecution = awsNaming.getRoleLogicalId();
       expect(cfTemplate.Resources).to.not.have.property(IamRoleLambdaExecution);
     });
+
+    it('should configure LogGroup resources with `provider.iam.role`', async () => {
+      const { cfTemplate, awsNaming } = await runServerless({
+        fixture: 'web-function',
+        command: 'package',
+        configExt: {
+          provider: { iam: { role: 'arn:aws:iam::123456789012:role/web' } },
+        },
+      });
+
+      expect(cfTemplate.Resources).to.not.have.property(awsNaming.getRoleLogicalId());
+      expect(cfTemplate.Resources).to.have.property(
+        awsNaming.getWebFunctionLogGroupLogicalId('basic')
+      );
+      expect(cfTemplate.Resources).to.have.property(
+        awsNaming.getWebFunctionLocalLogGroupLogicalId('basic')
+      );
+    });
   });
 
   describe('Default role', () => {
@@ -1086,81 +1104,6 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
         ]);
       });
 
-      describe('without functions', () => {
-        let roleProperties;
-        let webService;
-
-        before(async () => {
-          const { cfTemplate, awsNaming, fixtureData } = await runServerless({
-            fixture: 'web-function',
-            command: 'package',
-            configExt: {
-              provider: {
-                vpc: { securityGroupIds: ['sg-0a0a0a0a'], subnetIds: ['subnet-01010101'] },
-              },
-              webFunctions: {
-                basic: {
-                  kmsKeyArn:
-                    'arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab',
-                },
-              },
-            },
-          });
-          roleProperties = cfTemplate.Resources[awsNaming.getRoleLogicalId()].Properties;
-          webService = fixtureData.serviceConfig.service;
-        });
-
-        it('should add logGroup access policies for the web functions only', () => {
-          const { Statement } = roleProperties.Policies[0].PolicyDocument;
-          const allRegionsArnLogPrefix = 'arn:${AWS::Partition}:logs:*:${AWS::AccountId}';
-
-          expect(Statement[0].Resource).to.deep.equal([
-            { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*` },
-            { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*:*` },
-            {
-              'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*.local`,
-            },
-            {
-              'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*.local:*`,
-            },
-          ]);
-          expect(Statement[1].Resource).to.deep.equal([
-            { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*:*:*` },
-            {
-              'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*.local:*:*`,
-            },
-          ]);
-        });
-
-        it('should not add a statement for `webFunctions[].kmsKeyArn`, which Lambda uses through the key policy', () => {
-          expect(
-            JSON.stringify(roleProperties.Policies[0].PolicyDocument.Statement)
-          ).to.not.include('kms:');
-        });
-
-        it('should not attach the VPC policy for `provider.vpc`, which does not apply to web functions', () => {
-          expect(roleProperties).to.not.have.property('ManagedPolicyArns');
-        });
-      });
-
-      it('should configure LogGroup resources with `provider.iam.role`', async () => {
-        const { cfTemplate, awsNaming } = await runServerless({
-          fixture: 'web-function',
-          command: 'package',
-          configExt: {
-            provider: { iam: { role: 'arn:aws:iam::123456789012:role/web' } },
-          },
-        });
-
-        expect(cfTemplate.Resources).to.not.have.property(awsNaming.getRoleLogicalId());
-        expect(cfTemplate.Resources).to.have.property(
-          awsNaming.getWebFunctionLogGroupLogicalId('basic')
-        );
-        expect(cfTemplate.Resources).to.have.property(
-          awsNaming.getWebFunctionLocalLogGroupLogicalId('basic')
-        );
-      });
-
       it('should configure LogGroup resources for web functions', () => {
         expect(cfResources[naming.getWebFunctionLogGroupLogicalId('basic')]).to.deep.equal({
           Type: 'AWS::Logs::LogGroup',
@@ -1219,6 +1162,63 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
         });
 
         expect(cfTemplate.Resources).to.have.property(awsNaming.getRoleLogicalId());
+      });
+
+      describe('without functions', () => {
+        let roleProperties;
+        let webService;
+
+        before(async () => {
+          const { cfTemplate, awsNaming, fixtureData } = await runServerless({
+            fixture: 'web-function',
+            command: 'package',
+            configExt: {
+              provider: {
+                vpc: { securityGroupIds: ['sg-0a0a0a0a'], subnetIds: ['subnet-01010101'] },
+              },
+              webFunctions: {
+                basic: {
+                  kmsKeyArn:
+                    'arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab',
+                },
+              },
+            },
+          });
+          roleProperties = cfTemplate.Resources[awsNaming.getRoleLogicalId()].Properties;
+          webService = fixtureData.serviceConfig.service;
+        });
+
+        it('should add logGroup access policies for the web functions only', () => {
+          const { Statement } = roleProperties.Policies[0].PolicyDocument;
+          const allRegionsArnLogPrefix = 'arn:${AWS::Partition}:logs:*:${AWS::AccountId}';
+
+          expect(Statement[0].Resource).to.deep.equal([
+            { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*` },
+            { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*:*` },
+            {
+              'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*.local`,
+            },
+            {
+              'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*.local:*`,
+            },
+          ]);
+          expect(Statement[1].Resource).to.deep.equal([
+            { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*:*:*` },
+            {
+              'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*.local:*:*`,
+            },
+          ]);
+        });
+
+        it('should not add a statement for `webFunctions[].kmsKeyArn`, which Lambda uses through the key policy', () => {
+          expect(
+            JSON.stringify(roleProperties.Policies[0].PolicyDocument.Statement)
+          ).to.not.include('kms:');
+        });
+
+        it('should not attach the VPC policy for `provider.vpc`, which does not apply to web functions', () => {
+          expect(roleProperties).to.not.have.property('ManagedPolicyArns');
+        });
       });
     });
   });

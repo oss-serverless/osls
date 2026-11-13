@@ -233,4 +233,4 @@ provider:
 
 Set it to a higher value if you need to keep more rollback targets, or to `0` to retain only the current deployment.
 
-The zips of [web functions](./web-functions.md#where-the-code-is-stored) are stored outside the deployment directories and are never pruned, because Lambda keeps reading their code from the deployment bucket. `osls remove` deletes them.
+The zips of [web functions](./web-functions.md#where-the-code-is-stored) are stored outside the deployment directories and are never pruned, because Lambda keeps referring to their code in the deployment bucket. `osls remove` deletes them.

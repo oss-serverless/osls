@@ -305,7 +305,7 @@ describe('#naming()', () => {
   });
 
   describe('#getWebFunctionArtifactName()', () => {
-    it('should not collide with the artifact name of a function or a layer', () => {
+    it('should suffix the web function name with ".web.zip"', () => {
       expect(sdk.naming.getWebFunctionArtifactName('functionName')).to.equal(
         'functionName.web.zip'
       );

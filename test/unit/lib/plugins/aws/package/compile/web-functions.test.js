@@ -386,6 +386,18 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
       );
     });
 
+    it('should not change the deployment bucket policy of a service without web functions', async () => {
+      const { awsNaming, cfTemplate } = await runServerless({
+        fixture: 'function',
+        command: 'package',
+      });
+
+      expect(
+        cfTemplate.Resources[awsNaming.getDeploymentBucketPolicyLogicalId()].Properties
+          .PolicyDocument.Statement
+      ).to.have.lengthOf(1);
+    });
+
     it('should require `provider.deploymentBucket.versioning`', async () => {
       await expect(
         runServerless({
@@ -421,6 +433,11 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
       ['a `timeout` below 3 seconds', { timeout: 1 }, 'webFunctions.basic.timeout'],
       ['a negative `endpoint.rateLimit`', { endpoint: { rateLimit: -1 } }, 'rateLimit'],
       ['an unsupported `endpoint.authorizer`', { endpoint: { authorizer: 'none' } }, 'authorizer'],
+      [
+        'an unsupported `endpoint` property',
+        { endpoint: { auth: 'aws_iam' } },
+        "unrecognized property 'auth'",
+      ],
       ['an unsupported `endpoint.type`', { endpoint: { type: 'Global' } }, 'endpoint.type'],
       [
         '`endpoint.regions` that are not names of regions',
@@ -448,7 +465,8 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
       });
     }
 
-    for (const [description, entryPoint, message] of [
+    for (const [description, entryPoint, message, configValidationMode] of [
+      ['an `entryPoint` that is not a string', { Ref: 'EntryPoint' }, 'it is not a string', 'warn'],
       ['an absolute `entryPoint`', '/index.js', 'it is an absolute path'],
       [
         'an `entryPoint` outside of the package',
@@ -462,7 +480,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
           runServerless({
             fixture: 'web-function',
             command: 'package',
-            configExt: { webFunctions: { basic: { entryPoint } } },
+            configExt: { configValidationMode, webFunctions: { basic: { entryPoint } } },
           })
         )
           .to.eventually.be.rejectedWith(message)
@@ -486,6 +504,20 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
         .and.have.property('code', 'WEB_FUNCTION_INVALID_KMS_KEY_ARN');
     });
 
+    it('should reject web functions with the same logical ID', async () => {
+      await expect(
+        runServerless({
+          fixture: 'web-function',
+          command: 'print',
+          configExt: { webFunctions: { Basic: {} } },
+        })
+      )
+        .to.eventually.be.rejectedWith(
+          'Web functions "basic" and "Basic" both get the "BasicWebFunction" logical ID'
+        )
+        .and.have.property('code', 'WEB_FUNCTION_LOGICAL_ID_ALREADY_USED');
+    });
+
     it('should reject a web function with the key of a function', async () => {
       await expect(
         runServerless({
@@ -499,19 +531,24 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
       );
     });
 
-    it('should reject a web function with the log group logical ID of a function', async () => {
-      await expect(
-        runServerless({
-          fixture: 'web-function',
-          command: 'print',
-          configExt: { functions: { basicWebFunctionLocal: { handler: 'index.handler' } } },
-        })
-      )
-        .to.eventually.be.rejectedWith(
-          'Web function "basic" and function "basicWebFunctionLocal" both get a log group with the "BasicWebFunctionLocalLogGroup" logical ID'
+    for (const [functionName, logGroupLogicalId] of [
+      ['basicWebFunction', 'BasicWebFunctionLogGroup'],
+      ['basicWebFunctionLocal', 'BasicWebFunctionLocalLogGroup'],
+    ]) {
+      it(`should reject a web function with the log group logical ID of a function (${functionName})`, async () => {
+        await expect(
+          runServerless({
+            fixture: 'web-function',
+            command: 'print',
+            configExt: { functions: { [functionName]: { handler: 'index.handler' } } },
+          })
         )
-        .and.have.property('code', 'WEB_FUNCTION_LOGICAL_ID_ALREADY_USED_BY_FUNCTION');
-    });
+          .to.eventually.be.rejectedWith(
+            `Web function "basic" and function "${functionName}" both get a log group with the "${logGroupLogicalId}" logical ID`
+          )
+          .and.have.property('code', 'WEB_FUNCTION_LOGICAL_ID_ALREADY_USED_BY_FUNCTION');
+      });
+    }
 
     it('should accept a web function with the log group logical ID of a function without logs', async () => {
       const { cfTemplate } = await runServerless({
