@@ -54,7 +54,6 @@ export type AwsLogRetentionInDays =
 export type AwsLambdaMemorySize = number;
 export type AwsLambdaRole = string | AwsCfSub | AwsCfImport | AwsCfGetAtt;
 export type AwsLambdaRuntime =
-  | 'dotnet8'
   | 'dotnet10'
   | 'java25'
   | 'java21'
@@ -68,7 +67,6 @@ export type AwsLambdaRuntime =
   | 'nodejs24.x'
   | 'nodejs26.x'
   | 'provided.al2023'
-  | 'python3.10'
   | 'python3.11'
   | 'python3.12'
   | 'python3.13'
