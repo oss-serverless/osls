@@ -15,6 +15,8 @@ const { progress } = require('../../../../../../../lib/utils/serverless-utils/lo
 const skipOnDisabledSymlinksInWindows = require('../../../../../../lib/skip-on-disabled-symlinks-in-windows');
 const { createTmpDir, ensureFileSync, getTmpDirPath } = require('../../../../../../utils/fs');
 const runServerless = require('../../../../../../utils/run-serverless');
+const { createDeployAwsStubMap } = require('../../../../../../utils/aws-stub-maps');
+const setupProgrammaticFixture = require('../../../../../../utils/setup-programmatic-fixture');
 
 const expect = chai.expect;
 
@@ -770,5 +772,97 @@ describe('test/unit/lib/plugins/aws/deploy/lib/upload-artifacts.test.js', () => 
     );
     expect(statePayload.Body.includes('"service":')).to.be.true;
     expect(statePayload.ContentType).to.equal('application/json');
+  });
+
+  describe('web apps', () => {
+    const deployWebApp = async (headObject) => {
+      const uploadStub = sinon.stub().resolves({});
+      const { awsSdkV3Stub, cfTemplate, awsNaming } = await runServerless({
+        fixture: 'web-app',
+        command: 'deploy',
+        lastLifecycleHookName: 'aws:deploy:deploy:uploadArtifacts',
+        awsSdkV3StubMap: createDeployAwsStubMap({
+          S3: {
+            getBucketVersioning: { Status: 'Enabled' },
+            headObject,
+            upload: uploadStub,
+          },
+        }),
+      });
+      const { Key: artifactS3Key } =
+        cfTemplate.Resources[awsNaming.getWebFunctionRevisionLogicalId('api')].Properties
+          .BuildConfig.CodeConfig.S3Object;
+      const zipUploads = uploadStub.args
+        .map(([params]) => params)
+        .filter(({ Key }) => Key.endsWith('.zip'));
+
+      return { artifactS3Key, awsSdkV3Stub, zipUploads };
+    };
+    const rejectWith = (name, httpStatusCode) => () => {
+      throw Object.assign(new Error(name), { name, $metadata: { httpStatusCode } });
+    };
+
+    it('should upload the code of a web app to the key the template points at', async () => {
+      const { artifactS3Key, awsSdkV3Stub, zipUploads } = await deployWebApp(
+        rejectWith('NotFound', 404)
+      );
+
+      expect(artifactS3Key).to.match(/\/dev\/web-apps\/api-[0-9a-f]{64}\.zip$/);
+      expect(awsSdkV3Stub.sends.find(({ method }) => method === 'headObject').input).to.deep.equal({
+        Bucket: 'deployment-bucket',
+        Key: artifactS3Key,
+      });
+      expect(zipUploads).to.have.lengthOf(1);
+      expect(zipUploads[0]).to.include({
+        Bucket: 'deployment-bucket',
+        Key: artifactS3Key,
+        ContentType: 'application/zip',
+      });
+    });
+
+    it('should upload the code of a web app when checking for it is denied', async () => {
+      const { artifactS3Key, zipUploads } = await deployWebApp(rejectWith('Forbidden', 403));
+
+      expect(zipUploads.map(({ Key }) => Key)).to.deep.equal([artifactS3Key]);
+    });
+
+    it('should not upload the code of a web app that is already uploaded', async () => {
+      const { zipUploads } = await deployWebApp({});
+
+      expect(zipUploads).to.be.empty;
+    });
+
+    it('should upload the code of a web app when deploying a package', async () => {
+      const { servicePath } = await setupProgrammaticFixture('web-app');
+      const { cfTemplate, awsNaming } = await runServerless({
+        cwd: servicePath,
+        command: 'package',
+        options: { package: 'package-dir' },
+      });
+      const uploadStub = sinon.stub().resolves({});
+
+      await runServerless({
+        cwd: servicePath,
+        command: 'deploy',
+        options: { package: 'package-dir' },
+        lastLifecycleHookName: 'aws:deploy:deploy:uploadArtifacts',
+        awsSdkV3StubMap: createDeployAwsStubMap({
+          S3: {
+            getBucketVersioning: { Status: 'Enabled' },
+            headObject: rejectWith('NotFound', 404),
+            upload: uploadStub,
+          },
+        }),
+      });
+
+      const zipUpload = uploadStub.args
+        .map(([params]) => params)
+        .find(({ Key }) => Key.endsWith('.zip'));
+      expect(zipUpload.Key).to.equal(
+        cfTemplate.Resources[awsNaming.getWebFunctionRevisionLogicalId('api')].Properties
+          .BuildConfig.CodeConfig.S3Object.Key
+      );
+      expect(zipUpload.Body.path).to.equal(path.join('package-dir', 'api.web-app.zip'));
+    });
   });
 });

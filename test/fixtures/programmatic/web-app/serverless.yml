@@ -1,0 +1,13 @@
+service: service
+
+configValidationMode: error
+frameworkVersion: '*'
+
+provider:
+  name: aws
+  deploymentBucket:
+    versioning: true
+
+webApps:
+  api:
+    entry: src/server.js

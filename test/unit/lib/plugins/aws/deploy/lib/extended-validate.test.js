@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const chai = require('chai');
 const sinon = require('sinon');
 const extendedValidate = require('../../../../../../../lib/plugins/aws/deploy/lib/extended-validate');
@@ -49,6 +50,13 @@ describe('extendedValidate', () => {
       getFunction(functionName) {
         return this.functions[functionName];
       },
+      webApps: {},
+      getAllWebApps() {
+        return Object.keys(this.webApps);
+      },
+      getWebApp(webAppName) {
+        return this.webApps[webAppName];
+      },
     };
 
     return {
@@ -59,6 +67,7 @@ describe('extendedValidate', () => {
           getServiceStateFileName: () => 'service-state.json',
           getServiceArtifactName: () => 'service.zip',
           getFunctionArtifactName: (functionName) => `${functionName}.zip`,
+          getWebAppArtifactName: (webAppName) => `${webAppName}.web-app.zip`,
         },
       },
       serverless: {
@@ -171,6 +180,34 @@ describe('extendedValidate', () => {
       readFileSyncStub.returns(stateFileMock);
       awsDeploy.serverless.service.package.artifact = 'some/file.zip';
       await awsDeploy.extendedValidate();
+    });
+
+    it('should throw error if the package of a web app does not exist', async () => {
+      stateFileMock.service.functions = {};
+      stateFileMock.service.webApps = { api: { entry: 'server.js' } };
+      fileExistsSyncStub.onCall(0).returns(true);
+      fileExistsSyncStub.onCall(1).returns(false);
+      readFileSyncStub.returns(stateFileMock);
+
+      await expect(awsDeploy.extendedValidate()).to.eventually.be.rejected.and.have.property(
+        'code',
+        'MISSING_ARTIFACT_FILE'
+      );
+      expect(fileExistsSyncStub.secondCall.args[0]).to.equal(
+        path.join('package-path', 'api.web-app.zip')
+      );
+    });
+
+    it('should use the package artifact of a web app when provided', async () => {
+      stateFileMock.service.functions = {};
+      stateFileMock.service.webApps = {
+        api: { entry: 'server.js', package: { artifact: 'prebuilt.zip' } },
+      };
+      fileExistsSyncStub.returns(true);
+      readFileSyncStub.returns(stateFileMock);
+
+      await awsDeploy.extendedValidate();
+      expect(fileExistsSyncStub).to.have.been.calledWithExactly('prebuilt.zip');
     });
 
     it('restores persisted service state without mutating the service prototype', async () => {

@@ -372,6 +372,39 @@ describe('AwsProvider', () => {
       });
     });
 
+    describe('webApps validation', () => {
+      for (const [description, webApp, message] of [
+        ['a web app without `entry`', { entry: null }, "must have required property 'entry'"],
+        [
+          'function properties',
+          { entry: 'src/server.js', handler: 'src/server.handler' },
+          "unrecognized property 'handler'",
+        ],
+        [
+          'a runtime older than Node.js 24',
+          { entry: 'src/server.js', runtime: 'nodejs22.x' },
+          'must match pattern',
+        ],
+        ['a timeout below 3 seconds', { entry: 'src/server.js', timeout: 2 }, 'must be >= 3'],
+        [
+          'an unknown log level',
+          { entry: 'src/server.js', logs: { systemLogLevel: 'error' } },
+          'unsupported string format',
+        ],
+        ['a web app that is not an object', 'src/server.js', 'must be object'],
+      ]) {
+        it(`rejects ${description}`, async () => {
+          await expect(
+            runServerless({
+              fixture: 'web-app',
+              command: 'print',
+              configExt: { webApps: { api: webApp } },
+            })
+          ).to.eventually.be.rejectedWith(message);
+        });
+      }
+    });
+
     describe('deploymentBucket configuration', () => {
       it('should do nothing if not defined', () => {
         serverless.service.provider.deploymentBucket = undefined;

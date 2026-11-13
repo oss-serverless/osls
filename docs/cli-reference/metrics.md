@@ -6,6 +6,8 @@ Lets you watch the metrics of a specific function.
 osls metrics
 ```
 
+The metrics of [web apps](../guides/web-apps.md) are not included. AWS Lambda publishes them in the `AWS/Lambda/Web` CloudWatch namespace.
+
 ## Options
 
 - `--function` or `-f` The function you want to fetch the metrics for.

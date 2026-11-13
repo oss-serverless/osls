@@ -2,6 +2,8 @@
 
 If you are using AWS as a provider, all _functions_ inside the service are AWS Lambda functions.
 
+To run an HTTP server on AWS Lambda instead of a handler that receives events, see [AWS Lambda Web Apps](./web-apps.md).
+
 ## Contents
 
 - [Configuration](#configuration)

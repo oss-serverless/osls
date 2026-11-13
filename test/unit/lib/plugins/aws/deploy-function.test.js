@@ -932,6 +932,19 @@ describe('test/unit/lib/plugins/aws/deployFunction.test.js', () => {
     expect(updateFunctionConfigurationStub).not.to.be.called;
   });
 
+  it('should reject deploy function for a web app', async () => {
+    await expect(
+      runServerless({
+        fixture: 'web-app',
+        command: 'deploy function',
+        options: { function: 'api' },
+        awsSdkV3StubMap,
+      })
+    ).to.be.eventually.rejectedWith('"api" is a web app. Deploy it with "serverless deploy".');
+
+    expect(updateFunctionCodeStub).not.to.be.called;
+  });
+
   it('should recognize layers at `provider.layers`', async () => {
     await runServerless({
       fixture: 'function',

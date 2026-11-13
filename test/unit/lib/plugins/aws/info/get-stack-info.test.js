@@ -35,6 +35,7 @@ function createServerlessContext(options) {
         `${upperFirst(functionName)}LambdaFunctionUrl`,
       getLambdaLayerOutputLogicalId: (layerName) =>
         `${upperFirst(layerName)}LambdaLayerQualifiedArn`,
+      getWebFunctionUrlOutputLogicalId: (webAppName) => `${upperFirst(webAppName)}WebFunctionUrl`,
       getCloudFrontDistributionDomainNameLogicalId: () => 'CloudFrontDistributionDomainName',
     },
   };
@@ -51,6 +52,13 @@ function createServerlessContext(options) {
     },
     getAllLayers() {
       return Object.keys(this.layers || {});
+    },
+    webApps: {},
+    getAllWebApps() {
+      return Object.keys(this.webApps);
+    },
+    getWebApp(webAppName) {
+      return this.webApps[webAppName];
     },
   };
 
@@ -80,6 +88,7 @@ describe('#getStackInfo()', () => {
       world: { name: 'customized' },
     };
     serverless.service.layers = { test: {} };
+    serverless.service.webApps = { api: { name: 'my-service-dev-api' } };
     awsInfo = new AwsInfo(serverless, options);
 
     describeStacksStub = sinon.stub(CloudFormationClient.prototype, 'send');
@@ -124,6 +133,11 @@ describe('#getStackInfo()', () => {
               OutputValue: 'arn:aws:lambda:region:NNNNNNNNNNNN:layer:test:1',
             },
             {
+              Description: 'Lambda Web Function URL',
+              OutputKey: 'ApiWebFunctionUrl',
+              OutputValue: 'https://abc123example.lambda-web.us-east-1.on.aws',
+            },
+            {
               Description: 'CloudFront Distribution Id',
               OutputKey: 'CloudFrontDistribution',
               OutputValue: 'a12bcdef3g45hi',
@@ -166,6 +180,13 @@ describe('#getStackInfo()', () => {
             arn: 'arn:aws:lambda:region:NNNNNNNNNNNN:layer:test:1',
           },
         ],
+        webApps: [
+          {
+            name: 'api',
+            deployedName: 'my-service-dev-api',
+            url: 'https://abc123example.lambda-web.us-east-1.on.aws',
+          },
+        ],
 
         endpoints: ['ab12cd34ef.execute-api.us-east-1.amazonaws.com/dev'],
         cloudFront: 'a12bcdef3g45hi.cloudfront.net',
@@ -194,6 +215,11 @@ describe('#getStackInfo()', () => {
           Description: 'Current Lambda layer version',
           OutputKey: 'TestLambdaLayerQualifiedArn',
           OutputValue: 'arn:aws:lambda:region:NNNNNNNNNNNN:layer:test:1',
+        },
+        {
+          Description: 'Lambda Web Function URL',
+          OutputKey: 'ApiWebFunctionUrl',
+          OutputValue: 'https://abc123example.lambda-web.us-east-1.on.aws',
         },
         {
           Description: 'CloudFront Distribution Id',
@@ -228,6 +254,7 @@ describe('#getStackInfo()', () => {
       info: {
         functions: [],
         layers: [],
+        webApps: [],
         endpoints: [],
         service: 'my-service',
         stage: 'dev',
@@ -327,6 +354,7 @@ describe('#getStackInfo()', () => {
       info: {
         functions: [],
         layers: [],
+        webApps: [],
         endpoints: ['httpApi: my-endpoint'],
         service: 'my-service',
         stage: 'dev',

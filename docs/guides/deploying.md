@@ -29,6 +29,7 @@ osls translates all syntax in `serverless.yml` to a single AWS CloudFormation te
 - Any IAM Roles, Functions, Events and Resources are added to the AWS CloudFormation template.
 - The CloudFormation Stack is updated with the new CloudFormation template.
 - Each deployment publishes a new version for each function in your service.
+- The code of [web apps](./web-apps.md#deploying) is uploaded once per version of the code, and a deployment creates a new revision of the web apps that changed.
 
 ### Deployment method
 
@@ -146,7 +147,7 @@ Keep in mind:
 - You can disable creation of default S3 bucket policy by setting `skipPolicySetup` under `deploymentBucket` config. It only applies to deployment bucket that is automatically created
   by osls.
 
-- You can enable versioning for the deployment bucket by setting `versioning` under `deploymentBucket` config to `true`.
+- You can enable versioning for the deployment bucket by setting `versioning` under `deploymentBucket` config to `true`. This is required for services with [web apps](./web-apps.md#deployment-bucket).
 
 Check out the [deploy command docs](../cli-reference/deploy.md) for all details and options.
 

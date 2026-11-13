@@ -10,6 +10,7 @@ This page lists the `serverless.yml` properties available when the provider is s
 - [Functions](#functions)
 - [Lambda events](#lambda-events)
 - [Function layers](#function-layers)
+- [Web apps](#web-apps)
 - [AWS Resources](#aws-resources)
 
 ## Root properties
@@ -179,7 +180,7 @@ provider:
     blockPublicAccess: true
     # Skip the creation of a default bucket policy when the deployment bucket is created (default: false)
     skipPolicySetup: true
-    # Enable bucket versioning (default: false)
+    # Enable bucket versioning (default: false, required for web apps)
     versioning: true
     # Server-side encryption method
     serverSideEncryption: AES256
@@ -1453,6 +1454,69 @@ layers:
     # optional, false by default. If true, layer versions are not deleted as new ones are created
     retain: false
 ```
+
+## Web apps
+
+Deploy HTTP servers as [Lambda Web Functions](./web-apps.md):
+
+```yaml
+# serverless.yml
+
+webApps:
+  # A web app
+  api:
+    # required, the file that starts the HTTP server
+    entry: src/server.js
+    # optional, Node.js 24 or newer (default: provider.runtime when it is nodejs24.x or newer, otherwise nodejs24.x)
+    runtime: nodejs24.x
+    # optional, name of the deployed web function (default: ${service}-${stage}-${key})
+    name: ${sls:stage}-api
+    # optional, up to 256 characters
+    description: Storefront API
+    # optional, request timeout in seconds, 3-900 (default: provider.timeout when it is set, otherwise 30)
+    timeout: 60
+    # optional, concurrent requests per execution environment, 1-128 (default: 64)
+    maxConcurrency: 32
+    # optional, merged over provider.environment
+    environment:
+      TABLE_NAME: !Ref OrdersTable
+    # optional, case-insensitive log levels (default: the provider.logs.lambda levels)
+    logs:
+      # trace, debug, info, warn, error or fatal
+      applicationLogLevel: info
+      # debug, info or warn
+      systemLogLevel: info
+    # optional, retention of the log groups of the web app (default: provider.logRetentionInDays)
+    logRetentionInDays: 14
+    # optional, data protection policy of the log groups of the web app (default: provider.logDataProtectionPolicy)
+    logDataProtectionPolicy:
+      Name: data-protection-policy
+      Version: '2021-06-01'
+      Statement: []
+    # optional, execution role (default: the role of the service)
+    role: arn:aws:iam::123456789012:role/my-role
+    # optional, key that encrypts the environment variables (default: provider.kmsKeyArn)
+    kmsKeyArn: arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab
+    # optional, merged over provider.tags
+    tags:
+      team: web
+    package:
+      # optional, applied after the service-level package.patterns
+      patterns:
+        - '!tests/**'
+      # optional, a prebuilt zip file to deploy as it is, instead of packaging the service directory
+      artifact: build/api.zip
+    # optional, true (the default) or the settings of the HTTPS endpoint. false is not accepted
+    url:
+      # optional, require requests signed with IAM credentials
+      authorizer: aws_iam
+      # optional, most execution environments at once, 2-10000
+      maxEnvironments: 50
+      # optional, most requests per second
+      rateLimit: 2000
+```
+
+Web apps require `provider.deploymentBucket.versioning: true`, see [Deployment bucket](./web-apps.md#deployment-bucket).
 
 ## AWS Resources
 

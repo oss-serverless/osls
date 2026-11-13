@@ -22,6 +22,7 @@ function createServerlessContext(options) {
     isFunctionLogGroupInfrequentAccess: AwsProvider.prototype.isFunctionLogGroupInfrequentAccess,
     naming: {
       getLogGroupName: (lambdaName) => `/aws/lambda/${lambdaName}`,
+      getWebFunctionLocalLogGroupName: (lambdaName) => `/aws/lambda/web/${lambdaName}.local`,
     },
   };
   const service = {
@@ -36,6 +37,16 @@ function createServerlessContext(options) {
         );
       }
       return this.functions[functionName];
+    },
+    webApps: {},
+    getWebApp(webAppName) {
+      if (!Object.hasOwn(this.webApps, webAppName)) {
+        throw new ServerlessError(
+          `Web app "${webAppName}" doesn't exist in this Service`,
+          'WEB_APP_MISSING_IN_SERVICE'
+        );
+      }
+      return this.webApps[webAppName];
     },
   };
 
@@ -146,6 +157,46 @@ describe('AwsLogs', () => {
         .to.throw(ServerlessError)
         .with.property('code', 'LOGS_INFREQUENT_ACCESS_UNSUPPORTED');
     });
+
+    describe('with the "--web-app" option', () => {
+      beforeEach(() => {
+        serverless.service.provider.logs = { lambda: { logGroupClass: 'infrequent_access' } };
+        serverless.service.webApps = { api: { entry: 'server.js', name: 'customName' } };
+        delete awsLogs.options.function;
+        awsLogs.options['web-app'] = 'api';
+      });
+
+      it('it should read the log group where the lines of a web app arrive first', () => {
+        awsLogs.extendedValidate();
+
+        expect(awsLogs.options.interval).to.be.equal(1000);
+        expect(awsLogs.options.logGroupName).to.equal('/aws/lambda/web/customName.local');
+      });
+
+      it('it should throw error if the web app does not exist in the service', () => {
+        awsLogs.options['web-app'] = 'missing';
+
+        expect(() => awsLogs.extendedValidate())
+          .to.throw(ServerlessError)
+          .with.property('code', 'WEB_APP_MISSING_IN_SERVICE');
+      });
+
+      it('it should throw error if the "--function" option is set as well', () => {
+        awsLogs.options.function = 'first';
+
+        expect(() => awsLogs.extendedValidate())
+          .to.throw(ServerlessError)
+          .with.property('code', 'MISSING_REQUIRED_CLI_OPTION');
+      });
+
+      it('it should throw error if the "--function" option is not set either', () => {
+        delete awsLogs.options['web-app'];
+
+        expect(() => awsLogs.extendedValidate())
+          .to.throw(ServerlessError)
+          .with.property('code', 'MISSING_REQUIRED_CLI_OPTION');
+      });
+    });
   });
 
   describe('#getLogStreams()', () => {
@@ -197,6 +248,16 @@ describe('AwsLogs', () => {
       await expect(awsLogs.getLogStreams()).to.eventually.be.rejected.and.have.property(
         'name',
         'ServerlessError'
+      );
+    });
+
+    it('should tell that a web app has not logged anything yet', async () => {
+      awsLogs.options = { 'web-app': 'api', 'logGroupName': '/aws/lambda/web/customName.local' };
+      sinon.stub(CloudWatchLogsClient.prototype, 'send').resolves({ logStreams: [] });
+
+      await expect(awsLogs.getLogStreams()).to.eventually.be.rejectedWith(
+        ServerlessError,
+        'No logs yet for web app "api". Send it a request, then run this command again.'
       );
     });
   });

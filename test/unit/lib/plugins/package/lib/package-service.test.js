@@ -3,6 +3,7 @@
 const os = require('os');
 const path = require('path');
 const fsp = require('fs').promises;
+const JSZip = require('jszip');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 const { listFileProperties, listZipFiles } = require('../../../../../utils/fs');
@@ -324,6 +325,147 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
       expect(fnIndividualZippedFiles).to.not.include('dir1/subdir2/subsubdir1/index.js');
       expect(fnIndividualZippedFiles).to.include('dir1/subdir2/subsubdir2/index.js');
       expect(fnIndividualZippedFiles).to.include('dir1/subdir4/index.js');
+    });
+  });
+
+  describe('web apps', () => {
+    const startFileName = '__osls_web_app_start.mjs';
+    let serviceDir;
+    let serviceZippedFiles;
+    let apiZippedFiles;
+    let otherZippedFiles;
+
+    before(async () => {
+      const { serviceConfig, servicePath } = await setupProgrammaticFixture('web-app', {
+        configExt: {
+          package: { patterns: ['!docs/**'] },
+          functions: { fn: { handler: 'src/server.handler' } },
+          webApps: {
+            api: { package: { patterns: ['!tests/**', 'docs/api.md'] } },
+            other: { entry: 'src/other.mjs' },
+          },
+        },
+        files: [
+          { to: 'src/other.mjs', contents: "import 'node:http';" },
+          { to: 'tests/server.test.js', contents: '' },
+          { to: 'docs/api.md', contents: '' },
+          { to: 'docs/other.md', contents: '' },
+        ],
+      });
+      serviceDir = servicePath;
+      await runServerless({ cwd: serviceDir, command: 'package' });
+
+      serviceZippedFiles = await listZipFiles(
+        path.join(serviceDir, '.serverless', `${serviceConfig.service}.zip`)
+      );
+      apiZippedFiles = await listZipFiles(path.join(serviceDir, '.serverless', 'api.web-app.zip'));
+      otherZippedFiles = await listZipFiles(
+        path.join(serviceDir, '.serverless', 'other.web-app.zip')
+      );
+    });
+
+    it('should package every web app on its own without `package.individually`', () => {
+      expect(apiZippedFiles).to.include('src/server.js');
+      expect(otherZippedFiles).to.include('src/other.mjs');
+    });
+
+    it('should add the start file to the root of web app packages only', () => {
+      expect(apiZippedFiles).to.include(startFileName);
+      expect(otherZippedFiles).to.include(startFileName);
+      expect(serviceZippedFiles).to.not.include(startFileName);
+    });
+
+    it('should start the `entry` of the web app from the start file', async () => {
+      const zip = await new JSZip().loadAsync(
+        await fsp.readFile(path.join(serviceDir, '.serverless', 'other.web-app.zip'))
+      );
+
+      expect(await zip.file(startFileName).async('string')).to.include(
+        'path.join(import.meta.dirname, "src/other.mjs")'
+      );
+    });
+
+    it('should apply `webApps[].package.patterns` after `package.patterns`', () => {
+      expect(apiZippedFiles).to.not.include('tests/server.test.js');
+      expect(apiZippedFiles).to.include('docs/api.md');
+      expect(apiZippedFiles).to.not.include('docs/other.md');
+      expect(otherZippedFiles).to.include('tests/server.test.js');
+      expect(otherZippedFiles).to.not.include('docs/api.md');
+    });
+
+    it('should create the same package again from unchanged files', async () => {
+      const artifactPath = path.join(serviceDir, '.serverless', 'api.web-app.zip');
+      const artifact = await fsp.readFile(artifactPath);
+      const now = new Date();
+      await fsp.utimes(path.join(serviceDir, 'src/server.js'), now, now);
+
+      await runServerless({ cwd: serviceDir, command: 'package' });
+
+      expect((await fsp.readFile(artifactPath)).equals(artifact)).to.equal(true);
+    });
+
+    it('should reject an `entry` that is not packaged', async () => {
+      await expect(
+        runServerless({
+          fixture: 'web-app',
+          command: 'package',
+          configExt: { webApps: { api: { entry: 'src/missing.js' } } },
+        })
+      ).to.eventually.be.rejected.and.have.property('code', 'WEB_APP_ENTRY_NOT_PACKAGED');
+    });
+
+    it('should reject a file named like the start file', async () => {
+      const { servicePath } = await setupProgrammaticFixture('web-app', {
+        files: [{ to: startFileName, contents: '' }],
+      });
+
+      await expect(
+        runServerless({ cwd: servicePath, command: 'package' })
+      ).to.eventually.be.rejected.and.have.property('code', 'WEB_APP_START_FILE_NAME_CONFLICT');
+    });
+
+    describe('with `webApps[].package.artifact`', () => {
+      const setupArtifactFixture = async (entry) => {
+        const zip = new JSZip();
+        zip.file('dist/server.js', '');
+        return setupProgrammaticFixture('web-app', {
+          configExt: { webApps: { api: { entry, package: { artifact: 'prebuilt.zip' } } } },
+          files: [
+            { to: 'prebuilt.zip', contents: await zip.generateAsync({ type: 'nodebuffer' }) },
+          ],
+        });
+      };
+
+      it('should deploy the artifact as it is', async () => {
+        const { servicePath } = await setupArtifactFixture('dist/server.js');
+
+        const { serverless } = await runServerless({ cwd: servicePath, command: 'package' });
+
+        expect(serverless.service.getWebApp('api').package.artifact).to.equal(
+          path.join(servicePath, 'prebuilt.zip')
+        );
+        expect(await fsp.readdir(path.join(servicePath, '.serverless'))).to.not.include(
+          'api.web-app.zip'
+        );
+      });
+
+      it('should reject an `entry` that is not in the artifact', async () => {
+        const { servicePath } = await setupArtifactFixture('src/server.js');
+
+        await expect(
+          runServerless({ cwd: servicePath, command: 'package' })
+        ).to.eventually.be.rejected.and.have.property('code', 'WEB_APP_ENTRY_MISSING_IN_ARTIFACT');
+      });
+
+      it('should reject an artifact that does not exist', async () => {
+        await expect(
+          runServerless({
+            fixture: 'web-app',
+            command: 'package',
+            configExt: { webApps: { api: { package: { artifact: 'missing.zip' } } } },
+          })
+        ).to.eventually.be.rejected.and.have.property('code', 'INVALID_PACKAGE_ARTIFACT_PATH');
+      });
     });
   });
 

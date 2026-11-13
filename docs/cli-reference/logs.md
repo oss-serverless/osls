@@ -1,12 +1,15 @@
 # AWS - Logs
 
-Lets you watch the logs of a specific function.
+Lets you watch the logs of a specific function or web app.
 
 ```bash
 osls logs -f hello
 
 # Optionally tail the logs with --tail or -t
 osls logs -f hello -t
+
+# The logs of a web app
+osls logs --web-app api
 ```
 
 This command returns as many log events as can fit in 1MB (up to 10,000 log events). You can use the `--filter` option to ensure the logs you're looking for are included.
@@ -15,7 +18,8 @@ This command can't read Infrequent Access log groups, so for functions with `log
 
 ## Options
 
-- `--function` or `-f` The function you want to fetch the logs for. **Required**
+- `--function` or `-f` The function you want to fetch the logs for. **Required**, unless `--web-app` is set.
+- `--web-app` The [web app](../guides/web-apps.md#logs) you want to fetch the logs for, instead of a function. The logs are read from the `/aws/lambda/web/<name>.local` log group, where the log lines of a web app arrive first.
 - `--stage` or `-s` The stage you want to view the function logs for. If not provided, the plugin will use the default stage listed in `serverless.yml`. If that doesn't exist either it'll just fetch the logs from the `dev` stage.
 - `--region` or `-r` The region you want to view the function logs for. If not provided, the plugin will use the default region listed in `serverless.yml`. If that doesn't exist either it'll just fetch the logs from the `us-east-1` region.
 - `--startTime` A specific unit in time to start fetching logs from (ie: `2010-10-20` or `1469694264`). Here's a list of the supported string formats:
@@ -84,6 +88,12 @@ osls logs -f hello --filter serverless
 ```
 
 This will fetch only the logs that contain the string `serverless`
+
+```bash
+osls logs --web-app api -t
+```
+
+osls will tail the log output of the web app `api`. The other options work as they do for a function.
 
 ---
 

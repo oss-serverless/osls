@@ -70,6 +70,29 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
       const IamRoleLambdaExecution = awsNaming.getRoleLogicalId();
       expect(cfTemplate.Resources).to.not.have.property(IamRoleLambdaExecution);
     });
+
+    it('should not create role resource with all functions and web apps having `role`', async () => {
+      const { cfTemplate, awsNaming } = await runServerless({
+        fixture: 'web-app',
+        command: 'package',
+        configExt: {
+          functions: {
+            basic: {
+              handler: 'src/server.handler',
+              role: 'some:aws:arn:xx1:*:*',
+            },
+          },
+          webApps: {
+            api: {
+              role: 'arn:aws:iam::123456789012:role/web-app-role',
+            },
+          },
+        },
+      });
+
+      const IamRoleLambdaExecution = awsNaming.getRoleLogicalId();
+      expect(cfTemplate.Resources).to.not.have.property(IamRoleLambdaExecution);
+    });
   });
 
   describe('Default role', () => {
@@ -977,6 +1000,109 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
             return JSON.stringify(Action).includes('CheckpointDurableExecution');
           })
         ).to.equal(false);
+      });
+    });
+
+    describe('Web app properties', () => {
+      const logDataProtectionPolicy = {
+        Name: 'data-protection-policy',
+        Version: '2021-06-01',
+        Statement: [],
+      };
+      let cfResources;
+      let naming;
+      let service;
+
+      before(async () => {
+        const { awsNaming, cfTemplate, fixtureData } = await runServerless({
+          fixture: 'web-app',
+          command: 'package',
+          configExt: {
+            provider: {
+              logRetentionInDays: 5,
+            },
+            webApps: {
+              withRole: {
+                entry: 'src/server.js',
+                role: 'arn:aws:iam::123456789012:role/web-app-role',
+              },
+              customName: {
+                entry: 'src/server.js',
+                name: 'custom-web-app',
+                logRetentionInDays: 30,
+                logDataProtectionPolicy,
+              },
+            },
+          },
+        });
+        cfResources = cfTemplate.Resources;
+        naming = awsNaming;
+        service = fixtureData.serviceConfig.service;
+      });
+
+      it('should create the default role for a service that only has web apps', () => {
+        expect(cfResources).to.have.property(naming.getRoleLogicalId());
+      });
+
+      it('should add logGroup access policies for web apps', () => {
+        const { Statement } =
+          cfResources[naming.getRoleLogicalId()].Properties.Policies[0].PolicyDocument;
+        const logGroupArnPrefix = 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}';
+
+        expect(Statement[0]).to.deep.equal({
+          Effect: 'Allow',
+          Action: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:TagResource'],
+          Resource: [
+            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/${service}-dev*` },
+            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/${service}-dev*:*` },
+            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app` },
+            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app:*` },
+            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app.local` },
+            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app.local:*` },
+          ],
+        });
+        expect(Statement[1]).to.deep.equal({
+          Effect: 'Allow',
+          Action: ['logs:PutLogEvents'],
+          Resource: [
+            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/${service}-dev*:*:*` },
+            { 'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app:*:*` },
+            {
+              'Fn::Sub': `${logGroupArnPrefix}:log-group:/aws/lambda/web/custom-web-app.local:*:*`,
+            },
+          ],
+        });
+      });
+
+      it('should configure both LogGroup resources of a web app', () => {
+        expect(cfResources[naming.getWebFunctionLogGroupLogicalId('api')]).to.deep.equal({
+          Type: 'AWS::Logs::LogGroup',
+          Properties: { LogGroupName: `/aws/lambda/web/${service}-dev-api`, RetentionInDays: 5 },
+        });
+        expect(cfResources[naming.getWebFunctionLocalLogGroupLogicalId('api')]).to.deep.equal({
+          Type: 'AWS::Logs::LogGroup',
+          Properties: {
+            LogGroupName: `/aws/lambda/web/${service}-dev-api.local`,
+            RetentionInDays: 5,
+          },
+        });
+      });
+
+      it('should support `webApps[].logRetentionInDays` and `webApps[].logDataProtectionPolicy`', () => {
+        expect(
+          cfResources[naming.getWebFunctionLogGroupLogicalId('customName')].Properties
+        ).to.deep.equal({
+          LogGroupName: '/aws/lambda/web/custom-web-app',
+          RetentionInDays: 30,
+          DataProtectionPolicy: logDataProtectionPolicy,
+        });
+        expect(
+          cfResources[naming.getWebFunctionLocalLogGroupLogicalId('customName')].Properties
+        ).to.deep.equal({
+          LogGroupName: '/aws/lambda/web/custom-web-app.local',
+          RetentionInDays: 30,
+          DataProtectionPolicy: logDataProtectionPolicy,
+        });
       });
     });
   });

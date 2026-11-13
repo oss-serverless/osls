@@ -1479,6 +1479,54 @@ describe('zipService', () => {
       expect(fs.existsSync(artifactFilePath)).to.equal(false);
     });
 
+    it('rejects web app packages above the unzipped size limit of web functions', async () => {
+      serverless.utils.writeFileSync(path.join(tmpDirPath, 'server.js'), 'server');
+      // Sparse file: only its size is read
+      serverless.utils.writeFileSync(path.join(tmpDirPath, 'vendor/large.bin'), '');
+      await fs.promises.truncate(path.join(tmpDirPath, 'vendor/large.bin'), 520 * 1024 * 1024);
+
+      await expect(
+        packagePlugin.zipFiles(['server.js', 'vendor/large.bin'], 'too-large.zip', undefined, {
+          sizeLimit: 'webApp',
+        })
+      ).to.eventually.be.rejectedWith(
+        'The "too-large.zip" package is 520.0 MiB unzipped, above the 512 MiB AWS Lambda limit for web functions.'
+      );
+    });
+
+    it('adds generated files to the package, sorted with the files read from disk', async () => {
+      serverless.utils.writeFileSync(path.join(tmpDirPath, 'a.js'), 'a');
+      serverless.utils.writeFileSync(path.join(tmpDirPath, 'z.js'), 'z');
+
+      const artifact = await packagePlugin.zipFiles(['z.js', 'a.js'], 'generated.zip', undefined, {
+        generatedFiles: [{ name: 'generated.mjs', data: 'export default 1;' }],
+      });
+
+      const unzippedData = await new JsZip().loadAsync(fs.readFileSync(artifact));
+      expect(Object.keys(unzippedData.files)).to.deep.equal(['a.js', 'generated.mjs', 'z.js']);
+      expect(await unzippedData.file('generated.mjs').async('string')).to.equal(
+        'export default 1;'
+      );
+      expect(unzippedData.file('generated.mjs').date.getTime()).to.equal(
+        unzippedData.file('a.js').date.getTime()
+      );
+    });
+
+    it('adds generated files to the package when getFileContentAndStat is overridden', async () => {
+      serverless.utils.writeFileSync(path.join(tmpDirPath, 'a.js'), 'a');
+      const defaultGetFileContentAndStat = packagePlugin.getFileContentAndStat;
+      packagePlugin.getFileContentAndStat = function (filePath) {
+        return defaultGetFileContentAndStat.call(this, filePath);
+      };
+
+      const artifact = await packagePlugin.zipFiles(['a.js'], 'generated.zip', undefined, {
+        generatedFiles: [{ name: 'generated.mjs', data: 'export default 1;' }],
+      });
+
+      const unzippedData = await new JsZip().loadAsync(fs.readFileSync(artifact));
+      expect(Object.keys(unzippedData.files)).to.deep.equal(['a.js', 'generated.mjs']);
+    });
+
     it('configures metadata stat concurrency with ext/promise/limit', () => {
       let configuredLimit;
       const fakeLimit = function (limitValue, callback) {

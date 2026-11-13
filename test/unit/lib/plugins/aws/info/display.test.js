@@ -47,6 +47,10 @@ describe('test/unit/lib/plugins/aws/info/display.test.js', () => {
                     OutputKey: 'WithUrlLambdaFunctionUrl',
                     OutputValue: 'https://sub.lambda.com',
                   },
+                  {
+                    OutputKey: 'ApiWebFunctionUrl',
+                    OutputValue: 'https://abc123example.lambda-web.us-east-1.on.aws',
+                  },
                 ],
               },
             ],
@@ -83,6 +87,11 @@ describe('test/unit/lib/plugins/aws/info/display.test.js', () => {
             path: 'layer',
           },
         },
+        webApps: {
+          api: {
+            entry: 'index.js',
+          },
+        },
       },
     }));
   });
@@ -101,6 +110,7 @@ describe('test/unit/lib/plugins/aws/info/display.test.js', () => {
       'POST - https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/some-post',
       'GET - https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/bar/{marko}',
       'withUrl: https://sub.lambda.com',
+      'api: https://abc123example.lambda-web.us-east-1.on.aws',
     ]);
   });
   it('should register functions section', () => {

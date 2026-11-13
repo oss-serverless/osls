@@ -2,14 +2,33 @@
 
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { HeadBucketCommand } = require('@aws-sdk/client-s3');
+const {
+  GetBucketVersioningCommand,
+  HeadBucketCommand,
+  PutBucketVersioningCommand,
+} = require('@aws-sdk/client-s3');
 const { GetTemplateCommand, UpdateStackCommand } = require('@aws-sdk/client-cloudformation');
 const ensureValidBucketExists = require('../../../../../../../lib/plugins/aws/deploy/lib/ensure-valid-bucket-exists');
 
-const createCustomBucketContext = (send) => ({
+const createCustomBucketContext = (send, { webApps = [] } = {}) => ({
   bucketName: 'deployment-bucket',
   provider: { getRegion: sinon.stub().returns('us-east-1') },
-  serverless: { service: { provider: { deploymentBucket: 'deployment-bucket' } } },
+  serverless: {
+    service: {
+      provider: { deploymentBucket: 'deployment-bucket' },
+      getAllWebApps: () => webApps,
+    },
+  },
+  setBucketName: sinon.stub().resolves(),
+  s3ClientPromise: Promise.resolve({ send }),
+  ...ensureValidBucketExists,
+});
+
+const createManagedBucketContext = (send) => ({
+  bucketName: 'deployment-bucket',
+  checkIfBucketExists: sinon.stub().resolves(true),
+  provider: {},
+  serverless: { service: { provider: {}, getAllWebApps: () => ['api'] } },
   setBucketName: sinon.stub().resolves(),
   s3ClientPromise: Promise.resolve({ send }),
   ...ensureValidBucketExists,
@@ -38,6 +57,7 @@ describe('ensureValidBucketExists', () => {
           provider: {
             deploymentBucket: 'deployment-bucket',
           },
+          getAllWebApps: () => [],
         },
       },
       setBucketName: sinon.stub().resolves(),
@@ -136,6 +156,7 @@ describe('ensureValidBucketExists', () => {
             },
             deploymentMethod: 'direct',
           },
+          getAllWebApps: () => [],
         },
       },
       setBucketName,
@@ -166,5 +187,59 @@ describe('ensureValidBucketExists', () => {
       StackId: 'stack-id',
     });
     expect(setBucketName).to.have.been.calledTwice;
+  });
+
+  describe('when the service has web apps', () => {
+    it('accepts a versioned custom deployment bucket', async () => {
+      const send = sinon.stub().callsFake(async (command) => {
+        if (command instanceof GetBucketVersioningCommand) return { Status: 'Enabled' };
+        return {};
+      });
+      const context = createCustomBucketContext(send, { webApps: ['api'] });
+
+      await context.ensureValidBucketExists();
+
+      expect(send).to.have.been.calledTwice;
+      expect(send.secondCall.args[0]).to.be.instanceOf(GetBucketVersioningCommand);
+      expect(send.secondCall.args[0].input).to.deep.equal({ Bucket: 'deployment-bucket' });
+    });
+
+    it('rejects a custom deployment bucket that is not versioned', async () => {
+      const send = sinon.stub().resolves({});
+      const context = createCustomBucketContext(send, { webApps: ['api'] });
+
+      await expect(context.ensureValidBucketExists()).to.eventually.be.rejected.and.have.property(
+        'code',
+        'WEB_APP_DEPLOYMENT_BUCKET_NOT_VERSIONED'
+      );
+      expect(send).to.have.been.calledTwice;
+    });
+
+    it('enables versioning on the deployment bucket of the stack before code is uploaded', async () => {
+      const send = sinon.stub().callsFake(async (command) => {
+        if (command instanceof GetBucketVersioningCommand) return { Status: 'Suspended' };
+        return {};
+      });
+      const context = createManagedBucketContext(send);
+
+      await context.ensureValidBucketExists();
+
+      expect(send).to.have.been.calledTwice;
+      expect(send.secondCall.args[0]).to.be.instanceOf(PutBucketVersioningCommand);
+      expect(send.secondCall.args[0].input).to.deep.equal({
+        Bucket: 'deployment-bucket',
+        VersioningConfiguration: { Status: 'Enabled' },
+      });
+    });
+
+    it('leaves a versioned deployment bucket of the stack as it is', async () => {
+      const send = sinon.stub().resolves({ Status: 'Enabled' });
+      const context = createManagedBucketContext(send);
+
+      await context.ensureValidBucketExists();
+
+      expect(send).to.have.been.calledOnce;
+      expect(send.firstCall.args[0]).to.be.instanceOf(GetBucketVersioningCommand);
+    });
   });
 });

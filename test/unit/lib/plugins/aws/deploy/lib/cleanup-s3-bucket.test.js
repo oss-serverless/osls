@@ -213,6 +213,29 @@ describe('cleanupS3Bucket', () => {
       });
     });
 
+    it('should keep the code of web apps, which is stored outside of the deployments', async () => {
+      const deploymentDirectories = [
+        '1000000000000-2001-09-09T01:46:40.000Z',
+        '1000000001000-2001-09-09T01:46:41.000Z',
+        '1000000002000-2001-09-09T01:46:42.000Z',
+        '1000000003000-2001-09-09T01:46:43.000Z',
+        '1000000004000-2001-09-09T01:46:44.000Z',
+        '1000000005000-2001-09-09T01:46:45.000Z',
+      ];
+      s3SendStub.resolves({
+        Contents: [
+          ...deploymentDirectories.map((directory) => ({
+            Key: `${s3Key}/${directory}/artifact.zip`,
+          })),
+          { Key: `${s3Key}/web-apps/api-${'a'.repeat(64)}.zip` },
+        ],
+      });
+
+      expect(await awsDeploy.getObjectsToRemove()).to.deep.equal([
+        { Key: `${s3Key}/${deploymentDirectories[0]}/artifact.zip` },
+      ]);
+    });
+
     it('should not rewrite specific S3 list authentication failures', async () => {
       const listError = createSignatureMismatchListError();
       s3SendStub.rejects(listError);

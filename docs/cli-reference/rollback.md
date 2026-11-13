@@ -21,6 +21,8 @@ Rollback only works while the target deployment's artifacts still exist in the d
 
 Rollback uses the [`provider.deploymentMode`](../guides/deploying.md#deployment-mode) from the current `serverless.yml`, not the one saved with the target deployment.
 
+The code of [web apps](../guides/web-apps.md#where-the-code-is-stored) is not pruned with the deployment artifacts, so a rollback restores the web apps of the target deployment as well, by creating a new revision from its code.
+
 ## Examples
 
 ### AWS

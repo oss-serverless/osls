@@ -703,6 +703,33 @@ describe('test/unit/test-lib/configure-aws-sdk-v3-stub.test.js', () => {
     ]);
   });
 
+  it('stubs S3 bucket versioning commands', async () => {
+    const awsSdkV3Stub = configureAwsSdkV3Stub({
+      S3: {
+        getBucketVersioning: { Status: 'Suspended' },
+        putBucketVersioning: {},
+      },
+    });
+    const { S3Client, GetBucketVersioningCommand, PutBucketVersioningCommand } =
+      awsSdkV3Stub.modulesCacheStub['@aws-sdk/client-s3'];
+    const client = new S3Client({ region: 'us-east-1' });
+
+    await expect(
+      client.send(new GetBucketVersioningCommand({ Bucket: 'bucket' }))
+    ).to.eventually.deep.equal({ Status: 'Suspended' });
+    await client.send(
+      new PutBucketVersioningCommand({
+        Bucket: 'bucket',
+        VersioningConfiguration: { Status: 'Enabled' },
+      })
+    );
+
+    expect(awsSdkV3Stub.sends.map((send) => send.method)).to.deep.equal([
+      'getBucketVersioning',
+      'putBucketVersioning',
+    ]);
+  });
+
   it('stubs lib-storage Upload and records upload context', async () => {
     const awsSdkV3Stub = configureAwsSdkV3Stub({
       S3: {

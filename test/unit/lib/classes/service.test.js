@@ -266,4 +266,20 @@ describe('Service', () => {
       expect(service.getLayer('constructor')).to.equal(service.layers.constructor);
     });
   });
+
+  describe('#getAllWebApps() / #getWebApp()', () => {
+    it('resolves the web apps of the service', () => {
+      const service = new Service({}, null);
+
+      expect(service.getAllWebApps()).to.deep.equal([]);
+
+      service.webApps = { api: { entry: 'src/server.js' } };
+
+      expect(service.getAllWebApps()).to.deep.equal(['api']);
+      expect(service.getWebApp('api')).to.equal(service.webApps.api);
+      expect(() => service.getWebApp('constructor'))
+        .to.throw()
+        .and.have.property('code', 'WEB_APP_MISSING_IN_SERVICE');
+    });
+  });
 });

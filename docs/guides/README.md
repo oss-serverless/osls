@@ -14,6 +14,7 @@ In-depth guides for building, testing, deploying, and operating services with os
 - [AWS Lambda Events](events.md) — Wiring event sources (HTTP, schedule, queues, streams, and more) to functions.
 - [IAM Permissions For Functions](iam.md) — Granting functions the permissions they need via IAM roles and policies.
 - [AWS Lambda Layers](layers.md) — Publishing and consuming Lambda layers.
+- [AWS Lambda Web Apps](web-apps.md) — Deploying HTTP servers as Lambda Web Functions with the `webApps` property.
 - [AWS Infrastructure Resources](resources.md) — Adding raw CloudFormation resources and outputs to a service.
 - [Packaging](packaging.md) — Controlling what code and dependencies are bundled into the deployment artifact.
 - [Variables](variables.md) — Using `${...}` variable sources to keep configuration DRY.

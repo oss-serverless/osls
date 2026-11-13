@@ -145,6 +145,19 @@ describe('AwsRollbackFunction', () => {
       expect(fetchStub).to.not.have.been.called;
     });
 
+    it('should reject rollback function for a web app', async () => {
+      await expect(
+        runServerless({
+          fixture: 'web-app',
+          command: 'rollback function',
+          options: { 'function': 'api', 'function-version': '23' },
+        })
+      ).to.be.eventually.rejected.and.have.property(
+        'code',
+        'ROLLBACK_FUNCTION_WEB_APP_UNSUPPORTED'
+      );
+    });
+
     it('should surface the version-aware error when the function is missing', async () => {
       const error = await expect(
         runServerless({

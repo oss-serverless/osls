@@ -865,6 +865,16 @@ describe('test/unit/lib/plugins/aws/invoke.test.js', () => {
     ).to.be.eventually.rejected.and.have.property('code', 'AWS_LAMBDA_INVOCATION_FAILED');
   });
 
+  it('should reject invoking a web app', async () => {
+    await expect(
+      runServerless({
+        fixture: 'web-app',
+        command: 'invoke',
+        options: { function: 'api' },
+      })
+    ).to.be.eventually.rejected.and.have.property('code', 'INVOKE_WEB_APP_UNSUPPORTED');
+  });
+
   it('should resolve if path is not given', async () => {
     const lambdaInvokeStub = sinon.stub();
     await expect(

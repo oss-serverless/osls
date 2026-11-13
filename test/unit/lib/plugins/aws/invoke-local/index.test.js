@@ -2542,6 +2542,18 @@ describe('test/unit/lib/plugins/aws/invokeLocal/index.test.js', () => {
     });
   });
 
+  describe('Web apps', () => {
+    it('should reject invoking a web app', async () => {
+      await expect(
+        runServerless({
+          fixture: 'web-app',
+          command: 'invoke local',
+          options: { function: 'api' },
+        })
+      ).to.eventually.be.rejected.and.have.property('code', 'INVOKE_LOCAL_WEB_APP_UNSUPPORTED');
+    });
+  });
+
   describe('Python', function () {
     // First real child-process spawns of the suite; Windows runners show rare
     // multi-tens-of-seconds AV/disk stalls on first interpreter execution.

@@ -39,6 +39,8 @@ provider:
 
 By default, one IAM Role is shared by all the Lambda functions in your service. Also by default, your Lambda functions have permission to create and write to CloudWatch logs. When VPC configuration is provided the default AWS `AWSLambdaVPCAccessExecutionRole` will be associated in order to communicate with your VPC resources. Functions configured with `durableConfig` additionally receive scoped `lambda:CheckpointDurableExecution` and `lambda:GetDurableExecutionState` permissions so durable executions can checkpoint and replay (see [AWS Lambda Durable Functions](./functions.md#aws-lambda-durable-functions)).
 
+[Web apps](./web-apps.md#iam) share this role too, and it is allowed to write to their log groups.
+
 To add permissions to this role, add IAM statements in `provider.iam.role.statements`. These will be merged into the generated policy. As those statements will be merged into the CloudFormation template, you can use `Join`, `Ref` or any other CloudFormation method or feature.
 
 ```yaml

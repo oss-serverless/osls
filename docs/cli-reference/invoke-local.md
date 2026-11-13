@@ -131,6 +131,8 @@ Use of the `--docker` flag and runtimes other than NodeJs, Python, Java, & Ruby 
 
 **Note:** In order to get correct output when using Java runtime, your Response class must implement `toString()` method.
 
+**Web apps:** `invoke local` runs functions only. A [web app](../guides/web-apps.md) is an ordinary HTTP server: start its `entry` file with `node` to run it locally.
+
 **Environment variables:** The `IS_LOCAL` environment variable, as well as
 any environment variables provided via command line arguments,
 will only be set once the invoked function begins its execution.

@@ -1496,6 +1496,37 @@ export interface AWS {
       retain?: boolean;
     };
   };
+  webApps?: {
+    [k: string]: {
+      description?: string;
+      entry: string;
+      environment?: AwsLambdaEnvironment;
+      kmsKeyArn?: AwsKmsArn;
+      logDataProtectionPolicy?: AwsLogDataProtectionPolicy;
+      logRetentionInDays?: AwsLogRetentionInDays;
+      logs?: {
+        applicationLogLevel?: string;
+        systemLogLevel?: string;
+      };
+      maxConcurrency?: number;
+      name?: string;
+      package?: {
+        artifact?: string;
+        patterns?: string[];
+      };
+      role?: AwsLambdaRole;
+      runtime?: string;
+      tags?: AwsResourceTags;
+      timeout?: number;
+      url?:
+        | boolean
+        | {
+            authorizer?: 'aws_iam';
+            maxEnvironments?: number;
+            rateLimit?: number;
+          };
+    };
+  };
   org?: string;
   app?: string;
   outputs?: {

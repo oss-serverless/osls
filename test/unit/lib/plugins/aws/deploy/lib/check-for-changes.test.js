@@ -1363,6 +1363,40 @@ describe('test/unit/lib/plugins/aws/deploy/lib/checkForChanges.test.js', () => {
     expect(sentMethods).to.include('getFunction');
   });
 
+  it('should not deploy if nothing changed in a service with a web app', async () => {
+    const { serverless } = await runCheckForChanges({
+      configExt: {
+        provider: { deploymentBucket: { versioning: true } },
+        webApps: { api: { entry: 'fn.js' } },
+      },
+      awsSdkV3StubMapOverrides: (getServerless) => ({
+        S3: {
+          getBucketVersioning: { Status: 'Enabled' },
+          // The code of a web app is stored outside of the deployment directory
+          listObjectsV2: async () => {
+            const webAppArtifactName = getServerless()
+              .getProvider('aws')
+              .naming.getWebAppArtifactName('api');
+            return generateMatchingListObjectsResponse(getServerless(), {
+              artifactNames: (await getDeploymentObjectBasenames(getServerless())).filter(
+                (artifactName) => artifactName !== webAppArtifactName
+              ),
+              extraContents: [
+                {
+                  Key: getServerless().service.getWebApp('api').artifactS3Key,
+                  LastModified: new Date(),
+                },
+              ],
+            });
+          },
+        },
+      }),
+    });
+
+    expect(serverless.service.getWebApp('api').artifactS3Key).to.include('/dev/web-apps/api-');
+    expect(serverless.service.provider.shouldNotDeploy).to.equal(true);
+  });
+
   it('should still reconcile deletion protection when the deployment is skipped', async () => {
     const updateTerminationProtectionStub = sandbox.stub().resolves({});
 
