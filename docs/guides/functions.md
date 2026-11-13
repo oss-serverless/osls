@@ -2,6 +2,8 @@
 
 If you are using AWS as a provider, all _functions_ inside the service are AWS Lambda functions.
 
+Applications that run as an HTTP server instead of handling events are deployed as [AWS Lambda Web Functions](./web-functions.md), which have their own `webFunctions` property.
+
 ## Contents
 
 - [Configuration](#configuration)

@@ -642,6 +642,18 @@ describe('test/unit/lib/plugins/aws/invoke.test.js', () => {
     ).to.eventually.be.rejected.and.have.property('code', 'FUNCTION_MISSING_IN_SERVICE');
   });
 
+  it('should reject web functions', async () => {
+    await expect(
+      runServerless({
+        fixture: 'web-function',
+        command: 'invoke',
+        options: {
+          function: 'basic',
+        },
+      })
+    ).to.be.eventually.rejected.and.have.property('code', 'WEB_FUNCTION_INVOKE_UNSUPPORTED');
+  });
+
   it('should support --type option', async () => {
     const lambdaInvokeStub = sinon.stub();
     const result = await runServerless({

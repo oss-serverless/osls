@@ -932,6 +932,22 @@ describe('test/unit/lib/plugins/aws/deployFunction.test.js', () => {
     expect(updateFunctionConfigurationStub).not.to.be.called;
   });
 
+  it('should reject deploy function for web functions', async () => {
+    await expect(
+      runServerless({
+        fixture: 'web-function',
+        command: 'deploy function',
+        options: { function: 'basic' },
+        awsSdkV3StubMap,
+      })
+    ).to.be.eventually.rejected.and.have.property(
+      'code',
+      'WEB_FUNCTION_DEPLOY_FUNCTION_UNSUPPORTED'
+    );
+
+    expect(updateFunctionCodeStub).not.to.be.called;
+  });
+
   it('should recognize layers at `provider.layers`', async () => {
     await runServerless({
       fixture: 'function',

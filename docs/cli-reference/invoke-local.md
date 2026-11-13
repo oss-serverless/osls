@@ -8,6 +8,8 @@ osls invoke local --function functionName
 
 **Note:** Please refer to [this guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-input-format) for event data passing when your function uses the `http` event with a Lambda Proxy integration.
 
+**Note:** This command is not supported for [web functions](../guides/web-functions.md). A web function is a plain HTTP server: start it with Node.js instead.
+
 ## Options
 
 - `--function` or `-f`: The name of the function in your service that you want to invoke locally. **Required**.

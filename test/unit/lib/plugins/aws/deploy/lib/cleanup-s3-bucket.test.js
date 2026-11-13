@@ -213,6 +213,22 @@ describe('cleanupS3Bucket', () => {
       });
     });
 
+    it('should keep the code of web functions, which is stored outside of the deployments', async () => {
+      serverless.service.provider.deploymentBucketObject = {
+        maxPreviousDeploymentArtifacts: 0,
+      };
+      s3SendStub.resolves({
+        Contents: [
+          { Key: `${s3Key}/1000000000000-2001-09-09T01:46:40.000Z/artifact.zip` },
+          { Key: `${s3Key}/web-functions/web-${'a'.repeat(64)}.zip` },
+        ],
+      });
+
+      expect(await awsDeploy.getObjectsToRemove()).to.deep.equal([
+        { Key: `${s3Key}/1000000000000-2001-09-09T01:46:40.000Z/artifact.zip` },
+      ]);
+    });
+
     it('should not rewrite specific S3 list authentication failures', async () => {
       const listError = createSignatureMismatchListError();
       s3SendStub.rejects(listError);

@@ -83,6 +83,8 @@ package:
 
 AWS Lambda limits a function's code and layers to 250 MiB once unzipped. When a package built by osls is larger than that, `osls package` and `osls deploy` fail before anything is uploaded, and list the largest files and directories of the package. Use `patterns` to exclude files that are not needed at runtime.
 
+The limit for the package of a [web function](./web-functions.md#packaging) is 512 MiB.
+
 ### Artifact
 
 For complete control over the packaging process you can specify your own artifact zip file.
@@ -188,6 +190,23 @@ functions:
       individually: true
 ```
 
+### Packaging web functions
+
+Each [web function](./web-functions.md#packaging) is always packaged into its own zip, whatever `individually` is set to. Its `package.patterns` are merged with the service wide ones in the same way, and `package.artifact` accepts the local path of a zip to deploy instead.
+
+```yaml
+service: my-service
+functions:
+  hello:
+    handler: handler.hello
+webFunctions:
+  site:
+    entryPoint: web/server.js
+    package:
+      patterns:
+        - '!handler.js'
+```
+
 ### Development dependencies
 
 osls will auto-detect and exclude development dependencies based on the runtime your service is using.
@@ -213,3 +232,5 @@ provider:
 ```
 
 Set it to a higher value if you need to keep more rollback targets, or to `0` to retain only the current deployment.
+
+The zips of [web functions](./web-functions.md#where-the-code-is-stored) are stored outside the deployment directories and are never pruned, because Lambda keeps referring to their code in the deployment bucket. `osls remove` deletes them.

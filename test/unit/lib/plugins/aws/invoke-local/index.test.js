@@ -2387,6 +2387,16 @@ describe('test/unit/lib/plugins/aws/invokeLocal/index.test.js', () => {
     });
   };
 
+  it('should reject web functions', async () => {
+    await expect(
+      runServerless({
+        fixture: 'web-function',
+        command: 'invoke local',
+        options: { function: 'basic' },
+      })
+    ).to.eventually.be.rejected.and.have.property('code', 'WEB_FUNCTION_INVOKE_LOCAL_UNSUPPORTED');
+  });
+
   describe('Node.js', () => {
     testRuntime('callback', { shouldTestInputResolution: true, shouldAssertNodeEnv: true });
 

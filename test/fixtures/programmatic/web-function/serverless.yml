@@ -1,0 +1,12 @@
+service: service
+
+configValidationMode: error
+frameworkVersion: '*'
+
+provider:
+  name: aws
+  deploymentBucket:
+    versioning: true
+
+webFunctions:
+  basic: {}

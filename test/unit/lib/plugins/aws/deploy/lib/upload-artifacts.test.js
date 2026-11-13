@@ -15,6 +15,7 @@ const { progress } = require('../../../../../../../lib/utils/serverless-utils/lo
 const skipOnDisabledSymlinksInWindows = require('../../../../../../lib/skip-on-disabled-symlinks-in-windows');
 const { createTmpDir, ensureFileSync, getTmpDirPath } = require('../../../../../../utils/fs');
 const runServerless = require('../../../../../../utils/run-serverless');
+const { createDeployAwsStubMap } = require('../../../../../../utils/aws-stub-maps');
 
 const expect = chai.expect;
 
@@ -770,5 +771,109 @@ describe('test/unit/lib/plugins/aws/deploy/lib/upload-artifacts.test.js', () => 
     );
     expect(statePayload.Body.includes('"service":')).to.be.true;
     expect(statePayload.ContentType).to.equal('application/json');
+  });
+
+  describe('web functions', () => {
+    const rejectWith = (name, httpStatusCode) => () => {
+      throw Object.assign(new Error(name), { name, $metadata: { httpStatusCode } });
+    };
+    const runDeploy = async ({ headObject = rejectWith('NotFound', 404), ...options }) => {
+      const uploadStub = sinon.stub().resolves({});
+      const { awsNaming, awsSdkV3Stub, cfTemplate, fixtureData } = await runServerless({
+        command: 'deploy',
+        lastLifecycleHookName: 'aws:deploy:deploy:uploadArtifacts',
+        awsSdkV3StubMap: createDeployAwsStubMap({
+          S3: { getBucketVersioning: { Status: 'Enabled' }, headObject, upload: uploadStub },
+        }),
+        ...options,
+      });
+
+      return {
+        artifactS3Key:
+          cfTemplate.Resources[awsNaming.getWebFunctionRevisionLogicalId('basic')].Properties
+            .BuildConfig.CodeConfig.S3Object.Key,
+        awsSdkV3Stub,
+        fixtureData,
+        zipUploads: uploadStub.args
+          .map(([params]) => params)
+          .filter(({ Key }) => Key.endsWith('.zip')),
+      };
+    };
+    const packageService = async () => {
+      const {
+        fixtureData: { servicePath: serviceDir },
+      } = await runServerless({
+        fixture: 'web-function',
+        command: 'package',
+        options: { package: 'package-dir' },
+      });
+      return serviceDir;
+    };
+
+    it('should upload the code of a web function to the key the template points at', async () => {
+      const { artifactS3Key, awsSdkV3Stub, fixtureData, zipUploads } = await runDeploy({
+        fixture: 'web-function',
+      });
+
+      expect(artifactS3Key).to.match(/\/dev\/web-functions\/basic-[0-9a-f]{64}\.zip$/);
+      expect(awsSdkV3Stub.sends.find(({ method }) => method === 'headObject').input).to.deep.equal({
+        Bucket: 'deployment-bucket',
+        Key: artifactS3Key,
+      });
+      expect(zipUploads).to.have.lengthOf(1);
+      expect(zipUploads[0]).to.include({
+        Bucket: 'deployment-bucket',
+        Key: artifactS3Key,
+        ContentType: 'application/zip',
+      });
+      expect(zipUploads[0].Body.path).to.equal(
+        path.join(fixtureData.servicePath, '.serverless', 'basic.web.zip')
+      );
+    });
+
+    it('should not upload the code of a web function that is already uploaded', async () => {
+      const { zipUploads } = await runDeploy({ fixture: 'web-function', headObject: {} });
+
+      expect(zipUploads).to.be.empty;
+    });
+
+    it('should upload the code of a web function when checking for it is denied', async () => {
+      const { artifactS3Key, zipUploads } = await runDeploy({
+        fixture: 'web-function',
+        headObject: rejectWith('Forbidden', 403),
+      });
+
+      expect(zipUploads.map(({ Key }) => Key)).to.deep.equal([artifactS3Key]);
+    });
+
+    it('should fail when checking for the code of a web function fails for another reason', async () => {
+      await expect(
+        runDeploy({ fixture: 'web-function', headObject: rejectWith('InternalError', 500) })
+      ).to.eventually.be.rejectedWith('InternalError');
+    });
+
+    it('should upload the code of a web function of a service packaged beforehand', async () => {
+      const serviceDir = await packageService();
+
+      const { artifactS3Key, zipUploads } = await runDeploy({
+        cwd: serviceDir,
+        options: { package: 'package-dir' },
+      });
+
+      expect(zipUploads.map(({ Key }) => Key)).to.deep.equal([artifactS3Key]);
+      expect(zipUploads[0].Body.path).to.equal(path.join('package-dir', 'basic.web.zip'));
+    });
+
+    it('should reject the code of a web function that changed after it was packaged', async () => {
+      const serviceDir = await packageService();
+      await fs.promises.appendFile(
+        path.join(serviceDir, 'package-dir', 'basic.web.zip'),
+        'changed'
+      );
+
+      await expect(runDeploy({ cwd: serviceDir, options: { package: 'package-dir' } }))
+        .to.eventually.be.rejectedWith('changed after the service was packaged')
+        .and.have.property('code', 'WEB_FUNCTION_ARTIFACT_CHANGED');
+    });
   });
 });

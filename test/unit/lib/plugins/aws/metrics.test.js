@@ -37,6 +37,10 @@ function createServerlessContext(options) {
     getAllFunctionsNames() {
       return this.getAllFunctions().map((functionName) => this.getFunction(functionName).name);
     },
+    webFunctions: {},
+    getAllWebFunctions() {
+      return Object.keys(this.webFunctions);
+    },
   };
 
   return {
@@ -114,6 +118,15 @@ describe('AwsMetrics', () => {
       awsMetrics.extendedValidate();
 
       expect(validateStub.calledOnce).to.equal(true);
+    });
+
+    it('should reject web functions', () => {
+      awsMetrics.serverless.service.webFunctions = { web: {} };
+      awsMetrics.options.function = 'web';
+
+      expect(() => awsMetrics.extendedValidate())
+        .to.throw(ServerlessError)
+        .with.property('code', 'WEB_FUNCTION_METRICS_UNSUPPORTED');
     });
 
     it('should set the startTime to yesterday as the default value if not provided', () => {

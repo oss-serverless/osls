@@ -110,6 +110,19 @@ describe('AwsRollbackFunction', () => {
   });
 
   describe('command lifecycle', () => {
+    it('should reject rollback function for web functions', async () => {
+      await expect(
+        runServerless({
+          fixture: 'web-function',
+          command: 'rollback function',
+          options: { 'function': 'basic', 'function-version': '23' },
+        })
+      ).to.be.eventually.rejected.and.have.property(
+        'code',
+        'WEB_FUNCTION_ROLLBACK_FUNCTION_UNSUPPORTED'
+      );
+    });
+
     it('should reject rollback function for durable functions', async () => {
       serverless.service.functions.hello.durableConfig = { executionTimeout: 3600 };
 

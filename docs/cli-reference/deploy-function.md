@@ -12,6 +12,8 @@ stack. Use this for faster development cycles and not production deployments.
 
 **Note:** This command is not supported for functions configured with `durableConfig` locally or already deployed with durable configuration in AWS. Use `osls deploy` so osls can publish a new durable function version and retarget the generated durable alias.
 
+**Note:** This command is not supported for [web functions](../guides/web-functions.md). Use `osls deploy` so osls can create a new revision and route the endpoint to it.
+
 ## Options
 
 - `--function` or `-f` The name of the function which should be deployed. **Required**.

@@ -304,6 +304,38 @@ describe('#naming()', () => {
     });
   });
 
+  describe('#getWebFunctionArtifactName()', () => {
+    it('should suffix the web function name with ".web.zip"', () => {
+      expect(sdk.naming.getWebFunctionArtifactName('functionName')).to.equal(
+        'functionName.web.zip'
+      );
+    });
+  });
+
+  describe('#getWebFunctionRevisionLogicalId()', () => {
+    it('should normalize the web function name and add the logical suffix', () => {
+      expect(sdk.naming.getWebFunctionRevisionLogicalId('web-function')).to.equal(
+        'WebDashfunctionWebFunctionRevision'
+      );
+    });
+  });
+
+  describe('#getWebFunctionLogGroupName()', () => {
+    it('should add the web function name to the Lambda web log group name', () => {
+      expect(sdk.naming.getWebFunctionLogGroupName('functionName')).to.equal(
+        '/aws/lambda/web/functionName'
+      );
+    });
+  });
+
+  describe('#getWebFunctionLocalLogGroupName()', () => {
+    it('should suffix the log group name with ".local"', () => {
+      expect(sdk.naming.getWebFunctionLocalLogGroupName('functionName')).to.equal(
+        '/aws/lambda/web/functionName.local'
+      );
+    });
+  });
+
   describe('#getWebsocketsApiName()', () => {
     it('should return the composition of stage & service name if custom name not provided', () => {
       serverless.service.service = 'myService';

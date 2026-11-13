@@ -33,6 +33,8 @@ function createServerlessContext(options) {
       getServiceEndpointRegex: () => /^(ServiceEndpoint|HttpApiUrl)$/,
       getLambdaFunctionUrlOutputLogicalId: (functionName) =>
         `${upperFirst(functionName)}LambdaFunctionUrl`,
+      getWebFunctionUrlOutputLogicalId: (webFunctionName) =>
+        `${upperFirst(webFunctionName)}WebFunctionUrl`,
       getLambdaLayerOutputLogicalId: (layerName) =>
         `${upperFirst(layerName)}LambdaLayerQualifiedArn`,
       getCloudFrontDistributionDomainNameLogicalId: () => 'CloudFrontDistributionDomainName',
@@ -42,12 +44,19 @@ function createServerlessContext(options) {
     service: 'my-service',
     provider: {},
     functions: {},
+    webFunctions: {},
     layers: {},
     getAllFunctions() {
       return Object.keys(this.functions);
     },
     getFunction(functionName) {
       return this.functions[functionName];
+    },
+    getAllWebFunctions() {
+      return Object.keys(this.webFunctions);
+    },
+    getWebFunction(webFunctionName) {
+      return this.webFunctions[webFunctionName];
     },
     getAllLayers() {
       return Object.keys(this.layers || {});
@@ -79,6 +88,7 @@ describe('#getStackInfo()', () => {
       hello: { name: 'my-service-dev-hello' },
       world: { name: 'customized' },
     };
+    serverless.service.webFunctions = { web: { name: 'my-service-dev-web' } };
     serverless.service.layers = { test: {} };
     awsInfo = new AwsInfo(serverless, options);
 
@@ -117,6 +127,11 @@ describe('#getStackInfo()', () => {
               Description: 'second',
               OutputKey: 'ApiGatewayApiKey2Value',
               OutputValue: 'yyy',
+            },
+            {
+              Description: 'Lambda Web Function URL',
+              OutputKey: 'WebWebFunctionUrl',
+              OutputValue: 'https://abcdefgh.b7t.lambda-web.us-east-1.on.aws',
             },
             {
               Description: 'Current Lambda layer version',
@@ -160,6 +175,13 @@ describe('#getStackInfo()', () => {
             artifactSize: undefined,
           },
         ],
+        webFunctions: [
+          {
+            name: 'web',
+            deployedName: 'my-service-dev-web',
+            url: 'https://abcdefgh.b7t.lambda-web.us-east-1.on.aws',
+          },
+        ],
         layers: [
           {
             name: 'test',
@@ -189,6 +211,11 @@ describe('#getStackInfo()', () => {
           Description: 'second',
           OutputKey: 'ApiGatewayApiKey2Value',
           OutputValue: 'yyy',
+        },
+        {
+          Description: 'Lambda Web Function URL',
+          OutputKey: 'WebWebFunctionUrl',
+          OutputValue: 'https://abcdefgh.b7t.lambda-web.us-east-1.on.aws',
         },
         {
           Description: 'Current Lambda layer version',
@@ -227,6 +254,7 @@ describe('#getStackInfo()', () => {
     const expectedGatheredDataObj = {
       info: {
         functions: [],
+        webFunctions: [],
         layers: [],
         endpoints: [],
         service: 'my-service',
@@ -326,6 +354,7 @@ describe('#getStackInfo()', () => {
     const expectedGatheredDataObj = {
       info: {
         functions: [],
+        webFunctions: [],
         layers: [],
         endpoints: ['httpApi: my-endpoint'],
         service: 'my-service',

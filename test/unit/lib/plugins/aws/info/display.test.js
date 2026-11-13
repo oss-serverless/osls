@@ -47,6 +47,10 @@ describe('test/unit/lib/plugins/aws/info/display.test.js', () => {
                     OutputKey: 'WithUrlLambdaFunctionUrl',
                     OutputValue: 'https://sub.lambda.com',
                   },
+                  {
+                    OutputKey: 'WebWebFunctionUrl',
+                    OutputValue: 'https://sub.lambda-web.com',
+                  },
                 ],
               },
             ],
@@ -78,6 +82,9 @@ describe('test/unit/lib/plugins/aws/info/display.test.js', () => {
             url: true,
           },
         },
+        webFunctions: {
+          web: {},
+        },
         layers: {
           layer: {
             path: 'layer',
@@ -101,6 +108,7 @@ describe('test/unit/lib/plugins/aws/info/display.test.js', () => {
       'POST - https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/some-post',
       'GET - https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/bar/{marko}',
       'withUrl: https://sub.lambda.com',
+      'web: https://sub.lambda-web.com',
     ]);
   });
   it('should register functions section', () => {
@@ -109,6 +117,11 @@ describe('test/unit/lib/plugins/aws/info/display.test.js', () => {
       `foo: ${serviceName}-dev-foo`,
       `other: ${serviceName}-dev-other`,
       `withUrl: ${serviceName}-dev-withUrl`,
+    ]);
+  });
+  it('should register web functions section', () => {
+    expect(serverless.serviceOutputs.get('web functions')).to.deep.equal([
+      `web: ${serviceName}-dev-web`,
     ]);
   });
   it('should register layers section', () => {

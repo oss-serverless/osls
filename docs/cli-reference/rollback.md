@@ -17,6 +17,8 @@ If `timestamp` is not specified, the CLI will show your existing deployments.
 
 `osls rollback` redeploys the CloudFormation template and code artifacts from a previous deployment, returning your infrastructure and function code to that point in time. It does **not** roll back data: changes to DynamoDB tables, S3 objects, RDS databases, or any other stateful resource are not reverted.
 
+[Web functions](../guides/web-functions.md#deploying-rolling-back-and-removing) are rolled back with the rest of the service: a web function whose zip or revision settings changed since the target deployment gets a new revision from the zip of that deployment, and its endpoint keeps its URL unless the name of the web function or of its endpoint changed since then. These zips are stored outside the deployment directories and are not pruned.
+
 Rollback only works while the target deployment's artifacts still exist in the deployment bucket. osls keeps the most recent deployments and prunes older ones (the last `5` by default, configurable via `provider.deploymentBucket.maxPreviousDeploymentArtifacts`). Once a deployment's artifacts have been pruned, you can no longer roll back to it.
 
 Rollback uses the [`provider.deploymentMode`](../guides/deploying.md#deployment-mode) from the current `serverless.yml`, not the one saved with the target deployment.

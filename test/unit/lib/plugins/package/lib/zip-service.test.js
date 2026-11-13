@@ -1479,6 +1479,20 @@ describe('zipService', () => {
       expect(fs.existsSync(artifactFilePath)).to.equal(false);
     });
 
+    it('applies the unzipped size limit of web functions to their packages', async () => {
+      // Sparse file: only its size is read
+      serverless.utils.writeFileSync(path.join(tmpDirPath, 'large.bin'), '');
+      await fs.promises.truncate(path.join(tmpDirPath, 'large.bin'), 520 * 1024 * 1024);
+
+      await expect(
+        packagePlugin.zipFiles(['large.bin'], 'web.web.zip', undefined, { isWebFunction: true })
+      )
+        .to.eventually.be.rejectedWith(
+          'The "web.web.zip" package is 520.0 MiB unzipped, above the 512 MiB AWS Lambda limit for web function code.'
+        )
+        .and.have.property('code', 'PACKAGE_TOO_LARGE');
+    });
+
     it('configures metadata stat concurrency with ext/promise/limit', () => {
       let configuredLimit;
       const fakeLimit = function (limitValue, callback) {

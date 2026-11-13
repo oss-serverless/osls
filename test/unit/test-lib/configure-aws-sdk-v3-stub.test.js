@@ -680,10 +680,20 @@ describe('test/unit/test-lib/configure-aws-sdk-v3-stub.test.js', () => {
         getObject: { Body: 'body' },
         deleteObjects: { Deleted: [{ Key: 'key' }] },
         listObjectVersions: { Versions: [{ Key: 'key', VersionId: 'version' }] },
+        getBucketPolicy: { Policy: '{}' },
+        getBucketVersioning: { Status: 'Suspended' },
+        putBucketVersioning: {},
       },
     });
-    const { S3Client, GetObjectCommand, DeleteObjectsCommand, ListObjectVersionsCommand } =
-      awsSdkV3Stub.modulesCacheStub['@aws-sdk/client-s3'];
+    const {
+      S3Client,
+      GetObjectCommand,
+      DeleteObjectsCommand,
+      ListObjectVersionsCommand,
+      GetBucketPolicyCommand,
+      GetBucketVersioningCommand,
+      PutBucketVersioningCommand,
+    } = awsSdkV3Stub.modulesCacheStub['@aws-sdk/client-s3'];
     const client = new S3Client({ region: 'us-east-1' });
 
     await expect(
@@ -695,11 +705,28 @@ describe('test/unit/test-lib/configure-aws-sdk-v3-stub.test.js', () => {
     await expect(
       client.send(new ListObjectVersionsCommand({ Bucket: 'bucket' }))
     ).to.eventually.deep.equal({ Versions: [{ Key: 'key', VersionId: 'version' }] });
+    await expect(
+      client.send(new GetBucketPolicyCommand({ Bucket: 'bucket' }))
+    ).to.eventually.deep.equal({ Policy: '{}' });
+    await expect(
+      client.send(new GetBucketVersioningCommand({ Bucket: 'bucket' }))
+    ).to.eventually.deep.equal({ Status: 'Suspended' });
+    await expect(
+      client.send(
+        new PutBucketVersioningCommand({
+          Bucket: 'bucket',
+          VersioningConfiguration: { Status: 'Enabled' },
+        })
+      )
+    ).to.eventually.deep.equal({});
 
     expect(awsSdkV3Stub.sends.map((send) => send.method)).to.deep.equal([
       'getObject',
       'deleteObjects',
       'listObjectVersions',
+      'getBucketPolicy',
+      'getBucketVersioning',
+      'putBucketVersioning',
     ]);
   });
 

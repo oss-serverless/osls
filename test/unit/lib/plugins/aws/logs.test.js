@@ -20,8 +20,12 @@ function createServerlessContext(options) {
     getRegion: () => options.region,
     getAwsSdkV3Config: async () => ({ region: options.region }),
     isFunctionLogGroupInfrequentAccess: AwsProvider.prototype.isFunctionLogGroupInfrequentAccess,
+    resolveWebFunctionEndpoint: AwsProvider.prototype.resolveWebFunctionEndpoint,
     naming: {
       getLogGroupName: (lambdaName) => `/aws/lambda/${lambdaName}`,
+      getWebFunctionLogGroupName: (webFunctionName) => `/aws/lambda/web/${webFunctionName}`,
+      getWebFunctionLocalLogGroupName: (webFunctionName) =>
+        `/aws/lambda/web/${webFunctionName}.local`,
     },
   };
   const service = {
@@ -36,6 +40,13 @@ function createServerlessContext(options) {
         );
       }
       return this.functions[functionName];
+    },
+    webFunctions: {},
+    getAllWebFunctions() {
+      return Object.keys(this.webFunctions);
+    },
+    getWebFunction(webFunctionName) {
+      return this.webFunctions[webFunctionName];
     },
   };
 
@@ -139,6 +150,32 @@ describe('AwsLogs', () => {
       );
     });
 
+    it('it should read the local log group of a web function', () => {
+      serverless.service.webFunctions = { web: { name: 'new-service-dev-web' } };
+      awsLogs.options.function = 'web';
+
+      awsLogs.extendedValidate();
+
+      expect(awsLogs.options.interval).to.be.equal(1000);
+      expect(awsLogs.options.logGroupName).to.equal('/aws/lambda/web/new-service-dev-web.local');
+    });
+
+    for (const type of ['MultiRegion', 'PerRegion']) {
+      it(`it should read the centralized log group of a web function with a ${type} endpoint`, () => {
+        serverless.service.webFunctions = {
+          web: {
+            name: 'new-service-dev-web',
+            endpoint: { type, regions: ['us-west-2'] },
+          },
+        };
+        awsLogs.options.function = 'web';
+
+        awsLogs.extendedValidate();
+
+        expect(awsLogs.options.logGroupName).to.equal('/aws/lambda/web/new-service-dev-web');
+      });
+    }
+
     it('it should throw error if the function logs to an Infrequent Access log group', () => {
       serverless.service.functions.first.logs = { logGroupClass: 'infrequent_access' };
 
@@ -198,6 +235,16 @@ describe('AwsLogs', () => {
         'name',
         'ServerlessError'
       );
+    });
+
+    it('should tell that a web function has not logged anything yet', async () => {
+      awsLogs.serverless.service.webFunctions = { web: { name: 'new-service-dev-web' } };
+      awsLogs.options.function = 'web';
+      sinon.stub(CloudWatchLogsClient.prototype, 'send').resolves({ logStreams: [] });
+
+      await expect(awsLogs.getLogStreams())
+        .to.eventually.be.rejectedWith('Web function "web" has not logged anything yet')
+        .and.have.property('code', 'NO_EXISTING_LOG_STREAMS');
     });
   });
 

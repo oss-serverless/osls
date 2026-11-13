@@ -20,6 +20,8 @@ osls info
 On AWS the info plugin uses the `Outputs` section of the CloudFormation stack and the AWS SDK to gather the necessary information.
 See the example below for an example output.
 
+The URLs of [function URLs](../guides/functions.md#lambda-function-urls) and of [web functions](../guides/web-functions.md#endpoint) are listed under `endpoints`, each after the key of its function or web function. A URL that is the only endpoint of the service is shown on its own. The deployed names of web functions are listed under `web functions`.
+
 **Example:**
 
 ```bash
