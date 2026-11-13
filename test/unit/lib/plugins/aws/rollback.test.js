@@ -440,6 +440,45 @@ describe('AwsRollback', () => {
       );
     });
 
+    it('should reject rollback to a deployment with web functions in express mode with rollback disabled', async () => {
+      Object.assign(serverless.service.provider, {
+        deploymentMode: 'express',
+        disableRollback: true,
+      });
+      stubSelectedDeploymentList();
+      s3SendStub.onSecondCall().resolves({
+        Body: readableState({
+          service: {
+            initialServerlessConfig: { webFunctions: { api: {} } },
+            webFunctions: { $ref: '$["service"]["initialServerlessConfig"]["webFunctions"]' },
+          },
+        }),
+      });
+
+      await expect(awsRollback.setStackToUpdate()).to.be.eventually.rejected.and.have.property(
+        'code',
+        'WEB_FUNCTIONS_EXPRESS_MODE_WITHOUT_ROLLBACK_UNSUPPORTED'
+      );
+    });
+
+    it('should continue in express mode with rollback disabled when the selected deployment has an empty `webFunctions`', async () => {
+      Object.assign(serverless.service.provider, {
+        deploymentMode: 'express',
+        disableRollback: true,
+      });
+      stubSelectedDeploymentList();
+      s3SendStub.onSecondCall().resolves({
+        Body: readableState({
+          service: {
+            initialServerlessConfig: { webFunctions: {} },
+            webFunctions: { $ref: '$["service"]["initialServerlessConfig"]["webFunctions"]' },
+          },
+        }),
+      });
+
+      await expect(awsRollback.setStackToUpdate()).to.eventually.be.fulfilled;
+    });
+
     it('should reject malformed deployment state JSON', async () => {
       stubSelectedDeploymentList();
       s3SendStub.onSecondCall().resolves({

@@ -327,6 +327,155 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
     });
   });
 
+  describe('web functions', () => {
+    const configExt = { provider: { deploymentBucket: { versioning: true } } };
+    let serviceDir;
+    let webZippedFiles;
+
+    before(async () => {
+      ({
+        fixtureData: { servicePath: serviceDir },
+      } = await runServerless({
+        fixture: 'packaging',
+        command: 'package',
+        awsSdkV3StubMap,
+        configExt: {
+          ...configExt,
+          package: { patterns: ['!dir1/**', 'dir1/subdir3/**'] },
+          webFunctions: {
+            web: { package: { patterns: ['dir1/subdir4/**', '!dir3/**'] } },
+            webEntryPoint: { entryPoint: 'dir2/index.js' },
+            webArtifact: { package: { artifact: 'artifact-function.zip' } },
+          },
+        },
+      }));
+
+      webZippedFiles = await listZipFiles(path.join(serviceDir, '.serverless', 'web.web.zip'));
+    });
+
+    it('should package every web function on its own', async () => {
+      expect(webZippedFiles).to.include('index.js');
+      expect(
+        await listZipFiles(path.join(serviceDir, '.serverless', 'webEntryPoint.web.zip'))
+      ).to.include('dir2/index.js');
+    });
+
+    it('should support `package.patterns`', () => {
+      expect(webZippedFiles).to.not.include('dir1/subdir1/index.js');
+      expect(webZippedFiles).to.include('dir1/subdir3/index.js');
+    });
+
+    it('should support `webFunctions[].package.patterns`', () => {
+      expect(webZippedFiles).to.include('dir1/subdir4/index.js');
+      expect(webZippedFiles).to.not.include('dir3/index.js');
+    });
+
+    it('should exclude layers', () => {
+      expect(webZippedFiles).to.not.include('layer/layer-module-1.js');
+    });
+
+    it('should create the same package again from unchanged files', async () => {
+      const artifactPath = path.join(serviceDir, '.serverless', 'web.web.zip');
+      const artifact = await fsp.readFile(artifactPath);
+      const now = new Date();
+      await fsp.utimes(path.join(serviceDir, 'index.js'), now, now);
+
+      await runServerless({ cwd: serviceDir, command: 'package', awsSdkV3StubMap });
+
+      expect((await fsp.readFile(artifactPath)).equals(artifact)).to.equal(true);
+    });
+
+    it('should support `webFunctions[].package.artifact`', async () => {
+      expect(
+        await fsp.readFile(path.join(serviceDir, '.serverless', 'webArtifact.web.zip'))
+      ).to.deep.equal(await fsp.readFile(path.join(serviceDir, 'artifact-function.zip')));
+    });
+
+    for (const [description, webFunction, entryPoint] of [
+      ['`index.js`', { package: { patterns: ['!index.js'] } }, 'index.js'],
+      ['the `entryPoint`', { entryPoint: 'dir2/server.js' }, 'dir2/server.js'],
+    ]) {
+      it(`should reject a package without ${description}`, async () => {
+        await expect(
+          runServerless({
+            fixture: 'packaging',
+            command: 'package',
+            awsSdkV3StubMap,
+            configExt: { ...configExt, webFunctions: { web: webFunction } },
+          })
+        )
+          .to.eventually.be.rejectedWith(`Web function "web" has no "${entryPoint}" file`)
+          .and.have.property('code', 'WEB_FUNCTION_ENTRY_POINT_NOT_FOUND');
+      });
+    }
+
+    it('should reject a `webFunctions[].package.artifact` hosted on S3', async () => {
+      await expect(
+        runServerless({
+          fixture: 'packaging',
+          command: 'package',
+          awsSdkV3StubMap,
+          configExt: {
+            ...configExt,
+            webFunctions: { web: { package: { artifact: 's3://some-bucket/web.zip' } } },
+          },
+        })
+      )
+        .to.eventually.be.rejectedWith('has to be a local file')
+        .and.have.property('code', 'INVALID_PACKAGE_ARTIFACT_PATH');
+    });
+
+    it('should reject a `webFunctions[].package.artifact` that is not a zip file', async () => {
+      await expect(
+        runServerless({
+          fixture: 'packaging',
+          command: 'package',
+          awsSdkV3StubMap,
+          configExt: {
+            ...configExt,
+            webFunctions: { web: { package: { artifact: 'index.js' } } },
+          },
+        })
+      )
+        .to.eventually.be.rejectedWith('it is not a zip file')
+        .and.have.property('code', 'INVALID_PACKAGE_ARTIFACT');
+    });
+
+    it('should reject a `webFunctions[].package.artifact` without the `entryPoint`', async () => {
+      await expect(
+        runServerless({
+          fixture: 'packaging',
+          command: 'package',
+          awsSdkV3StubMap,
+          configExt: {
+            ...configExt,
+            webFunctions: {
+              web: { entryPoint: 'dir2/index.js', package: { artifact: 'artifact-function.zip' } },
+            },
+          },
+        })
+      )
+        .to.eventually.be.rejectedWith(
+          'Web function "web" has no "dir2/index.js" file in its package artifact "artifact-function.zip"'
+        )
+        .and.have.property('code', 'WEB_FUNCTION_ENTRY_POINT_NOT_FOUND');
+    });
+
+    it('should reject a `webFunctions[].package.artifact` that does not exist', async () => {
+      await expect(
+        runServerless({
+          fixture: 'packaging',
+          command: 'package',
+          awsSdkV3StubMap,
+          configExt: {
+            ...configExt,
+            webFunctions: { web: { package: { artifact: 'missing.zip' } } },
+          },
+        })
+      ).to.eventually.be.rejected.and.have.property('code', 'INVALID_PACKAGE_ARTIFACT_PATH');
+    });
+  });
+
   describe('pre-prepared artifact', () => {
     let serverless;
     before(async () => {

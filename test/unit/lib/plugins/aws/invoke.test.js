@@ -339,6 +339,18 @@ describe('test/unit/lib/plugins/aws/invoke.test.js', () => {
     ).to.be.eventually.rejected.and.have.property('code', 'DURABLE_INVOKE_REQUIRES_QUALIFIER');
   });
 
+  it('should reject web functions', async () => {
+    await expect(
+      runServerless({
+        fixture: 'web-function',
+        command: 'invoke',
+        options: {
+          function: 'basic',
+        },
+      })
+    ).to.be.eventually.rejected.and.have.property('code', 'WEB_FUNCTION_INVOKE_UNSUPPORTED');
+  });
+
   it('should invoke configured durable functions with explicit qualifier', async () => {
     const lambdaInvokeStub = sinon.stub();
     const result = await runServerless({

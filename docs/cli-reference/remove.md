@@ -6,6 +6,8 @@ If the stack has deletion protection enabled (see [`provider.deletionProtection`
 
 With [`provider.deploymentMode: express`](../guides/deploying.md#deployment-mode), the stack is deleted in CloudFormation express mode and the command returns while resources may still be deleting.
 
+Removing the service also removes its [web functions](../guides/web-functions.md#deploying-rolling-back-and-removing) and the zips osls uploaded for them. Some of their log groups can remain and have to be deleted by hand: the ones Lambda creates again while the stack is being deleted, and the `.local` log groups in the other regions of a multi-Region endpoint.
+
 ```bash
 osls remove
 ```

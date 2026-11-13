@@ -349,6 +349,24 @@ describe('test/unit/lib/aws/aws-sdk-v3-error.test.js', () => {
     expect(
       awsSdkV3Error.isS3HeadObjectForbiddenError({ $metadata: { httpStatusCode: 403 } })
     ).to.equal(true);
+    expect(awsSdkV3Error.isS3HeadObjectNotFoundError({ name: 'NotFound' })).to.equal(true);
+    expect(
+      awsSdkV3Error.isS3HeadObjectNotFoundError({ $metadata: { httpStatusCode: 404 } })
+    ).to.equal(true);
+    expect(awsSdkV3Error.isS3HeadObjectNotFoundError({ name: 'Forbidden' })).to.equal(false);
+    expect(awsSdkV3Error.isS3BucketAccessDeniedError({ name: 'AccessDenied' })).to.equal(true);
+    expect(
+      awsSdkV3Error.isS3BucketAccessDeniedError({ $metadata: { httpStatusCode: 403 } })
+    ).to.equal(true);
+    expect(awsSdkV3Error.isS3BucketAccessDeniedError({ name: 'NoSuchBucketPolicy' })).to.equal(
+      false
+    );
+    expect(awsSdkV3Error.isS3GetBucketPolicyNotFoundError({ name: 'NoSuchBucketPolicy' })).to.equal(
+      true
+    );
+    expect(awsSdkV3Error.isS3GetBucketPolicyNotFoundError({ name: 'AccessDenied' })).to.equal(
+      false
+    );
     expect(awsSdkV3Error.isS3HeadBucketNotFoundError({ name: 'NotFound' })).to.equal(true);
     expect(awsSdkV3Error.isS3HeadBucketNotFoundError({ name: 'NoSuchBucket' })).to.equal(true);
     expect(

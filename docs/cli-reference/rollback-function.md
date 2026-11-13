@@ -11,6 +11,8 @@ osls rollback function --function <name> \
 
 **Note:** This command is not supported for functions configured with `durableConfig` locally or already deployed with durable configuration in AWS. Use `osls deploy` to publish and retarget durable function versions.
 
+**Note:** This command is not supported for [web functions](../guides/web-functions.md). Use [`osls rollback`](./rollback.md), which creates a new revision from the code of an earlier deployment.
+
 ## Options
 
 - `--function` or `-f` The name of the function which should be rolled back. **Required**.

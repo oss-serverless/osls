@@ -70,6 +70,23 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
       const IamRoleLambdaExecution = awsNaming.getRoleLogicalId();
       expect(cfTemplate.Resources).to.not.have.property(IamRoleLambdaExecution);
     });
+
+    it('should not create role resource with all web functions having `webFunctions[].role`', async () => {
+      const { cfTemplate, awsNaming } = await runServerless({
+        fixture: 'web-function',
+        command: 'package',
+        configExt: {
+          webFunctions: {
+            basic: {
+              role: 'arn:aws:iam::123456789012:role/web',
+            },
+          },
+        },
+      });
+
+      const IamRoleLambdaExecution = awsNaming.getRoleLogicalId();
+      expect(cfTemplate.Resources).to.not.have.property(IamRoleLambdaExecution);
+    });
   });
 
   describe('Default role', () => {
@@ -977,6 +994,231 @@ describe('lib/plugins/aws/package/lib/mergeIamTemplates.test.js', () => {
             return JSON.stringify(Action).includes('CheckpointDurableExecution');
           })
         ).to.equal(false);
+      });
+    });
+
+    describe('Web function properties', () => {
+      let naming;
+      let cfResources;
+      let service;
+      const arnLogPrefix = 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}';
+
+      before(async () => {
+        const { cfTemplate, awsNaming, fixtureData } = await runServerless({
+          fixture: 'web-function',
+          command: 'package',
+          configExt: {
+            provider: {
+              logRetentionInDays: 14,
+              logDataProtectionPolicy: {
+                Name: 'provider-data-protection-policy',
+                Version: '2021-06-01',
+                Statement: [],
+              },
+            },
+            functions: {
+              myFunction: {
+                handler: 'index.handler',
+              },
+            },
+            webFunctions: {
+              webCustomName: {
+                name: 'myCustomWebName',
+              },
+              webLogs: {
+                logRetentionInDays: 5,
+                logDataProtectionPolicy: {
+                  Name: 'data-protection-policy',
+                  Version: '2021-06-01',
+                  Statement: [],
+                },
+              },
+            },
+          },
+        });
+        cfResources = cfTemplate.Resources;
+        naming = awsNaming;
+        service = fixtureData.serviceConfig.service;
+      });
+
+      it('should add logGroup access policies for functions and web functions', () => {
+        const { Statement } =
+          cfResources[naming.getRoleLogicalId()].Properties.Policies[0].PolicyDocument;
+        const allRegionsArnLogPrefix = 'arn:${AWS::Partition}:logs:*:${AWS::AccountId}';
+
+        expect(Statement[0].Action).to.be.deep.equal([
+          'logs:CreateLogStream',
+          'logs:CreateLogGroup',
+          'logs:TagResource',
+        ]);
+        expect(Statement[0].Resource).to.deep.equal([
+          { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/${service}-dev*` },
+          { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/${service}-dev*:*` },
+          { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/myCustomWebName` },
+          { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/myCustomWebName:*` },
+          {
+            'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/myCustomWebName.local`,
+          },
+          {
+            'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/myCustomWebName.local:*`,
+          },
+          { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${service}-dev*` },
+          { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${service}-dev*:*` },
+          {
+            'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${service}-dev*.local`,
+          },
+          {
+            'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${service}-dev*.local:*`,
+          },
+        ]);
+
+        expect(Statement[1].Action).to.be.deep.equal(['logs:PutLogEvents']);
+        expect(Statement[1].Resource).to.deep.equal([
+          { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/${service}-dev*:*:*` },
+          { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/myCustomWebName:*:*` },
+          {
+            'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/myCustomWebName.local:*:*`,
+          },
+          { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${service}-dev*:*:*` },
+          {
+            'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${service}-dev*.local:*:*`,
+          },
+        ]);
+      });
+
+      describe('without functions', () => {
+        let roleProperties;
+        let webService;
+
+        before(async () => {
+          const { cfTemplate, awsNaming, fixtureData } = await runServerless({
+            fixture: 'web-function',
+            command: 'package',
+            configExt: {
+              provider: {
+                vpc: { securityGroupIds: ['sg-0a0a0a0a'], subnetIds: ['subnet-01010101'] },
+              },
+              webFunctions: {
+                basic: {
+                  kmsKeyArn:
+                    'arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab',
+                },
+              },
+            },
+          });
+          roleProperties = cfTemplate.Resources[awsNaming.getRoleLogicalId()].Properties;
+          webService = fixtureData.serviceConfig.service;
+        });
+
+        it('should add logGroup access policies for the web functions only', () => {
+          const { Statement } = roleProperties.Policies[0].PolicyDocument;
+          const allRegionsArnLogPrefix = 'arn:${AWS::Partition}:logs:*:${AWS::AccountId}';
+
+          expect(Statement[0].Resource).to.deep.equal([
+            { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*` },
+            { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*:*` },
+            {
+              'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*.local`,
+            },
+            {
+              'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*.local:*`,
+            },
+          ]);
+          expect(Statement[1].Resource).to.deep.equal([
+            { 'Fn::Sub': `${arnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*:*:*` },
+            {
+              'Fn::Sub': `${allRegionsArnLogPrefix}:log-group:/aws/lambda/web/${webService}-dev*.local:*:*`,
+            },
+          ]);
+        });
+
+        it('should not add a statement for `webFunctions[].kmsKeyArn`, which Lambda uses through the key policy', () => {
+          expect(
+            JSON.stringify(roleProperties.Policies[0].PolicyDocument.Statement)
+          ).to.not.include('kms:');
+        });
+
+        it('should not attach the VPC policy for `provider.vpc`, which does not apply to web functions', () => {
+          expect(roleProperties).to.not.have.property('ManagedPolicyArns');
+        });
+      });
+
+      it('should configure LogGroup resources with `provider.iam.role`', async () => {
+        const { cfTemplate, awsNaming } = await runServerless({
+          fixture: 'web-function',
+          command: 'package',
+          configExt: {
+            provider: { iam: { role: 'arn:aws:iam::123456789012:role/web' } },
+          },
+        });
+
+        expect(cfTemplate.Resources).to.not.have.property(awsNaming.getRoleLogicalId());
+        expect(cfTemplate.Resources).to.have.property(
+          awsNaming.getWebFunctionLogGroupLogicalId('basic')
+        );
+        expect(cfTemplate.Resources).to.have.property(
+          awsNaming.getWebFunctionLocalLogGroupLogicalId('basic')
+        );
+      });
+
+      it('should configure LogGroup resources for web functions', () => {
+        expect(cfResources[naming.getWebFunctionLogGroupLogicalId('basic')]).to.deep.equal({
+          Type: 'AWS::Logs::LogGroup',
+          Properties: {
+            LogGroupName: `/aws/lambda/web/${service}-dev-basic`,
+            RetentionInDays: 14,
+            DataProtectionPolicy: {
+              Name: 'provider-data-protection-policy',
+              Version: '2021-06-01',
+              Statement: [],
+            },
+          },
+        });
+        expect(cfResources[naming.getWebFunctionLocalLogGroupLogicalId('basic')]).to.deep.equal({
+          Type: 'AWS::Logs::LogGroup',
+          Properties: {
+            LogGroupName: `/aws/lambda/web/${service}-dev-basic.local`,
+            RetentionInDays: 14,
+            DataProtectionPolicy: {
+              Name: 'provider-data-protection-policy',
+              Version: '2021-06-01',
+              Statement: [],
+            },
+          },
+        });
+        expect(
+          cfResources[naming.getWebFunctionLogGroupLogicalId('webCustomName')].Properties
+            .LogGroupName
+        ).to.equal('/aws/lambda/web/myCustomWebName');
+      });
+
+      it('should support `webFunctions[].logRetentionInDays` and `webFunctions[].logDataProtectionPolicy`', () => {
+        for (const logGroupLogicalId of [
+          naming.getWebFunctionLogGroupLogicalId('webLogs'),
+          naming.getWebFunctionLocalLogGroupLogicalId('webLogs'),
+        ]) {
+          const { Properties } = cfResources[logGroupLogicalId];
+
+          expect(Properties.RetentionInDays).to.equal(5);
+          expect(Properties.DataProtectionPolicy.Name).to.equal('data-protection-policy');
+        }
+      });
+
+      it('should create role resource if a web function has no `webFunctions[].role`', async () => {
+        const { cfTemplate, awsNaming } = await runServerless({
+          fixture: 'web-function',
+          command: 'package',
+          configExt: {
+            functions: {
+              withRole: {
+                handler: 'index.handler',
+                role: 'arn:aws:iam::123456789012:role/function',
+              },
+            },
+          },
+        });
+
+        expect(cfTemplate.Resources).to.have.property(awsNaming.getRoleLogicalId());
       });
     });
   });

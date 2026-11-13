@@ -10,6 +10,7 @@ This page lists the `serverless.yml` properties available when the provider is s
 - [Functions](#functions)
 - [Lambda events](#lambda-events)
 - [Function layers](#function-layers)
+- [Web functions](#web-functions)
 - [AWS Resources](#aws-resources)
 
 ## Root properties
@@ -180,6 +181,7 @@ provider:
     # Skip the creation of a default bucket policy when the deployment bucket is created (default: false)
     skipPolicySetup: true
     # Enable bucket versioning (default: false)
+    # Required when osls creates the bucket and the service has web functions
     versioning: true
     # Server-side encryption method
     serverSideEncryption: AES256
@@ -1452,6 +1454,76 @@ layers:
       - '*'
     # optional, false by default. If true, layer versions are not deleted as new ones are created
     retain: false
+```
+
+## Web functions
+
+Deploy [Lambda web functions](./web-functions.md), HTTP servers with their own HTTPS endpoint:
+
+```yaml
+# serverless.yml
+
+webFunctions:
+  # A Lambda web function
+  api:
+    # optional, the file that starts the HTTP server (default: index.js)
+    entryPoint: src/server.js
+    # optional, Deployed Lambda web function name (default: <service>-<stage>-<key>)
+    name: ${sls:stage}-webFunctionName
+    # optional, Description to publish to AWS
+    description: Description of what the web function does
+    # optional, the only runtime Lambda supports for web functions today (default: nodejs24.x)
+    runtime: nodejs24.x
+    # optional, request timeout in seconds, between 3 and 900 (default: 30, set by Lambda)
+    timeout: 30
+    # optional, concurrent requests per execution environment, between 1 and 128 (default: 64, set by Lambda)
+    maxConcurrencyPerEnvironment: 64
+    # optional, environment variables, merged over provider.environment
+    environment:
+      APP_ENV_VARIABLE: FOOBAR
+    # optional, IAM role, in any form a function role accepts (default: the role of the service)
+    role: arn:aws:iam::XXXXXX:role/role
+    # optional, KMS key ARN to encrypt the code and the environment variables with (default: a key owned by AWS)
+    kmsKeyArn: arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab
+    # optional, tags, merged over provider.tags
+    tags:
+      foo: bar
+    # optional, log levels (default: INFO for both, set by Lambda)
+    logs:
+      # TRACE, DEBUG, INFO, WARN, ERROR or FATAL
+      applicationLogLevel: INFO
+      # DEBUG, INFO or WARN
+      systemLogLevel: INFO
+    # optional, retention of both log groups (default: provider.logRetentionInDays)
+    logRetentionInDays: 14
+    # optional, data protection policy of both log groups (default: provider.logDataProtectionPolicy)
+    logDataProtectionPolicy:
+      Name: data-protection-policy
+      Version: '2021-06-01'
+      Statement: []
+    # optional, packaging configuration
+    package:
+      # Applied after the service-wide package.patterns
+      patterns:
+        - '!test/**'
+      # A zip built by yourself, deployed as it is. 'patterns' are ignored when it is set
+      artifact: path/to/my-artifact.zip
+    # optional, configuration of the HTTPS endpoint
+    endpoint:
+      # optional, 'aws_iam' to accept only requests signed with AWS credentials (default: public endpoint)
+      authorizer: aws_iam
+      # optional, maximum number of execution environments, between 2 and 10000 (default: no limit)
+      maxEnvironments: 50
+      # optional, maximum requests per second, one of the values Lambda supports in the region (default: no limit)
+      rateLimit: 2000
+      # optional, name of the endpoint. Changing it replaces the endpoint and its URL (default: main)
+      name: main
+      # optional, 'HomeRegion', 'MultiRegion' or 'PerRegion' (default: HomeRegion)
+      type: MultiRegion
+      # required with 'MultiRegion' and 'PerRegion', the regions to serve besides the region of the service
+      regions:
+        - us-east-2
+        - us-west-2
 ```
 
 ## AWS Resources

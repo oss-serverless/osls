@@ -1363,6 +1363,67 @@ describe('test/unit/lib/plugins/aws/deploy/lib/checkForChanges.test.js', () => {
     expect(sentMethods).to.include('getFunction');
   });
 
+  describe('web functions', () => {
+    const deployedArtifactS3Key = `serverless/${checkForChangesServiceName}/dev/web-functions/web-${'a'.repeat(64)}.zip`;
+    const runWebFunctionCheckForChanges = (getDeployedTemplate) =>
+      runCheckForChanges({
+        configExt: {
+          provider: { deploymentBucket: { versioning: true } },
+          webFunctions: { web: { entryPoint: 'fn.js' } },
+        },
+        awsSdkV3StubMapOverrides: (getServerless) => ({
+          S3: {
+            getBucketVersioning: { Status: 'Enabled' },
+            // The code of a web function is stored outside of the deployment directory
+            listObjectsV2: async () =>
+              generateMatchingListObjectsResponse(getServerless(), {
+                artifactNames: (await getDeploymentObjectBasenames(getServerless())).filter(
+                  (artifactName) => artifactName !== 'web.web.zip'
+                ),
+                extraContents: [{ Key: deployedArtifactS3Key, LastModified: new Date() }],
+              }),
+            headObject: (input) => {
+              if (path.basename(input.Key) !== 'compiled-cloudformation-template.json') {
+                return generateMatchingHeadObjectResponse(getServerless(), input);
+              }
+              const deployedTemplate = getDeployedTemplate(
+                structuredClone(getServerless().service.provider.compiledCloudFormationTemplate)
+              );
+              return {
+                LastModified: remoteArtifactLastModified,
+                Metadata: {
+                  filesha256: crypto
+                    .createHash('sha256')
+                    .update(
+                      JSON.stringify(
+                        normalizeFiles.normalizeCloudFormationTemplate(deployedTemplate)
+                      )
+                    )
+                    .digest('base64'),
+                },
+              };
+            },
+          },
+        }),
+      });
+
+    it('should not deploy if nothing changed in a service with functions and a web function', async () => {
+      const { serverless } = await runWebFunctionCheckForChanges((template) => template);
+
+      expect(serverless.service.provider.shouldNotDeploy).to.equal(true);
+    });
+
+    it('should deploy if only the code of a web function changed', async () => {
+      const { serverless } = await runWebFunctionCheckForChanges((template) => {
+        template.Resources.WebWebFunctionRevision.Properties.BuildConfig.CodeConfig.S3Object.Key =
+          deployedArtifactS3Key;
+        return template;
+      });
+
+      expect(serverless.service.provider.shouldNotDeploy).to.equal(false);
+    });
+  });
+
   it('should still reconcile deletion protection when the deployment is skipped', async () => {
     const updateTerminationProtectionStub = sandbox.stub().resolves({});
 

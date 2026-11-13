@@ -66,6 +66,7 @@ Keep in mind:
 - CloudFormation does not accept `OnFailure` in express mode, so osls cannot ask it to delete a stack whose creation failed, which it otherwise does with `deploymentMethod: direct`. This matters when a deployment creates the stack: the first deployment of a service creates the stack with the deployment bucket, and with a custom `provider.deploymentBucket` it creates the whole stack at once. A failed creation leaves the stack in `ROLLBACK_COMPLETE`; run `osls remove` before deploying again, as is already the case for change set deployments.
 - With `disableRollback: true`, a failed express deployment leaves the stack in `CREATE_FAILED` or `UPDATE_FAILED`. Until an update succeeds, CloudFormation rejects every update that does not also use express mode with rollback disabled, and `RollbackStack` (`aws cloudformation rollback-stack`) is rejected too. Keep both settings, fix the problem and deploy again, with either deployment method. If `osls deploy` reports that there are no changes, deploy with `--force`.
 - While rollback is disabled, CloudFormation rejects updates that replace a resource, for example changing a function's `name` (which also replaces its log group) or a DynamoDB table's or SQS queue's name. The deployment fails and leaves the stack in `UPDATE_FAILED`, and CloudFormation records the attempted properties, so reverting the change is treated as a replacement as well: a resource that keeps its physical name is deleted before it is created again, which discards a log group and its logs, and the creation can fail once more with `AlreadyExists` until the deletion has propagated. Deploy the reverted configuration with `deploymentMethod: direct` and `disableRollback: true` still set (`osls rollback --timestamp` uses the same path, while a change set built from the reverted configuration alone reports nothing to deploy), or remove and redeploy the service. Re-enable rollback before deploying the replacement.
+- A service with [web functions](./web-functions.md#deploying-rolling-back-and-removing) cannot use express mode together with `disableRollback: true`, because every change to a web function replaces its revision. `osls package`, `osls deploy` and `osls rollback` stop with an error.
 - `provider.rollbackConfiguration` still applies, and the operation only completes after its monitoring period.
 - Switching between express and the default mode is a per-deployment choice: after a successful operation, the next one can use either mode.
 - `osls deploy --package` uses the value saved by `osls package`; re-run `osls package` after changing it. `osls rollback` and `osls remove` use the current `serverless.yml`.
@@ -144,9 +145,9 @@ Keep in mind:
 - You can make uploading to S3 faster by adding `--aws-s3-accelerate`
 
 - You can disable creation of default S3 bucket policy by setting `skipPolicySetup` under `deploymentBucket` config. It only applies to deployment bucket that is automatically created
-  by osls.
+  by osls. It cannot be used when the service has web functions.
 
-- You can enable versioning for the deployment bucket by setting `versioning` under `deploymentBucket` config to `true`.
+- You can enable versioning for the deployment bucket by setting `versioning` under `deploymentBucket` config to `true`. This is required when osls creates the bucket and the service has [web functions](./web-functions.md#deployment-bucket), because Lambda reads their code from the deployment bucket for as long as they are deployed.
 
 Check out the [deploy command docs](../cli-reference/deploy.md) for all details and options.
 
@@ -171,6 +172,7 @@ osls deploy function --function myFunction
 
 - **Note:** You can always enforce a deployment using the `--force` option.
 - **Note:** You can use `--update-config` to change only Lambda configuration without deploying code.
+- **Note:** [Web functions](./web-functions.md) cannot be deployed this way, use `osls deploy`.
 
 ### How It Works
 

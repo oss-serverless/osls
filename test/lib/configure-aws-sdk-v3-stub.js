@@ -110,6 +110,9 @@ const serviceDefinitions = {
       deleteObjects: 'DeleteObjectsCommand',
       headObject: 'HeadObjectCommand',
       headBucket: 'HeadBucketCommand',
+      getBucketPolicy: 'GetBucketPolicyCommand',
+      getBucketVersioning: 'GetBucketVersioningCommand',
+      putBucketVersioning: 'PutBucketVersioningCommand',
     },
     paginators: {
       listObjectsV2: {

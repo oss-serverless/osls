@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const chai = require('chai');
 const sinon = require('sinon');
 const extendedValidate = require('../../../../../../../lib/plugins/aws/deploy/lib/extended-validate');
@@ -49,6 +50,9 @@ describe('extendedValidate', () => {
       getFunction(functionName) {
         return this.functions[functionName];
       },
+      getAllWebFunctions() {
+        return Object.keys(this.webFunctions || {});
+      },
     };
 
     return {
@@ -59,6 +63,7 @@ describe('extendedValidate', () => {
           getServiceStateFileName: () => 'service-state.json',
           getServiceArtifactName: () => 'service.zip',
           getFunctionArtifactName: (functionName) => `${functionName}.zip`,
+          getWebFunctionArtifactName: (webFunctionName) => `${webFunctionName}.web.zip`,
         },
       },
       serverless: {
@@ -171,6 +176,18 @@ describe('extendedValidate', () => {
       readFileSyncStub.returns(stateFileMock);
       awsDeploy.serverless.service.package.artifact = 'some/file.zip';
       await awsDeploy.extendedValidate();
+    });
+
+    it('should throw error if web function package does not exist', async () => {
+      stateFileMock.service.functions = {};
+      stateFileMock.service.webFunctions = { web: {} };
+      fileExistsSyncStub.returns(true);
+      fileExistsSyncStub.withArgs(path.join('package-path', 'web.web.zip')).returns(false);
+      readFileSyncStub.returns(stateFileMock);
+
+      await expect(awsDeploy.extendedValidate())
+        .to.eventually.be.rejectedWith('No web.web.zip file found')
+        .and.have.property('code', 'MISSING_ARTIFACT_FILE');
     });
 
     it('restores persisted service state without mutating the service prototype', async () => {

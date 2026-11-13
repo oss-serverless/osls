@@ -219,6 +219,44 @@ describe('Service', () => {
       );
     });
 
+    it('should make sure web function name contains the default stage', async () => {
+      const { serverless } = await runServerless({
+        fixture: 'web-function',
+        command: 'print',
+        configExt: { webFunctions: { named: { name: 'custom-name' }, withoutValue: null } },
+      });
+
+      expect(serverless.service.getAllWebFunctions()).to.deep.equal([
+        'basic',
+        'named',
+        'withoutValue',
+      ]);
+      expect(serverless.service.getWebFunction('withoutValue').name).to.equal(
+        `${serverless.service.service}-dev-withoutValue`
+      );
+      expect(serverless.service.getWebFunction('basic').name).to.equal(
+        `${serverless.service.service}-dev-basic`
+      );
+      expect(serverless.service.getWebFunction('named').name).to.equal('custom-name');
+    });
+
+    it('should throw when receives web function with non-object configuration', async () => {
+      await expect(
+        runServerless({
+          fixture: 'web-function',
+          command: 'print',
+          configExt: {
+            webFunctions: {
+              bar: true,
+            },
+          },
+        })
+      ).to.be.eventually.rejected.and.have.property(
+        'code',
+        'NON_OBJECT_WEB_FUNCTION_CONFIGURATION_ERROR'
+      );
+    });
+
     it('should reject invalid short stage alias', async () => {
       const service = new Service({}, null);
 
@@ -246,23 +284,29 @@ describe('Service', () => {
     });
   });
 
-  describe('#getFunction() / #getLayer()', () => {
+  describe('#getFunction() / #getWebFunction() / #getLayer()', () => {
     it('ignores inherited names unless explicitly defined as own properties', () => {
       const service = new Service({}, null);
       service.functions = {};
+      service.webFunctions = {};
       service.layers = {};
 
       expect(() => service.getFunction('constructor'))
         .to.throw()
         .and.have.property('code', 'FUNCTION_MISSING_IN_SERVICE');
+      expect(() => service.getWebFunction('constructor'))
+        .to.throw()
+        .and.have.property('code', 'WEB_FUNCTION_MISSING_IN_SERVICE');
       expect(() => service.getLayer('constructor'))
         .to.throw()
         .and.have.property('code', 'LAYER_MISSING_IN_SERVICE');
 
       service.functions.constructor = { handler: 'handler.run' };
+      service.webFunctions.constructor = { entryPoint: 'server.js' };
       service.layers.constructor = { path: 'layer' };
 
       expect(service.getFunction('constructor')).to.equal(service.functions.constructor);
+      expect(service.getWebFunction('constructor')).to.equal(service.webFunctions.constructor);
       expect(service.getLayer('constructor')).to.equal(service.layers.constructor);
     });
   });

@@ -84,6 +84,7 @@ export type AwsLambdaRuntimeManagement =
 export type AwsLambdaTimeout = number;
 export type AwsLambdaTracing = ('Active' | 'PassThrough') | boolean;
 export type AwsLambdaVersioning = boolean;
+export type AwsLambdaWebFunctionRuntime = 'nodejs24.x';
 export type AwsPruneFunctionVersions =
   | boolean
   | {
@@ -1494,6 +1495,42 @@ export interface AWS {
       };
       path?: string;
       retain?: boolean;
+    };
+  };
+  webFunctions?: {
+    /**
+     * This interface was referenced by `undefined`'s JSON-Schema definition
+     * via the `patternProperty` "^[a-zA-Z0-9-_]+$".
+     */
+    [k: string]: {
+      description?: string;
+      endpoint?: {
+        authorizer?: 'aws_iam';
+        maxEnvironments?: number;
+        name?: string;
+        rateLimit?: number;
+        regions?: string[];
+        type?: 'HomeRegion' | 'MultiRegion' | 'PerRegion';
+      };
+      entryPoint?: string;
+      environment?: AwsLambdaEnvironment;
+      kmsKeyArn?: AwsKmsArn;
+      logDataProtectionPolicy?: AwsLogDataProtectionPolicy;
+      logRetentionInDays?: AwsLogRetentionInDays;
+      logs?: {
+        applicationLogLevel?: 'DEBUG' | 'ERROR' | 'FATAL' | 'INFO' | 'TRACE' | 'WARN';
+        systemLogLevel?: 'DEBUG' | 'INFO' | 'WARN';
+      };
+      maxConcurrencyPerEnvironment?: number;
+      name?: string;
+      package?: {
+        artifact?: string;
+        patterns?: string[];
+      };
+      role?: AwsLambdaRole;
+      runtime?: AwsLambdaWebFunctionRuntime;
+      tags?: AwsResourceTags;
+      timeout?: number;
     };
   };
   org?: string;

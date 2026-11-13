@@ -13,9 +13,11 @@ This command returns as many log events as can fit in 1MB (up to 10,000 log even
 
 This command can't read Infrequent Access log groups, so for functions with `logGroupClass: infrequent_access` use CloudWatch Logs Insights instead.
 
+Pass the key of a [web function](../guides/web-functions.md#logs) to `--function` to watch its logs. They are read from its `/aws/lambda/web/<name>.local` log group, where Lambda writes every line first, or from its `/aws/lambda/web/<name>` log group when the endpoint serves several regions.
+
 ## Options
 
-- `--function` or `-f` The function you want to fetch the logs for. **Required**
+- `--function` or `-f` The function or web function you want to fetch the logs for. **Required**
 - `--stage` or `-s` The stage you want to view the function logs for. If not provided, the plugin will use the default stage listed in `serverless.yml`. If that doesn't exist either it'll just fetch the logs from the `dev` stage.
 - `--region` or `-r` The region you want to view the function logs for. If not provided, the plugin will use the default region listed in `serverless.yml`. If that doesn't exist either it'll just fetch the logs from the `us-east-1` region.
 - `--startTime` A specific unit in time to start fetching logs from (ie: `2010-10-20` or `1469694264`). Here's a list of the supported string formats:

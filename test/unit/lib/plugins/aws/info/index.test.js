@@ -49,6 +49,7 @@ describe('AwsInfo', () => {
   let displayApiKeysStub;
   let displayEndpointsStub;
   let displayFunctionsStub;
+  let displayWebFunctionsStub;
   let displayLayersStub;
   let displayStackOutputsStub;
 
@@ -67,6 +68,7 @@ describe('AwsInfo', () => {
     displayApiKeysStub = sinon.stub(awsInfo, 'displayApiKeys').resolves();
     displayEndpointsStub = sinon.stub(awsInfo, 'displayEndpoints').resolves();
     displayFunctionsStub = sinon.stub(awsInfo, 'displayFunctions').resolves();
+    displayWebFunctionsStub = sinon.stub(awsInfo, 'displayWebFunctions').resolves();
     displayLayersStub = sinon.stub(awsInfo, 'displayLayers').resolves();
     displayStackOutputsStub = sinon.stub(awsInfo, 'displayStackOutputs').resolves();
   });
@@ -80,6 +82,7 @@ describe('AwsInfo', () => {
     awsInfo.displayApiKeys.restore();
     awsInfo.displayEndpoints.restore();
     awsInfo.displayFunctions.restore();
+    awsInfo.displayWebFunctions.restore();
     awsInfo.displayLayers.restore();
     awsInfo.displayStackOutputs.restore();
   });
@@ -105,6 +108,7 @@ describe('AwsInfo', () => {
         expect(displayApiKeysStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
         expect(displayEndpointsStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
         expect(displayFunctionsStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
+        expect(displayWebFunctionsStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
         expect(displayLayersStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
         expect(displayStackOutputsStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
       }));
@@ -119,6 +123,7 @@ describe('AwsInfo', () => {
           expect(displayApiKeysStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
           expect(displayEndpointsStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
           expect(displayFunctionsStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
+          expect(displayWebFunctionsStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
           expect(displayLayersStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
           expect(displayStackOutputsStub.calledAfter(getApiKeyValuesStub)).to.equal(true);
         }));
