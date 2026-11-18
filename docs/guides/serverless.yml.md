@@ -123,7 +123,7 @@ Some function settings can be defined for all functions inside the `provider` ke
 # serverless.yml
 
 provider:
-  runtime: nodejs24.x
+  runtime: nodejs24.x # or the ARN of a customer-managed runtime alias: arn:aws:lambda:us-east-1:111122223333:runtime/my-runtime/alias/production
   runtimeManagement: auto # optional, set how Lambda controls all functions runtime. AWS default is auto; this can either be 'auto' or 'onFunctionUpdate'. For 'manual', see example in hello function below (syntax for both is identical
   # Default memory size for functions (default: 1024MB)
   memorySize: 512

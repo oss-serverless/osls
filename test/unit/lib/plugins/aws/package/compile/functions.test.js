@@ -3153,6 +3153,47 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
       );
     });
 
+    it('should support customer-managed runtimes', async () => {
+      const { cfTemplate, awsNaming } = await runServerless({
+        fixture: 'function',
+        command: 'package',
+        configExt: {
+          functions: {
+            basic: {
+              runtime: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime/alias/production',
+            },
+          },
+        },
+      });
+      const { Runtime, RuntimeConfig } =
+        cfTemplate.Resources[awsNaming.getLambdaLogicalId('basic')].Properties;
+
+      expect(Runtime).to.equal('custom');
+      expect(RuntimeConfig).to.deep.equal({
+        RuntimeArn: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime',
+        RuntimeAlias: 'production',
+      });
+    });
+
+    it('should reject customer-managed runtime ARNs without an alias', () => {
+      return expect(
+        runServerless({
+          fixture: 'function',
+          command: 'package',
+          configExt: {
+            functions: {
+              basic: {
+                runtime: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime',
+              },
+            },
+          },
+        })
+      ).to.eventually.be.rejected.and.have.property(
+        'code',
+        'INVALID_NON_SCHEMA_COMPLIANT_CONFIGURATION'
+      );
+    });
+
     it('should reject `functions[].name` values outside the Lambda character set', () => {
       return expect(
         runServerless({

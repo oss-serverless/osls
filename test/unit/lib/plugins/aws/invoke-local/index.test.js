@@ -2397,6 +2397,21 @@ describe('test/unit/lib/plugins/aws/invokeLocal/index.test.js', () => {
     ).to.eventually.be.rejected.and.have.property('code', 'WEB_FUNCTION_INVOKE_LOCAL_UNSUPPORTED');
   });
 
+  it('should reject functions using a customer-managed runtime', async () => {
+    await expect(
+      runServerless({
+        fixture: 'invocation',
+        command: 'invoke local',
+        options: { function: 'async' },
+        configExt: {
+          provider: {
+            runtime: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime/alias/production',
+          },
+        },
+      })
+    ).to.eventually.be.rejected.and.have.property('code', 'INVOKE_LOCAL_CUSTOMER_MANAGED_RUNTIME');
+  });
+
   describe('Node.js', () => {
     testRuntime('callback', { shouldTestInputResolution: true, shouldAssertNodeEnv: true });
 
