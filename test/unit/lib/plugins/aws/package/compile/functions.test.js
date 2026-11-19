@@ -1346,6 +1346,28 @@ describe('AwsCompileFunctions', () => {
       });
     });
 
+    it('should support durableConfig with customer-managed runtimes', async () => {
+      const { cfTemplate } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          provider: {
+            runtime: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime/alias/production',
+          },
+          functions: { basic: { durableConfig: { executionTimeout: 3600 } } },
+        },
+        command: 'package',
+      });
+      const { Runtime, RuntimeConfig, DurableConfig } =
+        cfTemplate.Resources.BasicLambdaFunction.Properties;
+
+      expect(Runtime).to.equal('custom');
+      expect(RuntimeConfig).to.deep.equal({
+        RuntimeArn: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime',
+        RuntimeAlias: 'production',
+      });
+      expect(DurableConfig).to.deep.equal({ ExecutionTimeout: 3600 });
+    });
+
     it('should include DurableConfig changes in version logical ids', async () => {
       const packageService = async (durableConfig) => {
         const { awsNaming, cfTemplate } = await runServerless({

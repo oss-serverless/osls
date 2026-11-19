@@ -75,6 +75,9 @@ export type AwsLambdaRuntime =
   | 'ruby3.3'
   | 'ruby3.4'
   | 'ruby4.0';
+export type AwsLambdaFunctionRuntime =
+  | AwsLambdaRuntime
+  | `arn:${string}:lambda:${string}:${string}:runtime/${string}/alias/${string}`;
 export type AwsLambdaRuntimeManagement =
   | ('auto' | 'onFunctionUpdate')
   | {
@@ -740,7 +743,7 @@ export interface AWS {
       provisionedConcurrency?: number | AwsCfFunction | AwsCfIf;
       reservedConcurrency?: number | AwsCfFunction | AwsCfIf;
       role?: AwsLambdaRole;
-      runtime?: AwsLambdaRuntime;
+      runtime?: AwsLambdaFunctionRuntime;
       runtimeManagement?: AwsLambdaRuntimeManagement;
       tags?: AwsResourceTags;
       timeout?: AwsLambdaTimeout;
@@ -1106,7 +1109,7 @@ export interface AWS {
       }[];
       MonitoringTimeInMinutes?: number;
     };
-    runtime?: AwsLambdaRuntime;
+    runtime?: AwsLambdaFunctionRuntime;
     runtimeManagement?: AwsLambdaRuntimeManagement;
     deploymentMethod?: 'changesets' | 'direct';
     s3?: {

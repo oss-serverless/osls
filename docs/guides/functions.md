@@ -167,18 +167,18 @@ Use `provided.al2023` together with [Lambda Layers](#layers) to ship your own cu
 
 ### Customer-managed runtimes
 
-To use a [customer-managed runtime](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-customer-managed.html), set `runtime` to the ARN of one of its aliases:
+To use a [customer-managed runtime](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-customer-managed.html) from the function's region, set `runtime` to the ARN of one of its aliases:
 
 ```yaml
 provider:
   runtime: arn:aws:lambda:us-east-1:111122223333:runtime/my-runtime/alias/production
 ```
 
-The function is deployed with the `custom` runtime and a `RuntimeConfig` pointing to that runtime and alias. It picks up the version the alias points to at each cold start.
+The function is deployed with the `custom` runtime and a `RuntimeConfig` pointing to that runtime and alias. By default, it picks up the version the alias points to at each cold start; set [`runtimeManagement`](#runtime-management) to `onFunctionUpdate` to pick it up only when the function is redeployed.
 
-To use a runtime shared from another AWS account, the credentials used to deploy (or `provider.iam.deploymentRole`, if set) need the `lambda:AssociateRuntimeAlias` permission on the alias ARN.
+The credentials used to deploy (or `provider.iam.deploymentRole`, if set) need the `lambda:AssociateRuntimeAlias` permission on the alias ARN. A runtime from another AWS account must also be shared with yours through its resource-based policy.
 
-`serverless invoke local` does not support customer-managed runtimes.
+`osls invoke local` does not support customer-managed runtimes.
 
 ## Permissions
 
@@ -561,7 +561,7 @@ Use `osls deploy` after code or durable configuration changes so CloudFormation 
 
 Functions currently configured with `durableConfig` are skipped by osls function pruning because durable executions may depend on retained versions for replay.
 
-osls supports durable functions for managed runtimes `nodejs22.x`, `nodejs24.x`, `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`, plus compatible container images. Durable functions with `snapStart: true` are limited to the runtime intersection supported by both features: `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`. Durable functions with SnapStart cannot use container images, EFS, provisioned concurrency, or ephemeral storage larger than 512 MB.
+osls supports durable functions for managed runtimes `nodejs22.x`, `nodejs24.x`, `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`, plus compatible customer-managed runtimes and container images. Durable functions with `snapStart: true` are limited to the runtime intersection supported by both features: `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`. Durable functions with SnapStart cannot use container images, EFS, provisioned concurrency, or ephemeral storage larger than 512 MB.
 
 ## Recursive Loop Detection
 
