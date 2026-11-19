@@ -1990,7 +1990,7 @@ describe('AwsCompileFunctions', () => {
       });
     });
 
-    it('should reject durableConfig over 900 seconds with event source mappings', async () => {
+    it('should reject durableConfig over 1800 seconds with event source mappings', async () => {
       const events = [
         { sqs: 'arn:aws:sqs:region:account:MyQueue' },
         { stream: 'arn:aws:dynamodb:region:account:table/foo/stream/1' },
@@ -2035,7 +2035,7 @@ describe('AwsCompileFunctions', () => {
                 basic: {
                   runtime: 'nodejs24.x',
                   durableConfig: {
-                    executionTimeout: 901,
+                    executionTimeout: 1801,
                   },
                   events: [event],
                 },
@@ -2050,7 +2050,7 @@ describe('AwsCompileFunctions', () => {
       }
     });
 
-    it('should support durableConfig with event source mappings at 900 seconds', async () => {
+    it('should support durableConfig with event source mappings at 1800 seconds', async () => {
       const { awsNaming, cfTemplate } = await runServerless({
         fixture: 'function',
         configExt: {
@@ -2058,7 +2058,7 @@ describe('AwsCompileFunctions', () => {
             basic: {
               runtime: 'nodejs24.x',
               durableConfig: {
-                executionTimeout: 900,
+                executionTimeout: 1800,
               },
               events: [
                 {
