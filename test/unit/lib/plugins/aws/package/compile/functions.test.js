@@ -1346,6 +1346,28 @@ describe('AwsCompileFunctions', () => {
       });
     });
 
+    it('should support durableConfig with customer-managed runtimes', async () => {
+      const { cfTemplate } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          provider: {
+            runtime: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime/alias/production',
+          },
+          functions: { basic: { durableConfig: { executionTimeout: 3600 } } },
+        },
+        command: 'package',
+      });
+      const { Runtime, RuntimeConfig, DurableConfig } =
+        cfTemplate.Resources.BasicLambdaFunction.Properties;
+
+      expect(Runtime).to.equal('custom');
+      expect(RuntimeConfig).to.deep.equal({
+        RuntimeArn: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime',
+        RuntimeAlias: 'production',
+      });
+      expect(DurableConfig).to.deep.equal({ ExecutionTimeout: 3600 });
+    });
+
     it('should include DurableConfig changes in version logical ids', async () => {
       const packageService = async (durableConfig) => {
         const { awsNaming, cfTemplate } = await runServerless({
@@ -3143,6 +3165,47 @@ describe('lib/plugins/aws/package/compile/functions/index.test.js', () => {
             functions: {
               basic: {
                 runtime: 'python3.9',
+              },
+            },
+          },
+        })
+      ).to.eventually.be.rejected.and.have.property(
+        'code',
+        'INVALID_NON_SCHEMA_COMPLIANT_CONFIGURATION'
+      );
+    });
+
+    it('should support customer-managed runtimes', async () => {
+      const { cfTemplate, awsNaming } = await runServerless({
+        fixture: 'function',
+        command: 'package',
+        configExt: {
+          functions: {
+            basic: {
+              runtime: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime/alias/production',
+            },
+          },
+        },
+      });
+      const { Runtime, RuntimeConfig } =
+        cfTemplate.Resources[awsNaming.getLambdaLogicalId('basic')].Properties;
+
+      expect(Runtime).to.equal('custom');
+      expect(RuntimeConfig).to.deep.equal({
+        RuntimeArn: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime',
+        RuntimeAlias: 'production',
+      });
+    });
+
+    it('should reject customer-managed runtime ARNs without an alias', () => {
+      return expect(
+        runServerless({
+          fixture: 'function',
+          command: 'package',
+          configExt: {
+            functions: {
+              basic: {
+                runtime: 'arn:aws:lambda:us-east-1:123456789012:runtime/my-runtime',
               },
             },
           },

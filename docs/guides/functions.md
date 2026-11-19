@@ -8,6 +8,7 @@ Applications that run as an HTTP server instead of handling events are deployed 
 
 - [Configuration](#configuration)
 - [Supported runtimes](#supported-runtimes)
+  - [Customer-managed runtimes](#customer-managed-runtimes)
 - [Permissions](#permissions)
 - [Lambda Function URLs](#lambda-function-urls)
 - [Referencing container image as a target](#referencing-container-image-as-a-target)
@@ -160,9 +161,24 @@ The `runtime` property (set at `provider.runtime` or per function) accepts a fix
 - **.NET:** `dotnet10`
 - **Custom (OS-only):** `provided.al2023`
 
-Use `provided.al2023` together with [Lambda Layers](#layers) to ship your own custom runtime. Any other value is rejected during schema validation.
+Use `provided.al2023` together with [Lambda Layers](#layers) to ship your own custom runtime, or use a [customer-managed runtime](#customer-managed-runtimes). Any other value is rejected during schema validation.
 
 `nodejs26.x` and `python3.15` are AWS public preview runtimes. They are not covered by the Lambda SLA or AWS Support, and AWS recommends against using them for production workloads. When AWS makes them generally available, functions using them move over automatically because the identifiers stay the same.
+
+### Customer-managed runtimes
+
+To use a [customer-managed runtime](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-customer-managed.html) from the function's region, set `runtime` to the ARN of one of its aliases:
+
+```yaml
+provider:
+  runtime: arn:aws:lambda:us-east-1:111122223333:runtime/my-runtime/alias/production
+```
+
+The function is deployed with the `custom` runtime and a `RuntimeConfig` pointing to that runtime and alias. By default, it picks up the version the alias points to at each cold start; set [`runtimeManagement`](#runtime-management) to `onFunctionUpdate` to pick it up only when the function is redeployed.
+
+The credentials used to deploy (or `provider.iam.deploymentRole`, if set) need the `lambda:AssociateRuntimeAlias` permission on the alias ARN. A runtime from another AWS account must also be shared with yours through its resource-based policy.
+
+`osls invoke local` does not support customer-managed runtimes.
 
 ## Permissions
 
@@ -545,7 +561,7 @@ Use `osls deploy` after code or durable configuration changes so CloudFormation 
 
 Functions currently configured with `durableConfig` are skipped by osls function pruning because durable executions may depend on retained versions for replay.
 
-osls supports durable functions for managed runtimes `nodejs22.x`, `nodejs24.x`, `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`, plus compatible container images. Durable functions with `snapStart: true` are limited to the runtime intersection supported by both features: `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`. Durable functions with SnapStart cannot use container images, EFS, provisioned concurrency, or ephemeral storage larger than 512 MB.
+osls supports durable functions for managed runtimes `nodejs22.x`, `nodejs24.x`, `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`, plus compatible customer-managed runtimes and container images. Durable functions with `snapStart: true` are limited to the runtime intersection supported by both features: `python3.13`, `python3.14`, `java17`, `java21`, `java25`, and `dotnet10`. Durable functions with SnapStart cannot use container images, EFS, provisioned concurrency, or ephemeral storage larger than 512 MB.
 
 ## Recursive Loop Detection
 
