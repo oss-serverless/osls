@@ -10,7 +10,7 @@ Install `osls` module via NPM:
 npm install -g osls@3
 ```
 
-_Requires Node.js `^20.19.0 || ^22.13.0 || >=24`. If you don’t already have a supported Node.js version on your machine, [install it first](https://nodejs.org/)._
+_Requires Node.js `^20.19.0 || ^22.13.0 || >=24`. Node.js 26 and later require [osls v4](https://github.com/oss-serverless/osls/blob/4.x/docs/guides/upgrading-to-v4.md). If you don’t already have a supported Node.js version on your machine, [install it first](https://nodejs.org/)._
 
 The package installs the `osls`, `sls`, and `serverless` commands. This guide uses `serverless` because osls 3.x is intended as a drop-in replacement for Serverless Framework v3.
 

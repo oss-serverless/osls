@@ -10,7 +10,7 @@ This repository is a maintained alternative to [Serverless Framework](https://gi
 
 ## Installation
 
-Requires Node.js `^20.19.0 || ^22.13.0 || >=24`.
+Requires Node.js `^20.19.0 || ^22.13.0 || >=24`. Node.js 26 and later require [osls v4](https://github.com/oss-serverless/osls/blob/4.x/docs/guides/upgrading-to-v4.md).
 
 Install the 3.x release line explicitly:
 
