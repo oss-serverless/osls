@@ -65,6 +65,10 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-c
         existing: '${cf:existing.someOutput}',
         existingAgain: '${cf:existing.someOutput}',
         existingInRegion: '${cf(eu-west-1):existing.someOutput}',
+        existingWithRole:
+          '${cf(eu-west-1, arn:aws:iam::123456789012:role/reader):withRole.someOutput}',
+        existingWithRoleInProviderRegion:
+          '${cf(, arn:aws:iam::123456789012:role/reader):withRole.someOutput}',
         noOutput: '${cf:existing.unrecognizedOutput, null}',
         noOutputs: '${cf:noOutputs.someOutput, null}',
         noStack: '${cf:notExisting.someOutput, null}',
@@ -79,7 +83,7 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-c
     };
     variablesMeta = resolveMeta(configuration);
 
-    const source = loadSource(({ StackName }, { region }) => {
+    const source = loadSource(({ StackName }, { region, credentials: clientCredentials }) => {
       if (StackName === 'existing') {
         return {
           Stacks: [
@@ -88,6 +92,21 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-c
                 {
                   OutputKey: 'someOutput',
                   OutputValue: region === 'eu-west-1' ? region : 'someValue',
+                },
+              ],
+            },
+          ],
+        };
+      }
+      if (StackName === 'withRole') {
+        return {
+          Stacks: [
+            {
+              Outputs: [
+                {
+                  OutputKey: 'someOutput',
+                  OutputValue:
+                    clientCredentials === credentials ? 'someValue' : `${region}-roleValue`,
                 },
               ],
             },
@@ -165,6 +184,20 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/get-c
     expect(getAwsSdkV3Config).to.have.been.calledWith({
       region: 'eu-west-1',
     });
+  });
+
+  it('should resolve existing output with an assumed role', () => {
+    if (variablesMeta.get('custom\0existingWithRole')) {
+      throw variablesMeta.get('custom\0existingWithRole').error;
+    }
+    expect(configuration.custom.existingWithRole).to.equal('eu-west-1-roleValue');
+  });
+
+  it('should resolve existing output with an assumed role in the provider region', () => {
+    if (variablesMeta.get('custom\0existingWithRoleInProviderRegion')) {
+      throw variablesMeta.get('custom\0existingWithRoleInProviderRegion').error;
+    }
+    expect(configuration.custom.existingWithRoleInProviderRegion).to.equal('us-east-1-roleValue');
   });
 
   it('should resolve null on missing output', () => {
