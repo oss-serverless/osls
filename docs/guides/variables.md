@@ -235,6 +235,19 @@ functions:
     handler: handler.world
 ```
 
+You can also reference a CloudFormation stack in another AWS account with the `cf(REGION, ROLE_ARN):stackName.outputKey` syntax. osls assumes the given IAM role to read the stack outputs. The credentials osls runs with must be allowed to assume the role, and the role must allow `cloudformation:DescribeStacks` on the stack. For example:
+
+```yaml
+service: new-service
+provider: aws
+functions:
+  hello:
+    name: ${cf(us-west-2, arn:aws:iam::123456789012:role/stack-reader):another-service-dev.functionPrefix}-hello
+    handler: handler.hello
+```
+
+An empty `REGION`, as in `cf(, ROLE_ARN)`, falls back to the region used by the osls CLI, and no role is assumed when `ROLE_ARN` is empty.
+
 You can reference [CloudFormation stack outputs export values](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/outputs-section-structure.html) as well. For example:
 
 ```yaml

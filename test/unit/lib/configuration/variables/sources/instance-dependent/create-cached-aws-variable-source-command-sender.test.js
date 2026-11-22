@@ -1,6 +1,7 @@
 'use strict';
 
 const { expect } = require('chai');
+const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 const createCachedAwsVariableSourceCommandSender = require('../../../../../../../lib/configuration/variables/sources/instance-dependent/create-cached-aws-variable-source-command-sender');
 
@@ -208,6 +209,95 @@ describe('test/unit/lib/configuration/variables/sources/instance-dependent/creat
       { region: null },
       { region: '' },
     ]);
+    expect(TestClient.instances).to.have.length(3);
+    expect(send).to.have.been.calledThrice;
+  });
+
+  it('assumes a given role with the provider credentials', async () => {
+    const credentials = sinon.stub();
+    const roleCredentials = sinon.stub();
+    const fromTemporaryCredentials = sinon.stub().returns(roleCredentials);
+    const provider = createProvider({ region: 'eu-west-1', credentials });
+    const getProvider = sinon.stub().returns(provider);
+    const send = sinon.stub().resolves({ ok: true });
+    const TestClient = createClient({ send });
+    const sender = proxyquire(
+      '../../../../../../../lib/configuration/variables/sources/instance-dependent/create-cached-aws-variable-source-command-sender',
+      { '@aws-sdk/credential-providers': { fromTemporaryCredentials } }
+    )({
+      getProvider,
+      Client: TestClient,
+    });
+
+    await expect(
+      sender.send(
+        TestCommand,
+        { Name: 'parameter' },
+        { region: 'eu-west-1', roleArn: 'arn:aws:iam::123456789012:role/reader' }
+      )
+    ).to.eventually.deep.equal({ ok: true });
+
+    expect(provider.getAwsSdkV3Config).to.have.been.calledOnceWithExactly({
+      region: 'eu-west-1',
+    });
+    expect(fromTemporaryCredentials).to.have.been.calledOnceWithExactly({
+      masterCredentials: credentials,
+      params: { RoleArn: 'arn:aws:iam::123456789012:role/reader' },
+    });
+    expect(TestClient.instances).to.have.length(1);
+    expect(TestClient.instances[0].config).to.deep.equal({
+      region: 'eu-west-1',
+      credentials: roleCredentials,
+    });
+  });
+
+  it('shares cache entries between omitted and empty roles', async () => {
+    const credentials = sinon.stub();
+    const provider = createProvider({ region: 'us-east-1', credentials });
+    const getProvider = sinon.stub().returns(provider);
+    const send = sinon.stub().resolves({ ok: true });
+    const TestClient = createClient({ send });
+    const sender = createCachedAwsVariableSourceCommandSender({
+      getProvider,
+      Client: TestClient,
+    });
+
+    await sender.send(TestCommand, { Name: 'parameter' });
+    await sender.send(TestCommand, { Name: 'parameter' }, { roleArn: null });
+    await sender.send(TestCommand, { Name: 'parameter' }, { roleArn: '' });
+
+    expect(TestClient.instances).to.have.length(1);
+    expect(TestClient.instances[0].config.credentials).to.equal(credentials);
+    expect(send).to.have.been.calledOnce;
+  });
+
+  it('separates clients and cached commands by role', async () => {
+    const provider = createProvider();
+    const getProvider = sinon.stub().returns(provider);
+    const send = sinon.stub().resolves({ ok: true });
+    const TestClient = createClient({ send });
+    const sender = createCachedAwsVariableSourceCommandSender({
+      getProvider,
+      Client: TestClient,
+    });
+
+    await sender.send(TestCommand, { Name: 'parameter' });
+    await sender.send(
+      TestCommand,
+      { Name: 'parameter' },
+      { roleArn: 'arn:aws:iam::123456789012:role/reader' }
+    );
+    await sender.send(
+      TestCommand,
+      { Name: 'parameter' },
+      { roleArn: 'arn:aws:iam::123456789012:role/reader' }
+    );
+    await sender.send(
+      TestCommand,
+      { Name: 'parameter' },
+      { roleArn: 'arn:aws:iam::210987654321:role/reader' }
+    );
+
     expect(TestClient.instances).to.have.length(3);
     expect(send).to.have.been.calledThrice;
   });
