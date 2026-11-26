@@ -34,10 +34,10 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
   };
 
   describe('#getRuntime()', () => {
-    it('should default to "nodejs24.x" when no runtime is configured', () => {
+    it('should default to "nodejs26.x" when no runtime is configured', () => {
       expect(
         packageService.getRuntime.call({ serverless: { service: { provider: {} } } }, undefined)
-      ).to.equal('nodejs24.x');
+      ).to.equal('nodejs26.x');
     });
   });
 
