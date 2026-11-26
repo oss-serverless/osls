@@ -42,7 +42,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
   runtimeManagement: auto # optional, set how Lambda controls all functions runtime. AWS default is auto; this can either be 'auto' or 'onFunctionUpdate'. For 'manual', see example in hello function below (syntax for both is identical)
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
@@ -55,7 +55,7 @@ functions:
     handler: handler.hello # required, handler set in AWS Lambda
     name: ${sls:stage}-lambdaName # optional, Deployed Lambda name
     description: Description of what the lambda function does # optional, Description to publish to AWS
-    runtime: python3.14 # optional overwrite, default is provider runtime
+    runtime: python3.15 # optional overwrite, default is provider runtime
     runtimeManagement:
       mode: manual # syntax required for manual, mode property also supports 'auto' or 'onFunctionUpdate' (see provider.runtimeManagement)
       arn: <aws runtime arn> # required when mode is manual
@@ -66,11 +66,11 @@ functions:
     tracing: PassThrough # optional, overwrite, can be 'Active' or 'PassThrough'
 ```
 
-If `provider.runtime` is omitted for AWS services, osls defaults to the latest generally available Node.js Lambda runtime. Today that is `nodejs24.x`.
+If `provider.runtime` is omitted for AWS services, osls defaults to the latest generally available Node.js Lambda runtime. Today that is `nodejs26.x`.
 
 We still recommend explicitly setting the runtime you want to deploy, either at `provider.runtime` or per function, so your service does not change runtimes when that default advances.
 
-For new services, prefer `nodejs24.x`, `python3.14`, `java25`, `dotnet10`, `ruby4.0`, and `provided.al2023` for custom runtimes.
+For new services, prefer `nodejs26.x`, `python3.15`, `java25`, `dotnet10`, `ruby4.0`, and `provided.al2023` for custom runtimes.
 
 The `handler` property points to the file and module containing the code you want to run in your function.
 
@@ -88,7 +88,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
 
 functions:
   functionOne:
@@ -108,7 +108,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
   memorySize: 512 # will be inherited by all functions
 
 functions:
@@ -124,7 +124,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
 
 functions:
   functionOne:
@@ -163,8 +163,6 @@ The `runtime` property (set at `provider.runtime` or per function) accepts a fix
 
 Use `provided.al2023` together with [Lambda Layers](#layers) to ship your own custom runtime, or use a [customer-managed runtime](#customer-managed-runtimes). Any other value is rejected during schema validation.
 
-`nodejs26.x` and `python3.15` are AWS public preview runtimes. They are not covered by the Lambda SLA or AWS Support, and AWS recommends against using them for production workloads. When AWS makes them generally available, functions using them move over automatically because the identifiers stay the same.
-
 ### Customer-managed runtimes
 
 To use a [customer-managed runtime](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-customer-managed.html) from the function's region, set `runtime` to the ARN of one of its aliases:
@@ -190,7 +188,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
   iam:
     role:
       statements: # permissions for all of your functions can be set here
@@ -934,7 +932,7 @@ service: service
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
 
 functions:
   hello:
@@ -989,7 +987,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
   tracing:
     lambda: true
 ```

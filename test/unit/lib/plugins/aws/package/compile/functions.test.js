@@ -560,7 +560,7 @@ describe('AwsCompileFunctions', () => {
           Handler: 'func.function.handler',
           MemorySize: 1024,
           Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-          Runtime: 'nodejs24.x',
+          Runtime: 'nodejs26.x',
           Timeout: 6,
         },
       };
@@ -620,7 +620,7 @@ describe('AwsCompileFunctions', () => {
               Handler: 'func.function.handler',
               MemorySize: 1024,
               Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-              Runtime: 'nodejs24.x',
+              Runtime: 'nodejs26.x',
               Timeout: 6,
               DeadLetterConfig: {
                 TargetArn: 'arn:aws:sns:region:accountid:foo',
@@ -671,7 +671,7 @@ describe('AwsCompileFunctions', () => {
               Handler: 'func.function.handler',
               MemorySize: 1024,
               Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-              Runtime: 'nodejs24.x',
+              Runtime: 'nodejs26.x',
               Timeout: 6,
               DeadLetterConfig: {
                 TargetArn: {
@@ -713,7 +713,7 @@ describe('AwsCompileFunctions', () => {
               Handler: 'func.function.handler',
               MemorySize: 1024,
               Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-              Runtime: 'nodejs24.x',
+              Runtime: 'nodejs26.x',
               Timeout: 6,
               DeadLetterConfig: {
                 TargetArn: {
@@ -755,7 +755,7 @@ describe('AwsCompileFunctions', () => {
               Handler: 'func.function.handler',
               MemorySize: 1024,
               Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-              Runtime: 'nodejs24.x',
+              Runtime: 'nodejs26.x',
               Timeout: 6,
               DeadLetterConfig: {
                 TargetArn: {
@@ -797,7 +797,7 @@ describe('AwsCompileFunctions', () => {
               Handler: 'func.function.handler',
               MemorySize: 1024,
               Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-              Runtime: 'nodejs24.x',
+              Runtime: 'nodejs26.x',
               Timeout: 6,
               DeadLetterConfig: {
                 TargetArn: 'arn:aws:sns:region:accountid:foo',
@@ -864,7 +864,7 @@ describe('AwsCompileFunctions', () => {
               Handler: 'func.function.handler',
               MemorySize: 1024,
               Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-              Runtime: 'nodejs24.x',
+              Runtime: 'nodejs26.x',
               Timeout: 6,
               TracingConfig: {
                 Mode: 'Active',
@@ -921,7 +921,7 @@ describe('AwsCompileFunctions', () => {
           Handler: 'func.function.handler',
           MemorySize: 1024,
           Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-          Runtime: 'nodejs24.x',
+          Runtime: 'nodejs26.x',
           Timeout: 6,
           Environment: {
             Variables: {
@@ -1039,7 +1039,7 @@ describe('AwsCompileFunctions', () => {
           Handler: 'func.function.handler',
           MemorySize: 128,
           Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-          Runtime: 'nodejs24.x',
+          Runtime: 'nodejs26.x',
           Timeout: 10,
         },
       };
@@ -1138,7 +1138,7 @@ describe('AwsCompileFunctions', () => {
           MemorySize: 1024,
           ReservedConcurrentExecutions: 5,
           Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-          Runtime: 'nodejs24.x',
+          Runtime: 'nodejs26.x',
           Timeout: 6,
         },
       };
@@ -1194,7 +1194,7 @@ describe('AwsCompileFunctions', () => {
           MemorySize: 1024,
           ReservedConcurrentExecutions: 0,
           Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-          Runtime: 'nodejs24.x',
+          Runtime: 'nodejs26.x',
           Timeout: 6,
         },
       };
@@ -2283,7 +2283,7 @@ describe('AwsCompileFunctions', () => {
           Handler: 'func.function.handler',
           MemorySize: 1024,
           Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-          Runtime: 'nodejs24.x',
+          Runtime: 'nodejs26.x',
           Timeout: 6,
         },
       };
@@ -2321,7 +2321,7 @@ describe('AwsCompileFunctions', () => {
           Handler: 'func.function.handler',
           MemorySize: 1024,
           Role: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
-          Runtime: 'nodejs24.x',
+          Runtime: 'nodejs26.x',
           Timeout: 6,
           Layers: ['arn:aws:xxx:*:*'],
         },

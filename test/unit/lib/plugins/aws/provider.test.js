@@ -93,8 +93,8 @@ describe('AwsProvider', () => {
   });
 
   describe('#getRuntime()', () => {
-    it('should default to "nodejs24.x" when no runtime is configured', () => {
-      expect(awsProvider.getRuntime()).to.equal('nodejs24.x');
+    it('should default to "nodejs26.x" when no runtime is configured', () => {
+      expect(awsProvider.getRuntime()).to.equal('nodejs26.x');
     });
 
     it('should use provider.runtime when no explicit runtime is passed', () => {
