@@ -43,7 +43,7 @@ webFunctions:
     entryPoint: src/server.js # optional, the file that starts the server (default: index.js)
     name: ${sls:stage}-api # optional, deployed name (default: <service>-<stage>-<key>)
     description: Storefront API # optional, up to 256 characters
-    runtime: nodejs26.x # optional, nodejs24.x or nodejs26.x (default: nodejs24.x)
+    runtime: nodejs26.x # optional, nodejs24.x or nodejs26.x (default: nodejs26.x)
     timeout: 30 # optional, in seconds, between 3 and 900 (Lambda's default: 30)
     maxConcurrencyPerEnvironment: 64 # optional, between 1 and 128 (Lambda's default: 64)
     environment: # optional, merged over provider.environment

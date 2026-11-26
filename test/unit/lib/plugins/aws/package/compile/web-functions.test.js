@@ -29,7 +29,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
               entryPoint: 'src/server.js',
               name: 'configured-web-function',
               description: 'Configured web function',
-              runtime: 'nodejs26.x',
+              runtime: 'nodejs24.x',
               timeout: 120,
               maxConcurrencyPerEnvironment: 16,
               environment: { TABLE_NAME: { Ref: 'Table' } },
@@ -117,7 +117,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
                 Key: `serverless/${service.service}/dev/web-functions/basic-${basicArtifactHash}.zip`,
               },
             },
-            RuntimeConfig: { Runtime: 'nodejs24.x' },
+            RuntimeConfig: { Runtime: 'nodejs26.x' },
           },
           ServiceConfig: {
             ExecutionRoleArn: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
@@ -173,7 +173,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
 
       expect(Properties.Description).to.equal('Configured web function');
       expect(Properties.KmsKeyArn).to.equal(kmsKeyArn);
-      expect(Properties.BuildConfig.RuntimeConfig).to.deep.equal({ Runtime: 'nodejs26.x' });
+      expect(Properties.BuildConfig.RuntimeConfig).to.deep.equal({ Runtime: 'nodejs24.x' });
       expect(Properties.ServiceConfig).to.deep.equal({
         ExecutionRoleArn: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
         TimeoutSeconds: 120,
@@ -358,7 +358,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
     it('should not apply the function settings of the provider', () => {
       const { Properties } = cfResources[naming.getWebFunctionRevisionLogicalId('basic')];
 
-      expect(Properties.BuildConfig.RuntimeConfig.Runtime).to.equal('nodejs24.x');
+      expect(Properties.BuildConfig.RuntimeConfig.Runtime).to.equal('nodejs26.x');
       expect(Properties).to.not.have.property('KmsKeyArn');
       expect(Properties.ServiceConfig).to.not.have.property('TimeoutSeconds');
       expect(Properties.ServiceConfig).to.not.have.property('TelemetryConfig');

@@ -1472,7 +1472,7 @@ webFunctions:
     name: ${sls:stage}-webFunctionName
     # optional, Description to publish to AWS
     description: Description of what the web function does
-    # optional, nodejs24.x or nodejs26.x (default: nodejs24.x)
+    # optional, nodejs24.x or nodejs26.x (default: nodejs26.x)
     runtime: nodejs26.x
     # optional, request timeout in seconds, between 3 and 900 (default: 30, set by Lambda)
     timeout: 30
