@@ -1,6 +1,6 @@
 # AWS Lambda Web Functions
 
-[AWS Lambda Web Functions](https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html) run a Node.js HTTP server on AWS Lambda. Instead of exporting a handler that receives events, your code starts a server and Lambda sends HTTPS requests to it through an endpoint with its own URL. No API Gateway, function URL or adapter is involved.
+[AWS Lambda Web Functions](https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html) run an HTTP server on AWS Lambda. Instead of exporting a handler that receives events, your code starts a Node.js server, or is a Python application that Lambda serves, and Lambda sends HTTPS requests to it through an endpoint with its own URL. No API Gateway, function URL or adapter is involved.
 
 Web functions are configured under the top-level `webFunctions` property.
 
@@ -8,6 +8,7 @@ Web functions are configured under the top-level `webFunctions` property.
 
 - [Configuration](#configuration)
 - [The server](#the-server)
+- [Python applications](#python-applications)
 - [Endpoint](#endpoint)
 - [Multi-Region endpoints](#multi-region-endpoints)
 - [Custom domains and CloudFront](#custom-domains-and-cloudfront)
@@ -43,7 +44,7 @@ webFunctions:
     entryPoint: src/server.js # optional, the file that starts the server (default: index.js)
     name: ${sls:stage}-api # optional, deployed name (default: <service>-<stage>-<key>)
     description: Storefront API # optional, up to 256 characters
-    runtime: nodejs26.x # optional, nodejs24.x or nodejs26.x (default: nodejs26.x)
+    runtime: nodejs26.x # optional, nodejs24.x, nodejs26.x or python3.15 (default: nodejs26.x)
     timeout: 30 # optional, in seconds, between 3 and 900 (Lambda's default: 30)
     maxConcurrencyPerEnvironment: 64 # optional, between 1 and 128 (Lambda's default: 64)
     environment: # optional, merged over provider.environment
@@ -80,7 +81,7 @@ Properties of functions such as `handler`, `events`, `memorySize`, `layers` or `
 
 ## The server
 
-Lambda sets the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable to the `host:port` the server has to listen on, and the server has to be listening there within 10 seconds of its start. When it listens somewhere else, for example on `localhost` or on `PORT`, or starts listening too late, requests to the endpoint fail with status 502.
+A Node.js web function starts its own HTTP server. Lambda sets the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable to the `host:port` the server has to listen on, and the server has to be listening there within 10 seconds of its start. When it listens somewhere else, for example on `localhost` or on `PORT`, or starts listening too late, requests to the endpoint fail with status 502.
 
 ```js
 // index.js
@@ -109,6 +110,43 @@ webFunctions:
 ```
 
 `entryPoint` is the only way to name the entry file. osls passes it to Lambda in the `AWS_LAMBDA_NODEJS_ENTRYPOINT` environment variable, and rejects that variable in `environment` and in `provider.environment`. Lambda does not read the entry file from `package.json`, and it reports a deployment as successful even when the entry file is missing. For that reason `osls package` and `osls deploy` fail when the package does not contain the entry file, also when it is a [zip you built yourself](#packaging).
+
+## Python applications
+
+Lambda offers the `python3.15` runtime for web functions as a public preview. It is not covered by the Lambda SLA or AWS Support, AWS recommends against using it for production workloads, and its behavior can still change.
+
+A Python web function is an ASGI or WSGI application and not a server: Lambda runs the HTTP server and calls the application, which does not use `AWS_LAMBDA_HTTP_ENDPOINT`. Set `runtime`, because web functions do not use `provider.runtime`:
+
+```yaml
+webFunctions:
+  api:
+    runtime: python3.15
+```
+
+```python
+# main.py
+import json
+
+
+def app(environ, start_response):
+    start_response('200 OK', [('Content-Type', 'application/json')])
+    return [json.dumps({'message': 'Hello from a web function'}).encode()]
+```
+
+Lambda imports the `main` module at the root of the package and serves its `app`. Set `entryPoint` to serve another application. It is the module and the name of the application in it, separated by a colon, with the module written without the `.py` extension:
+
+```yaml
+webFunctions:
+  api:
+    runtime: python3.15
+    entryPoint: src.api:application # "application" in src/api.py
+```
+
+The module can be a dotted path to a file or to a package, and the name can be a dotted path to an attribute, but not a call such as `create_app()`. Lambda detects whether the application uses ASGI or WSGI. Prefix `entryPoint` with `asgi:` or `wsgi:`, in lower case, to choose one, as in `asgi:src.api:application`.
+
+osls passes `entryPoint` to Lambda in the `AWS_LAMBDA_PYTHON_ENTRYPOINT` environment variable, and rejects that variable in `environment` and in `provider.environment`. Lambda reports a deployment as successful even when it cannot import the application, and then answers every request with status 502. For that reason `osls package` and `osls deploy` fail when the root of the package contains neither the file nor the package of the module, which for `src.api` are `src/api.py` and `src/api/__init__.py`.
+
+Unlike the Python runtime of functions, this runtime does not include `boto3`. See [Packaging](#packaging) for the dependencies of the application.
 
 ## Endpoint
 
@@ -316,6 +354,14 @@ An entry file that is an ES module needs the `package.json` with `"type": "modul
 
 The package has to contain everything the server needs at runtime, including `node_modules`. osls does not bundle or compile code. Native modules have to be built for Linux on arm64. A package can be up to 512 MiB once unzipped.
 
+The package of a Python web function has to contain the dependencies of the application at its root, next to the module of `entryPoint`, built for Linux on arm64 and for Python 3.15. osls does not install them. Install them into the directory of the service, or into the directory you build the zip of `package.artifact` from:
+
+```bash
+pip install --target . --platform manylinux2014_aarch64 --python-version 3.15 --only-binary=:all: -r requirements.txt
+```
+
+Exclude directories such as `.venv` and `__pycache__` with `package.patterns`: they are not needed, and a change to them gives the web function a new revision.
+
 To deploy a zip built by another tool, set `package.artifact` of the web function to its local path, instead of `patterns`. The zip is deployed as it is and `patterns` are ignored. Packaging fails when the file is not a zip or does not contain the entry file. An artifact hosted on S3 is not supported.
 
 ```yaml
@@ -376,7 +422,7 @@ See [Encryption at rest for Web Functions](https://docs.aws.amazon.com/lambda/la
 `environment` works like the [environment of a function](./functions.md#environment-variables) and is merged over `provider.environment`. Lambda is stricter with web functions, and osls reports each of the following when packaging:
 
 - The following names are reserved: `AWS_ACCESS_KEY`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SECRET_KEY`, `AWS_SECURITY_TOKEN`, `AWS_SESSION_TOKEN`, `AWS_DEFAULT_REGION`, `AWS_REGION`, `AWS_LAMBDA_HTTP_ENDPOINT`, `AWS_LAMBDA_RUNTIME_API`, `AWS_LAMBDA_INITIALIZATION_TYPE`, `AWS_LAMBDA_FUNCTION_MEMORY_SIZE`, `AWS_LAMBDA_METADATA_API` and `AWS_LAMBDA_METADATA_TOKEN`.
-- `AWS_LAMBDA_NODEJS_ENTRYPOINT` is set with [`entryPoint`](#the-server).
+- `AWS_LAMBDA_NODEJS_ENTRYPOINT` and `AWS_LAMBDA_PYTHON_ENTRYPOINT` are set with [`entryPoint`](#the-server).
 - A name has to start with a letter.
 - A value cannot be an empty string or have more than 4,096 characters, and all names and values together cannot exceed 32 KB.
 
@@ -430,7 +476,7 @@ Prefer the default [deployment mode](./deploying.md#deployment-mode) where a suc
 | [`osls deploy function`](../cli-reference/deploy-function.md)                                | Not supported, use `osls deploy`                            |
 | [`osls rollback function`](../cli-reference/rollback-function.md)                            | Not supported, use `osls rollback`                          |
 | [`osls invoke`](../cli-reference/invoke.md)                                                  | Not supported, send a request to the URL                    |
-| [`osls invoke local`](../cli-reference/invoke-local.md)                                      | Not supported, start the server with Node.js                |
+| [`osls invoke local`](../cli-reference/invoke-local.md)                                      | Not supported, run the server or the application yourself   |
 | [`osls metrics`](../cli-reference/metrics.md)                                                | Not supported, web functions are left out                   |
 
 ## Generated resources
@@ -521,12 +567,12 @@ The function arn:aws:lambda:us-east-2:123456789012:web-function/myService-dev-ap
 
 **The deployment fails on the revision with "does not have s3:GetObject and s3:GetObjectVersion permission".** The policy of an existing deployment bucket does not let Lambda read the code, see [Existing bucket](#existing-bucket). If this was the first deployment of the service, the stack can be left in the `ROLLBACK_COMPLETE` state: run `osls remove` before deploying again.
 
-**Every request fails with status 502 after a successful deployment.** The server did not start, or does not listen on the `host:port` of `AWS_LAMBDA_HTTP_ENDPOINT`, see [The server](#the-server). `osls logs` shows the error.
+**Every request fails with status 502 after a successful deployment.** The server did not start, or does not listen on the `host:port` of `AWS_LAMBDA_HTTP_ENDPOINT`, see [The server](#the-server). `osls logs` shows the error. A Python web function answers with the header `lambda-web-error-type: Runtime.ImportCodeError` when Lambda cannot import the application, see [Python applications](#python-applications).
 
 **Every request fails with status 409 and the header `lambda-web-error-type: Platform.RevisionNotActive`.** The zip of the revision is gone from the deployment bucket, see [Where the code is stored](#where-the-code-is-stored).
 
 ## Limitations
 
-- Only the `nodejs24.x` and `nodejs26.x` runtimes are supported, and Lambda does not offer web functions in every region.
+- Only the `nodejs24.x`, `nodejs26.x` and `python3.15` runtimes are supported, the last one as a public preview, and Lambda does not offer web functions in every region.
 - One endpoint per web function. Several endpoints and shifting traffic gradually between revisions are not supported.
-- No local emulation. The server is a plain Node.js HTTP server, so run it with `AWS_LAMBDA_HTTP_ENDPOINT=127.0.0.1:3000 node index.js`.
+- No local emulation. The server is a plain Node.js HTTP server, so run it with `AWS_LAMBDA_HTTP_ENDPOINT=127.0.0.1:3000 node index.js`. A Python application runs under any ASGI or WSGI server.

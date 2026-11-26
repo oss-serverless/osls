@@ -49,6 +49,9 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
             perRegion: { endpoint: { type: 'PerRegion', regions: ['us-east-1', 'us-west-2'] } },
             indexEntryPoint: { entryPoint: 'index.js' },
             relativeEntryPoint: { entryPoint: './src/server.js' },
+            python: { runtime: 'python3.15' },
+            pythonEntryPoint: { runtime: 'python3.15', entryPoint: 'asgi:src.api:application' },
+            pythonNameEndingInPy: { runtime: 'python3.15', entryPoint: 'main:holder.py' },
             emptyEndpoint: { endpoint: { type: null, regions: null } },
             roleArn: { role: roleArn },
             roleLogicalId: { role: 'WebRole' },
@@ -200,6 +203,27 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
         cfResources[naming.getWebFunctionRevisionLogicalId('relativeEntryPoint')].Properties
           .ServiceConfig.EnvironmentVariables
       ).to.deep.equal({ AWS_LAMBDA_NODEJS_ENTRYPOINT: 'src/server.js' });
+    });
+
+    it('should support the `python3.15` runtime', () => {
+      const { Properties } = cfResources[naming.getWebFunctionRevisionLogicalId('python')];
+
+      expect(Properties.BuildConfig.RuntimeConfig).to.deep.equal({ Runtime: 'python3.15' });
+      expect(Properties.ServiceConfig).to.not.have.property('EnvironmentVariables');
+    });
+
+    it('should support a Python `webFunctions[].entryPoint`', () => {
+      expect(
+        cfResources[naming.getWebFunctionRevisionLogicalId('pythonEntryPoint')].Properties
+          .ServiceConfig.EnvironmentVariables
+      ).to.deep.equal({ AWS_LAMBDA_PYTHON_ENTRYPOINT: 'asgi:src.api:application' });
+    });
+
+    it('should support a Python `webFunctions[].entryPoint` with a name that ends in `.py`', () => {
+      expect(
+        cfResources[naming.getWebFunctionRevisionLogicalId('pythonNameEndingInPy')].Properties
+          .ServiceConfig.EnvironmentVariables
+      ).to.deep.equal({ AWS_LAMBDA_PYTHON_ENTRYPOINT: 'main:holder.py' });
     });
 
     it('should support `webFunctions[].endpoint`', () => {
@@ -488,6 +512,41 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
       });
     }
 
+    for (const [description, entryPoint, message] of [
+      [
+        'a Python `entryPoint` that is a file',
+        'src/api.py',
+        'it names a file with the ".py" extension',
+      ],
+      [
+        'a Python `entryPoint` without a callable',
+        'api',
+        'it is not of the "module:callable" form',
+      ],
+      [
+        'a Python `entryPoint` that calls a factory',
+        'api:create_app()',
+        'it is not of the "module:callable" form',
+      ],
+      [
+        'a Python `entryPoint` with an upper-case prefix',
+        'WSGI:api:application',
+        'it is not of the "module:callable" form',
+      ],
+    ]) {
+      it(`should reject ${description}`, async () => {
+        await expect(
+          runServerless({
+            fixture: 'web-function',
+            command: 'package',
+            configExt: { webFunctions: { basic: { runtime: 'python3.15', entryPoint } } },
+          })
+        )
+          .to.eventually.be.rejectedWith(message)
+          .and.have.property('code', 'WEB_FUNCTION_INVALID_ENTRY_POINT');
+      });
+    }
+
     it('should reject a `kmsKeyArn` that is the ARN of an alias', async () => {
       await expect(
         runServerless({
@@ -684,21 +743,22 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
         .and.have.property('code', 'WEB_FUNCTION_ENVIRONMENT_TOO_LARGE');
     });
 
-    it('should reject the environment variable that `entryPoint` sets', async () => {
-      await expect(
-        runServerless({
-          fixture: 'web-function',
-          command: 'package',
-          configExt: {
-            webFunctions: {
-              basic: { environment: { AWS_LAMBDA_NODEJS_ENTRYPOINT: 'src/server.js' } },
-            },
-          },
-        })
-      )
-        .to.eventually.be.rejectedWith('Set "entryPoint" on the web function instead')
-        .and.have.property('code', 'WEB_FUNCTION_ENTRY_POINT_ENVIRONMENT_VARIABLE_DEFINED');
-    });
+    for (const [variableName, value] of [
+      ['AWS_LAMBDA_NODEJS_ENTRYPOINT', 'src/server.js'],
+      ['AWS_LAMBDA_PYTHON_ENTRYPOINT', 'src.api:application'],
+    ]) {
+      it(`should reject the \`${variableName}\` environment variable that \`entryPoint\` sets`, async () => {
+        await expect(
+          runServerless({
+            fixture: 'web-function',
+            command: 'package',
+            configExt: { webFunctions: { basic: { environment: { [variableName]: value } } } },
+          })
+        )
+          .to.eventually.be.rejectedWith('Set "entryPoint" on the web function instead')
+          .and.have.property('code', 'WEB_FUNCTION_ENTRY_POINT_ENVIRONMENT_VARIABLE_DEFINED');
+      });
+    }
 
     it('should reject `endpoint.regions` on a `HomeRegion` endpoint', async () => {
       await expect(
