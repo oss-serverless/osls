@@ -1575,6 +1575,73 @@ describe('AwsCompileFunctions', () => {
       });
     });
 
+    it('should accept durableConfig with the default runtime', async () => {
+      const { cfTemplate } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          functions: {
+            basic: {
+              durableConfig: {
+                executionTimeout: 3600,
+              },
+            },
+          },
+        },
+        hooks: {
+          beforeInstanceInit: (serverless) => {
+            delete serverless.configurationInput.provider.runtime;
+          },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Resources.BasicLambdaFunction.Properties.DurableConfig).to.deep.equal({
+        ExecutionTimeout: 3600,
+      });
+    });
+
+    it('should accept durableConfig with the nodejs26.x runtime', async () => {
+      const { cfTemplate } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          functions: {
+            basic: {
+              runtime: 'nodejs26.x',
+              durableConfig: {
+                executionTimeout: 3600,
+              },
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Resources.BasicLambdaFunction.Properties.DurableConfig).to.deep.equal({
+        ExecutionTimeout: 3600,
+      });
+    });
+
+    it('should accept durableConfig with the python3.15 runtime', async () => {
+      const { cfTemplate } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          functions: {
+            basic: {
+              runtime: 'python3.15',
+              durableConfig: {
+                executionTimeout: 3600,
+              },
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Resources.BasicLambdaFunction.Properties.DurableConfig).to.deep.equal({
+        ExecutionTimeout: 3600,
+      });
+    });
+
     it('should accept durableConfig with the dotnet10 runtime', async () => {
       const { cfTemplate } = await runServerless({
         fixture: 'function',
@@ -1711,6 +1778,31 @@ describe('AwsCompileFunctions', () => {
           DependsOn: awsNaming.getLambdaLogicalId('basic'),
         }
       );
+    });
+
+    it('should accept durableConfig with SnapStart on the python3.15 runtime', async () => {
+      const { cfTemplate } = await runServerless({
+        fixture: 'function',
+        configExt: {
+          functions: {
+            basic: {
+              runtime: 'python3.15',
+              durableConfig: {
+                executionTimeout: 3600,
+              },
+              snapStart: true,
+            },
+          },
+        },
+        command: 'package',
+      });
+
+      expect(cfTemplate.Resources.BasicLambdaFunction.Properties.DurableConfig).to.deep.equal({
+        ExecutionTimeout: 3600,
+      });
+      expect(cfTemplate.Resources.BasicLambdaFunction.Properties.SnapStart).to.deep.equal({
+        ApplyOn: 'PublishedVersions',
+      });
     });
 
     it('should accept durableConfig with SnapStart on the dotnet10 runtime', async () => {
