@@ -81,7 +81,7 @@ Properties of functions such as `handler`, `events`, `memorySize`, `layers` or `
 
 ## The server
 
-Lambda sets the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable to the `host:port` the server has to listen on, and the server has to be listening there within 10 seconds of its start. When it listens somewhere else, for example on `localhost` or on `PORT`, or starts listening too late, requests to the endpoint fail with status 502.
+A Node.js web function starts its own HTTP server. Lambda sets the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable to the `host:port` the server has to listen on, and the server has to be listening there within 10 seconds of its start. When it listens somewhere else, for example on `localhost` or on `PORT`, or starts listening too late, requests to the endpoint fail with status 502.
 
 ```js
 // index.js
@@ -354,7 +354,7 @@ An entry file that is an ES module needs the `package.json` with `"type": "modul
 
 The package has to contain everything the server needs at runtime, including `node_modules`. osls does not bundle or compile code. Native modules have to be built for Linux on arm64. A package can be up to 512 MiB once unzipped.
 
-The package of a Python web function has to contain the dependencies of the application at its root, next to the module of `entryPoint`, built for Linux on arm64 and for Python 3.15. osls does not install them. Install them into the directory that is packaged, or into the zip that `package.artifact` names:
+The package of a Python web function has to contain the dependencies of the application at its root, next to the module of `entryPoint`, built for Linux on arm64 and for Python 3.15. osls does not install them. Install them into the directory of the service, or into the directory you build the zip of `package.artifact` from:
 
 ```bash
 pip install --target . --platform manylinux2014_aarch64 --python-version 3.15 --only-binary=:all: -r requirements.txt
@@ -567,7 +567,7 @@ The function arn:aws:lambda:us-east-2:123456789012:web-function/myService-dev-ap
 
 **The deployment fails on the revision with "does not have s3:GetObject and s3:GetObjectVersion permission".** The policy of an existing deployment bucket does not let Lambda read the code, see [Existing bucket](#existing-bucket). If this was the first deployment of the service, the stack can be left in the `ROLLBACK_COMPLETE` state: run `osls remove` before deploying again.
 
-**Every request fails with status 502 after a successful deployment.** The server did not start, or does not listen on the `host:port` of `AWS_LAMBDA_HTTP_ENDPOINT`, see [The server](#the-server). For a Python web function, Lambda could not import the application, and the responses have the header `lambda-web-error-type: Runtime.ImportCodeError`, see [Python applications](#python-applications). `osls logs` shows the error.
+**Every request fails with status 502 after a successful deployment.** The server did not start, or does not listen on the `host:port` of `AWS_LAMBDA_HTTP_ENDPOINT`, see [The server](#the-server). `osls logs` shows the error. A Python web function answers with the header `lambda-web-error-type: Runtime.ImportCodeError` when Lambda cannot import the application, see [Python applications](#python-applications).
 
 **Every request fails with status 409 and the header `lambda-web-error-type: Platform.RevisionNotActive`.** The zip of the revision is gone from the deployment bucket, see [Where the code is stored](#where-the-code-is-stored).
 
