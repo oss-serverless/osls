@@ -117,7 +117,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
                 Key: `serverless/${service.service}/dev/web-functions/basic-${basicArtifactHash}.zip`,
               },
             },
-            RuntimeConfig: { Runtime: 'nodejs24.x' },
+            RuntimeConfig: { Runtime: 'nodejs26.x' },
           },
           ServiceConfig: {
             ExecutionRoleArn: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
@@ -358,7 +358,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
     it('should not apply the function settings of the provider', () => {
       const { Properties } = cfResources[naming.getWebFunctionRevisionLogicalId('basic')];
 
-      expect(Properties.BuildConfig.RuntimeConfig.Runtime).to.equal('nodejs24.x');
+      expect(Properties.BuildConfig.RuntimeConfig.Runtime).to.equal('nodejs26.x');
       expect(Properties).to.not.have.property('KmsKeyArn');
       expect(Properties.ServiceConfig).to.not.have.property('TimeoutSeconds');
       expect(Properties.ServiceConfig).to.not.have.property('TelemetryConfig');
