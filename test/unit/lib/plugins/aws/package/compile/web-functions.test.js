@@ -51,6 +51,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
             relativeEntryPoint: { entryPoint: './src/server.js' },
             python: { runtime: 'python3.15' },
             pythonEntryPoint: { runtime: 'python3.15', entryPoint: 'asgi:src.api:application' },
+            pythonNameEndingInPy: { runtime: 'python3.15', entryPoint: 'main:holder.py' },
             emptyEndpoint: { endpoint: { type: null, regions: null } },
             roleArn: { role: roleArn },
             roleLogicalId: { role: 'WebRole' },
@@ -216,6 +217,13 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
         cfResources[naming.getWebFunctionRevisionLogicalId('pythonEntryPoint')].Properties
           .ServiceConfig.EnvironmentVariables
       ).to.deep.equal({ AWS_LAMBDA_PYTHON_ENTRYPOINT: 'asgi:src.api:application' });
+    });
+
+    it('should support a Python `webFunctions[].entryPoint` with a name that ends in `.py`', () => {
+      expect(
+        cfResources[naming.getWebFunctionRevisionLogicalId('pythonNameEndingInPy')].Properties
+          .ServiceConfig.EnvironmentVariables
+      ).to.deep.equal({ AWS_LAMBDA_PYTHON_ENTRYPOINT: 'main:holder.py' });
     });
 
     it('should support `webFunctions[].endpoint`', () => {
