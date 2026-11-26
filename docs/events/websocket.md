@@ -61,7 +61,7 @@ service: serverless-ws-test
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
   websocketsApiName: custom-websockets-api-name
   websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
   websocketsDescription: Custom Serverless Websockets
@@ -191,7 +191,7 @@ module.exports.defaultHandler = async (event) => {
 };
 ```
 
-**Note:** For `nodejs24.x`, use the modular AWS SDK v3 package `@aws-sdk/client-apigatewaymanagementapi`. Lambda includes SDK v3 in the runtime, but AWS recommends bundling your own dependency for version control and performance optimization.
+**Note:** For `nodejs26.x`, use the modular AWS SDK v3 package `@aws-sdk/client-apigatewaymanagementapi`. Lambda includes SDK v3 in the runtime, but AWS recommends bundling your own dependency for version control and performance optimization.
 
 ## Respond to a ws-client message
 
