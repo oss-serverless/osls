@@ -1472,8 +1472,8 @@ webFunctions:
     name: ${sls:stage}-webFunctionName
     # optional, Description to publish to AWS
     description: Description of what the web function does
-    # optional, the only runtime Lambda supports for web functions today (default: nodejs24.x)
-    runtime: nodejs24.x
+    # optional, nodejs24.x or nodejs26.x (default: nodejs24.x)
+    runtime: nodejs26.x
     # optional, request timeout in seconds, between 3 and 900 (default: 30, set by Lambda)
     timeout: 30
     # optional, concurrent requests per execution environment, between 1 and 128 (default: 64, set by Lambda)

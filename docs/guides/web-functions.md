@@ -43,7 +43,7 @@ webFunctions:
     entryPoint: src/server.js # optional, the file that starts the server (default: index.js)
     name: ${sls:stage}-api # optional, deployed name (default: <service>-<stage>-<key>)
     description: Storefront API # optional, up to 256 characters
-    runtime: nodejs24.x # optional (default: nodejs24.x)
+    runtime: nodejs26.x # optional, nodejs24.x or nodejs26.x (default: nodejs24.x)
     timeout: 30 # optional, in seconds, between 3 and 900 (Lambda's default: 30)
     maxConcurrencyPerEnvironment: 64 # optional, between 1 and 128 (Lambda's default: 64)
     environment: # optional, merged over provider.environment
@@ -527,6 +527,6 @@ The function arn:aws:lambda:us-east-2:123456789012:web-function/myService-dev-ap
 
 ## Limitations
 
-- Lambda offers web functions with the `nodejs24.x` runtime only, and not in every region.
+- Only the `nodejs24.x` and `nodejs26.x` runtimes are supported, and Lambda does not offer web functions in every region.
 - One endpoint per web function. Several endpoints and shifting traffic gradually between revisions are not supported.
 - No local emulation. The server is a plain Node.js HTTP server, so run it with `AWS_LAMBDA_HTTP_ENDPOINT=127.0.0.1:3000 node index.js`.

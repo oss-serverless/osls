@@ -29,7 +29,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
               entryPoint: 'src/server.js',
               name: 'configured-web-function',
               description: 'Configured web function',
-              runtime: 'nodejs24.x',
+              runtime: 'nodejs26.x',
               timeout: 120,
               maxConcurrencyPerEnvironment: 16,
               environment: { TABLE_NAME: { Ref: 'Table' } },
@@ -173,7 +173,7 @@ describe('test/unit/lib/plugins/aws/package/compile/web-functions.test.js', () =
 
       expect(Properties.Description).to.equal('Configured web function');
       expect(Properties.KmsKeyArn).to.equal(kmsKeyArn);
-      expect(Properties.BuildConfig.RuntimeConfig).to.deep.equal({ Runtime: 'nodejs24.x' });
+      expect(Properties.BuildConfig.RuntimeConfig).to.deep.equal({ Runtime: 'nodejs26.x' });
       expect(Properties.ServiceConfig).to.deep.equal({
         ExecutionRoleArn: { 'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'] },
         TimeoutSeconds: 120,
