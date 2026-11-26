@@ -87,7 +87,7 @@ export type AwsLambdaRuntimeManagement =
 export type AwsLambdaTimeout = number;
 export type AwsLambdaTracing = ('Active' | 'PassThrough') | boolean;
 export type AwsLambdaVersioning = boolean;
-export type AwsLambdaWebFunctionRuntime = 'nodejs24.x' | 'nodejs26.x';
+export type AwsLambdaWebFunctionRuntime = 'nodejs24.x' | 'nodejs26.x' | 'python3.15';
 export type AwsPruneFunctionVersions =
   | boolean
   | {

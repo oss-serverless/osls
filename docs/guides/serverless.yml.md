@@ -1466,13 +1466,14 @@ Deploy [Lambda web functions](./web-functions.md), HTTP servers with their own H
 webFunctions:
   # A Lambda web function
   api:
-    # optional, the file that starts the HTTP server (default: index.js)
+    # optional, the file that starts the HTTP server (default: index.js),
+    # or the module and name of a Python application (default: main:app)
     entryPoint: src/server.js
     # optional, Deployed Lambda web function name (default: <service>-<stage>-<key>)
     name: ${sls:stage}-webFunctionName
     # optional, Description to publish to AWS
     description: Description of what the web function does
-    # optional, nodejs24.x or nodejs26.x (default: nodejs26.x)
+    # optional, nodejs24.x, nodejs26.x or python3.15 (default: nodejs26.x)
     runtime: nodejs26.x
     # optional, request timeout in seconds, between 3 and 900 (default: 30, set by Lambda)
     timeout: 30

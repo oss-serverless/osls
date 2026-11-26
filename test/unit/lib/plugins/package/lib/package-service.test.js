@@ -402,9 +402,15 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
       ).to.deep.equal(await fsp.readFile(path.join(serviceDir, 'artifact-function.zip')));
     });
 
-    for (const [description, webFunction, entryPoint] of [
-      ['`index.js`', { package: { patterns: ['!index.js'] } }, 'index.js'],
-      ['the `entryPoint`', { entryPoint: 'dir2/server.js' }, 'dir2/server.js'],
+    for (const [description, webFunction, entryFiles] of [
+      ['`index.js`', { package: { patterns: ['!index.js'] } }, '"index.js"'],
+      ['the `entryPoint`', { entryPoint: 'dir2/server.js' }, '"dir2/server.js"'],
+      ['`main.py`', { runtime: 'python3.15' }, '"main.py" or "main/__init__.py"'],
+      [
+        'the module of the Python `entryPoint`',
+        { runtime: 'python3.15', entryPoint: 'dir2.api:application' },
+        '"dir2/api.py" or "dir2/api/__init__.py"',
+      ],
     ]) {
       it(`should reject a package without ${description}`, async () => {
         await expect(
@@ -415,7 +421,7 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
             configExt: { ...configExt, webFunctions: { web: webFunction } },
           })
         )
-          .to.eventually.be.rejectedWith(`Web function "web" has no "${entryPoint}" file`)
+          .to.eventually.be.rejectedWith(`Web function "web" has no ${entryFiles} file`)
           .and.have.property('code', 'WEB_FUNCTION_ENTRY_POINT_NOT_FOUND');
       });
     }
@@ -492,6 +498,24 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
           webFunctions: { web: { package: { artifact: 'dot-slash.zip' } } },
         },
         files: [{ to: 'dot-slash.zip', contents: await createZipBuffer(['./index.js']) }],
+      });
+
+      await runServerless({ cwd: servicePath, command: 'package', awsSdkV3StubMap });
+    });
+
+    it('should support a `webFunctions[].package.artifact` with a Python package as the module', async () => {
+      const { servicePath } = await setupProgrammaticFixture('packaging', {
+        configExt: {
+          ...configExt,
+          webFunctions: {
+            web: {
+              runtime: 'python3.15',
+              entryPoint: 'app:application',
+              package: { artifact: 'python.zip' },
+            },
+          },
+        },
+        files: [{ to: 'python.zip', contents: await createZipBuffer(['app/__init__.py']) }],
       });
 
       await runServerless({ cwd: servicePath, command: 'package', awsSdkV3StubMap });
