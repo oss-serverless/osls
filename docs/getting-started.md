@@ -34,7 +34,7 @@ service: osls-hello
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
   region: us-east-1
   stage: dev
 

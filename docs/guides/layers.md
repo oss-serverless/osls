@@ -20,7 +20,7 @@ layers:
     name: ${sls:stage}-layerName # optional, Deployed Lambda layer name
     description: Description of what the lambda layer does # optional, Description to publish to AWS
     compatibleRuntimes: # optional, a list of runtimes this layer is compatible with
-      - python3.14
+      - python3.15
     compatibleArchitectures: # optional, a list of architectures this layer is compatible with
       - x86_64
       - arm64
@@ -174,7 +174,7 @@ service: myService
 
 provider:
   name: aws
-  runtime: python3.14
+  runtime: python3.15
   layers:
     - arn:aws:lambda:us-east-1:xxxxxxxxxxxxx:layer:xxxxx:mylayer1
     - arn:aws:lambda:us-east-1:xxxxxxxxxxxxx:layer:xxxxx:mylayer2

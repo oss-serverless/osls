@@ -85,7 +85,7 @@ service: users
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
   stage: dev # Set the default stage used. Default is dev
   region: us-east-1 # Overwrite the default region used. Default is us-east-1
   profile: production # The default profile to use with this service
@@ -164,7 +164,7 @@ service: users
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
   memorySize: 512
 
 …
@@ -181,7 +181,7 @@ service: users
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs26.x
   memorySize: 512
 
 …
